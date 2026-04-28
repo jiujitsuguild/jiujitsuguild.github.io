@@ -844,8 +844,26 @@ body::before {
           <strong>日曜</strong> 14:30〜17:00
         </div>
         <div class="class-price">
-          <span class="class-price-num">2,000</span>
-          <span class="class-price-unit">円 / 回（税込）</span>
+          <span class="class-price-num" style="font-size:16px;">会員無料 ／ 外部2,000円</span>
+        </div>
+      </div>
+
+      <!-- 無料体験会（7月末まで） -->
+      <div class="class-card fade-in" style="border-color:rgba(255,200,0,0.3); position:relative;">
+        <div style="position:absolute; top:12px; right:12px; background:#C41E1E; color:white; font-size:10px; letter-spacing:2px; padding:3px 8px; border-radius:2px; font-family:var(--font-en);">〜7月末限定</div>
+        <span class="class-tag" style="background:rgba(255,200,0,0.15); color:#e8cc40; border:1px solid rgba(255,200,0,0.4);">Free Trial</span>
+        <div class="class-name">初心者無料体験会</div>
+        <div class="class-age">未経験・初心者歓迎 ／ 道着不要</div>
+        <div class="class-desc">
+          グラップリング（道着を着ずに行う柔術）を気軽に体験できる無料クラスです。<br>
+          動きやすい服装でOK。殴る・蹴るは一切なし。まずは雰囲気を感じてみてください。
+        </div>
+        <div class="class-schedule">
+          <strong>毎週土曜</strong> 18:30〜19:30<br>
+          <span style="font-size:11px; color:var(--muted);">※7月末まで開催</span>
+        </div>
+        <div class="class-price">
+          <span class="class-price-num" style="color:#50c878;">無料</span>
         </div>
       </div>
 
@@ -880,11 +898,12 @@ body::before {
           <tr><td>月〜金</td><td>20:30〜22:00</td><td><span class="sched-tag st-adult">Adult</span></td><td>16歳以上</td></tr>
           <tr><td>月・水・金</td><td>19:00〜20:00</td><td><span class="sched-tag st-kids-b">Kids B</span></td><td>13〜15歳</td></tr>
           <tr><td>火・木</td><td>19:00〜20:00</td><td><span class="sched-tag st-kids-a">Kids A</span></td><td>9〜12歳</td></tr>
+          <tr><td>土曜</td><td>18:30〜19:30</td><td><span class="sched-tag" style="background:rgba(80,200,120,0.15);color:#50c878;border:1px solid rgba(80,200,120,0.3);">無料体験</span></td><td>初心者・未経験（〜7月末）</td></tr>
+          <tr><td>土曜</td><td>10:00〜19:00</td><td><span class="sched-tag st-private">Private</span></td><td>完全予約制</td></tr>
           <tr><td>日曜</td><td>10:30〜11:30</td><td><span class="sched-tag st-kids-a">Kids A</span></td><td>9〜12歳</td></tr>
           <tr><td>日曜</td><td>13:00〜14:00</td><td><span class="sched-tag st-kids-c">Kids C</span></td><td>6〜8歳（都度）</td></tr>
           <tr><td>日曜</td><td>14:30〜17:00</td><td><span class="sched-tag st-open">Open Mat</span></td><td>全員・所属不問</td></tr>
           <tr><td>日曜</td><td>18:00〜20:00</td><td><span class="sched-tag st-adult">Adult</span></td><td>16歳以上</td></tr>
-          <tr><td>土曜</td><td>10:00〜19:00</td><td><span class="sched-tag st-private">Private</span></td><td>完全予約制</td></tr>
         </tbody>
       </table>
     </div>
@@ -962,6 +981,37 @@ body::before {
           <div class="price-feature">入会金不要</div>
           <div class="price-feature">道着不要</div>
           <div class="price-feature">都度参加OK</div>
+        </div>
+      </div>
+
+      <div class="price-card fade-in">
+        <span class="price-card-tag">ビジター</span>
+        <div class="price-card-name">Visitor</div>
+        <div class="price-card-age">一般クラスへの参加</div>
+        <div class="price-card-amount">
+          <span class="price-main" style="font-size:24px;">1,000〜2,000</span>
+          <span class="price-unit">円 / 回（税込）</span>
+        </div>
+        <div class="price-divider"></div>
+        <div class="price-features">
+          <div class="price-feature">15歳以下：1,000円 / 回</div>
+          <div class="price-feature">16歳以上：2,000円 / 回</div>
+          <div class="price-feature">出稽古・体験参加歓迎</div>
+        </div>
+      </div>
+
+      <div class="price-card fade-in" style="border-color:rgba(80,200,120,0.4); background:linear-gradient(135deg,rgba(80,200,120,0.06),var(--gray));">
+        <span class="price-card-tag" style="color:#50c878;">〜7月末限定</span>
+        <div class="price-card-name" style="color:#50c878;">無料体験会</div>
+        <div class="price-card-age">初心者・未経験者歓迎</div>
+        <div class="price-card-amount">
+          <span class="price-main" style="color:#50c878;">無料</span>
+        </div>
+        <div class="price-divider"></div>
+        <div class="price-features">
+          <div class="price-feature">毎週土曜 18:30〜19:30</div>
+          <div class="price-feature">道着不要・動きやすい服装でOK</div>
+          <div class="price-feature">グラップリング（道着なし柔術）体験</div>
         </div>
       </div>
     </div>
@@ -1091,6 +1141,7 @@ body::before {
             <div class="access-value">
               平日（月〜金） 18:30〜22:30<br>
               日曜 10:00〜20:30<br>
+              土曜 18:30〜19:30 無料体験会（〜7月末）<br>
               土曜 プライベートクラスのみ（予約制）
             </div>
           </div>
