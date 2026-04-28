@@ -883,30 +883,115 @@ body::before {
     </div>
 
     <!-- スケジュール表 -->
-    <h3 class="fade-in" style="font-family:var(--font-en); font-size:24px; letter-spacing:2px; margin-top:64px; margin-bottom:0;">Weekly Schedule</h3>
-    <div style="overflow-x:auto;">
-      <table class="schedule-table">
-        <thead>
-          <tr>
-            <th>曜日</th>
-            <th>時間</th>
-            <th>クラス</th>
-            <th>対象</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>月〜金</td><td>20:30〜22:00</td><td><span class="sched-tag st-adult">Adult</span></td><td>16歳以上</td></tr>
-          <tr><td>月・水・金</td><td>19:00〜20:00</td><td><span class="sched-tag st-kids-b">Kids B</span></td><td>13〜15歳</td></tr>
-          <tr><td>火・木</td><td>19:00〜20:00</td><td><span class="sched-tag st-kids-a">Kids A</span></td><td>9〜12歳</td></tr>
-          <tr><td>土曜</td><td>18:30〜19:30</td><td><span class="sched-tag" style="background:rgba(80,200,120,0.15);color:#50c878;border:1px solid rgba(80,200,120,0.3);">無料体験</span></td><td>初心者・未経験（〜7月末）</td></tr>
-          <tr><td>土曜</td><td>10:00〜19:00</td><td><span class="sched-tag st-private">Private</span></td><td>完全予約制</td></tr>
-          <tr><td>日曜</td><td>10:30〜11:30</td><td><span class="sched-tag st-kids-a">Kids A</span></td><td>9〜12歳</td></tr>
-          <tr><td>日曜</td><td>13:00〜14:00</td><td><span class="sched-tag st-kids-c">Kids C</span></td><td>6〜8歳（都度）</td></tr>
-          <tr><td>日曜</td><td>14:30〜17:00</td><td><span class="sched-tag st-open">Open Mat</span></td><td>全員・所属不問</td></tr>
-          <tr><td>日曜</td><td>18:00〜20:00</td><td><span class="sched-tag st-adult">Adult</span></td><td>16歳以上</td></tr>
-        </tbody>
-      </table>
+    <h3 class="fade-in" style="font-family:var(--font-en); font-size:24px; letter-spacing:2px; margin-top:64px; margin-bottom:24px;">Weekly Schedule</h3>
+
+    <!-- タブ -->
+    <div class="fade-in" style="display:flex; gap:0; border-bottom:2px solid var(--border); margin-bottom:24px; flex-wrap:wrap;">
+      <button onclick="switchSchedTab('adult')" id="stab-adult"
+        style="padding:12px 24px; background:var(--red); color:white; border:none; cursor:pointer; font-family:var(--font-en); font-size:12px; letter-spacing:3px; text-transform:uppercase; border-radius:4px 4px 0 0; margin-right:4px; transition:all 0.2s;">
+        Adult
+      </button>
+      <button onclick="switchSchedTab('kids')" id="stab-kids"
+        style="padding:12px 24px; background:var(--gray-2,#1a1a1a); color:var(--muted); border:none; cursor:pointer; font-family:var(--font-en); font-size:12px; letter-spacing:3px; text-transform:uppercase; border-radius:4px 4px 0 0; margin-right:4px; transition:all 0.2s;">
+        Kids
+      </button>
+      <button onclick="switchSchedTab('other')" id="stab-other"
+        style="padding:12px 24px; background:var(--gray-2,#1a1a1a); color:var(--muted); border:none; cursor:pointer; font-family:var(--font-en); font-size:12px; letter-spacing:3px; text-transform:uppercase; border-radius:4px 4px 0 0; transition:all 0.2s;">
+        Open / Other
+      </button>
     </div>
+
+    <!-- アダルト -->
+    <div id="sched-adult" class="fade-in">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
+        <div style="background:var(--gray); border:1px solid var(--border); border-left:4px solid var(--red); border-radius:4px; padding:16px 18px;">
+          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:var(--red); margin-bottom:8px;">月曜日〜金曜日</div>
+          <div style="font-size:15px; font-weight:700; color:var(--white); margin-bottom:4px;">アダルトクラス</div>
+          <div style="font-size:13px; color:var(--muted);">20:30〜22:00</div>
+          <div style="margin-top:8px;"><span class="sched-tag st-adult">Adult</span></div>
+        </div>
+        <div style="background:var(--gray); border:1px solid var(--border); border-left:4px solid var(--red); border-radius:4px; padding:16px 18px;">
+          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:var(--red); margin-bottom:8px;">日曜日</div>
+          <div style="font-size:15px; font-weight:700; color:var(--white); margin-bottom:4px;">アダルトクラス</div>
+          <div style="font-size:13px; color:var(--muted);">18:00〜20:00</div>
+          <div style="margin-top:8px;"><span class="sched-tag st-adult">Adult</span></div>
+        </div>
+      </div>
+      <p style="font-size:12px; color:var(--muted); margin-top:12px;">週5日（月〜金）＋日曜開催。平日は20:30スタート。</p>
+    </div>
+
+    <!-- キッズ -->
+    <div id="sched-kids" style="display:none;">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
+        <div style="background:var(--gray); border:1px solid var(--border); border-left:4px solid #1e6fc4; border-radius:4px; padding:16px 18px;">
+          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:#5599e0; margin-bottom:8px;">火曜日・木曜日・日曜日</div>
+          <div style="font-size:15px; font-weight:700; color:var(--white); margin-bottom:4px;">キッズAクラス</div>
+          <div style="font-size:13px; color:var(--muted);">火・木 19:00〜20:00</div>
+          <div style="font-size:13px; color:var(--muted);">日曜 10:30〜11:30</div>
+          <div style="font-size:12px; color:var(--muted); margin-top:4px;">9〜12歳</div>
+          <div style="margin-top:8px;"><span class="sched-tag st-kids-a">Kids A</span></div>
+        </div>
+        <div style="background:var(--gray); border:1px solid var(--border); border-left:4px solid #1ea874; border-radius:4px; padding:16px 18px;">
+          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:#40c890; margin-bottom:8px;">月曜日・水曜日・金曜日</div>
+          <div style="font-size:15px; font-weight:700; color:var(--white); margin-bottom:4px;">キッズBクラス</div>
+          <div style="font-size:13px; color:var(--muted);">19:00〜20:00</div>
+          <div style="font-size:12px; color:var(--muted); margin-top:4px;">13〜15歳</div>
+          <div style="margin-top:8px;"><span class="sched-tag st-kids-b">Kids B</span></div>
+        </div>
+        <div style="background:var(--gray); border:1px solid var(--border); border-left:4px solid #c48a1e; border-radius:4px; padding:16px 18px;">
+          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:#e0b040; margin-bottom:8px;">日曜日</div>
+          <div style="font-size:15px; font-weight:700; color:var(--white); margin-bottom:4px;">キッズCクラス</div>
+          <div style="font-size:13px; color:var(--muted);">13:00〜14:00</div>
+          <div style="font-size:12px; color:var(--muted); margin-top:4px;">6〜8歳・都度参加</div>
+          <div style="margin-top:8px;"><span class="sched-tag st-kids-c">Kids C</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- オープン・その他 -->
+    <div id="sched-other" style="display:none;">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
+        <div style="background:var(--gray); border:1px solid var(--border); border-left:4px solid #8b1ec4; border-radius:4px; padding:16px 18px;">
+          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:#b060e0; margin-bottom:8px;">日曜日</div>
+          <div style="font-size:15px; font-weight:700; color:var(--white); margin-bottom:4px;">ギルドオープンマット</div>
+          <div style="font-size:13px; color:var(--muted);">14:30〜17:00</div>
+          <div style="font-size:12px; color:var(--muted); margin-top:4px;">所属不問・会員無料 / 外部2,000円</div>
+          <div style="margin-top:8px;"><span class="sched-tag st-open">Open Mat</span></div>
+        </div>
+        <div style="background:var(--gray); border:1px solid var(--border); border-left:4px solid #666; border-radius:4px; padding:16px 18px;">
+          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:#aaa; margin-bottom:8px;">土曜日</div>
+          <div style="font-size:15px; font-weight:700; color:var(--white); margin-bottom:4px;">プライベートクラス</div>
+          <div style="font-size:13px; color:var(--muted);">10:00〜19:00</div>
+          <div style="font-size:12px; color:var(--muted); margin-top:4px;">完全予約制・所属不問</div>
+          <div style="margin-top:8px;"><span class="sched-tag st-private">Private</span></div>
+        </div>
+        <div style="background:var(--gray); border:1px solid rgba(80,200,120,0.4); border-left:4px solid #50c878; border-radius:4px; padding:16px 18px; position:relative;">
+          <div style="position:absolute; top:10px; right:10px; background:var(--red); color:white; font-size:9px; letter-spacing:1px; padding:2px 6px; border-radius:2px; font-family:var(--font-en);">〜7月末</div>
+          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:#50c878; margin-bottom:8px;">土曜日</div>
+          <div style="font-size:15px; font-weight:700; color:var(--white); margin-bottom:4px;">初心者無料体験会</div>
+          <div style="font-size:13px; color:var(--muted);">18:30〜19:30</div>
+          <div style="font-size:12px; color:var(--muted); margin-top:4px;">道着不要・グラップリング体験</div>
+          <div style="margin-top:8px;"><span class="sched-tag" style="background:rgba(80,200,120,0.15);color:#50c878;border:1px solid rgba(80,200,120,0.3);">無料体験</span></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+    function switchSchedTab(tab) {
+      ['adult','kids','other'].forEach(t => {
+        document.getElementById('sched-' + t).style.display = t === tab ? 'block' : 'none';
+        const btn = document.getElementById('stab-' + t);
+        if (t === tab) {
+          btn.style.background = 'var(--red)';
+          btn.style.color = 'white';
+        } else {
+          btn.style.background = '#1a1a1a';
+          btn.style.color = '#6a7490';
+        }
+      });
+    }
+    </script>
+
   </div>
 </section>
 
