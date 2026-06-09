@@ -632,6 +632,19 @@ body::before {
 }
 @media (max-width: 768px) { .floating-cta { display: block; } }
 
+.lang-switch {
+  font-size: 22px; line-height: 1;
+  text-decoration: none;
+  transition: transform 0.2s, opacity 0.2s;
+  opacity: 0.85;
+  display: inline-flex; align-items: center;
+}
+.lang-switch:hover { transform: scale(1.15); opacity: 1; }
+.lang-switch-mobile { display: none; font-size: 22px; line-height: 1; text-decoration: none; opacity: 0.85; }
+@media (max-width: 768px) {
+  .lang-switch-mobile { display: inline-flex; align-items: center; }
+}
+
 /* =====================================================================
    Animations
    ===================================================================== */
@@ -667,9 +680,13 @@ body::before {
     <a href="#qa">Q&A</a>
     <a href="#access">アクセス</a>
     <a href="#contact" class="nav-cta">体験を予約</a>
+    <a href="index-pt.html" class="lang-switch" title="Versão em Português">🇧🇷</a>
   </div>
-  <div class="nav-hamburger" onclick="toggleMenu()" id="hamburger">
-    <span></span><span></span><span></span>
+  <div style="display:flex; align-items:center; gap:12px;">
+    <a href="index-pt.html" class="lang-switch-mobile" title="Versão em Português">🇧🇷</a>
+    <div class="nav-hamburger" onclick="toggleMenu()" id="hamburger">
+      <span></span><span></span><span></span>
+    </div>
   </div>
 </nav>
 
