@@ -1,1 +1,557 @@
-google-site-verification: google1826818c73d6d891.html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>インストラクター紹介｜柔術ギルド｜愛知県豊橋市のブラジリアン柔術専門道場</title>
+<meta name="description" content="柔術ギルドのインストラクター紹介。代表・コーチの経歴と指導方針をご紹介します。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+<style>
+/* =====================================================================
+   Design Tokens（index.htmlと共通）
+   ===================================================================== */
+:root {
+  --black:   #0A0A0A;
+  --white:   #FFFFFF;
+  --red:     #C41E1E;
+  --red-dim: #8B1515;
+  --red-glow:rgba(196,30,30,0.3);
+  --gray:    #1a1a1a;
+  --gray-2:  #242424;
+  --gray-3:  #333333;
+  --muted:   #888888;
+  --border:  #2a2a2a;
+
+  --font-en: 'Bebas Neue', sans-serif;
+  --font-jp: 'Noto Sans JP', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--font-jp);
+  overflow-x: hidden;
+  line-height: 1.7;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.012) 2px, rgba(255,255,255,0.012) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255,255,255,0.008) 2px, rgba(255,255,255,0.008) 4px);
+  pointer-events: none; z-index: 0;
+}
+
+.en { font-family: var(--font-en); letter-spacing: 2px; }
+
+.container { max-width: 1100px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+.section { padding: 96px 0; position: relative; }
+.section-label {
+  font-family: var(--font-en);
+  font-size: 11px; letter-spacing: 6px; color: var(--red);
+  text-transform: uppercase; margin-bottom: 16px; display: block;
+}
+.section-title {
+  font-family: var(--font-en);
+  font-size: clamp(36px, 6vw, 64px);
+  line-height: 1; letter-spacing: 2px;
+  color: var(--white); margin-bottom: 24px;
+}
+.section-sub {
+  font-size: 15px; color: var(--muted); line-height: 1.8;
+  max-width: 600px;
+}
+
+.divider {
+  display: flex; align-items: center; gap: 16px;
+  margin: 24px 0;
+}
+.divider-line { flex: 1; height: 1px; background: var(--border); }
+.divider-dot  { width: 5px; height: 5px; background: var(--red); transform: rotate(45deg); flex-shrink: 0; }
+
+/* =====================================================================
+   Navigation
+   ===================================================================== */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 0 40px;
+  height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(10,10,10,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+.nav-logo {
+  font-family: var(--font-en);
+  font-size: 20px; letter-spacing: 3px; color: var(--white);
+  text-decoration: none;
+}
+.nav-logo span { color: var(--red); }
+.nav-links { display: flex; align-items: center; gap: 32px; }
+.nav-links a {
+  font-size: 13px; letter-spacing: 2px; color: var(--muted);
+  text-decoration: none; text-transform: uppercase;
+  transition: color 0.2s; font-family: var(--font-en);
+}
+.nav-links a:hover { color: var(--white); }
+.nav-links a.active { color: var(--red); }
+.nav-cta {
+  background: var(--red); color: var(--white);
+  padding: 8px 20px; border-radius: 2px;
+  font-size: 12px; letter-spacing: 2px;
+  text-decoration: none; font-family: var(--font-en);
+  transition: all 0.2s; border: 1px solid var(--red);
+}
+.nav-cta:hover { background: transparent; color: var(--red); }
+
+.nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+.nav-hamburger span { display: block; width: 24px; height: 2px; background: var(--white); transition: all 0.3s; }
+
+.nav-mobile {
+  display: none;
+  position: fixed; top: 64px; left: 0; right: 0; z-index: 99;
+  background: rgba(10,10,10,0.98);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  flex-direction: column;
+  padding: 16px 24px 24px;
+}
+.nav-mobile.open { display: flex; }
+.nav-mobile a {
+  padding: 14px 0; font-size: 14px; letter-spacing: 1px;
+  color: var(--muted); text-decoration: none;
+  border-bottom: 1px solid var(--border);
+}
+.nav-mobile a:last-child { border-bottom: none; }
+
+@media (max-width: 880px) {
+  .nav-links { display: none; }
+  .nav-hamburger { display: flex; }
+}
+
+/* =====================================================================
+   Page Hero
+   ===================================================================== */
+.page-hero {
+  padding: 160px 0 60px;
+  position: relative;
+  z-index: 1;
+}
+.breadcrumb {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--muted); margin-bottom: 28px;
+  font-family: var(--font-en); letter-spacing: 1px;
+}
+.breadcrumb a { color: var(--muted); text-decoration: none; }
+.breadcrumb a:hover { color: var(--red); }
+.breadcrumb span { color: var(--border); }
+
+/* =====================================================================
+   Instructor Cards（PC: Netflix風カードグリッド）
+   ===================================================================== */
+.instructors-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 28px;
+  padding: 20px 0 80px;
+}
+
+.instructor-card {
+  position: relative;
+  background: var(--gray);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+}
+.instructor-card:hover {
+  transform: scale(1.035);
+  border-color: var(--red);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.55), 0 0 0 1px var(--red-glow);
+  z-index: 5;
+}
+
+.card-photo {
+  width: 100%;
+  aspect-ratio: 3/4;
+  overflow: hidden;
+  position: relative;
+  background: #111;
+}
+.card-photo img {
+  width: 100%; height: 100%; object-fit: cover; object-position: top center;
+  display: block;
+  transition: transform 0.6s ease;
+}
+.instructor-card:hover .card-photo img { transform: scale(1.06); }
+
+.card-photo::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 35%, rgba(10,10,10,0.92) 100%);
+  pointer-events: none;
+}
+
+.card-belt-tag {
+  position: absolute; top: 16px; left: 16px; z-index: 2;
+  background: rgba(10,10,10,0.85);
+  border: 1px solid var(--red);
+  color: var(--red);
+  font-family: var(--font-en);
+  font-size: 10px; letter-spacing: 2.5px;
+  padding: 5px 12px;
+}
+
+.card-private-tag {
+  position: absolute; top: 16px; right: 16px; z-index: 2;
+  background: var(--red);
+  color: var(--white);
+  font-size: 10px; letter-spacing: 1px;
+  padding: 5px 12px;
+  font-weight: 700;
+}
+
+.card-overlay {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
+  padding: 24px 24px 22px;
+}
+.card-role {
+  font-family: var(--font-en);
+  font-size: 11px; letter-spacing: 3px; color: var(--red);
+  display: block; margin-bottom: 6px;
+}
+.card-name {
+  font-size: 24px; font-weight: 900; color: var(--white);
+  margin-bottom: 2px; line-height: 1.3;
+}
+.card-name-en {
+  font-family: var(--font-en);
+  font-size: 12px; letter-spacing: 1.5px; color: var(--muted);
+  margin-bottom: 12px;
+}
+.card-stats {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin-bottom: 14px;
+}
+.card-stat {
+  font-size: 11px; color: #ccc;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 4px 10px;
+}
+.card-stat strong { color: var(--red); font-weight: 700; margin-right: 4px; }
+
+.card-quote {
+  font-size: 13px; color: #ddd; line-height: 1.8;
+  border-left: 2px solid var(--red);
+  padding-left: 12px;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, opacity 0.4s ease, margin 0.4s ease;
+}
+.instructor-card:hover .card-quote {
+  max-height: 140px;
+  opacity: 1;
+  margin-top: 4px;
+}
+
+@media (max-width: 820px) {
+  .instructors-grid { display: none; }
+}
+
+/* =====================================================================
+   Instructor Block（スマホ: 縦積みカード）
+   ===================================================================== */
+.instructor-block-mobile { display: none; }
+@media (max-width: 820px) {
+  .instructor-block-mobile { display: block; }
+}
+
+.instructor-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 56px;
+  align-items: start;
+}
+@media (max-width: 820px) {
+  .instructor-grid { grid-template-columns: 1fr; gap: 32px; }
+}
+
+.instructor-photo {
+  width: 100%;
+  aspect-ratio: 4/5;
+  background: var(--gray);
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.instructor-photo img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.photo-placeholder {
+  text-align: center;
+  color: var(--gray-3);
+  padding: 24px;
+}
+.photo-placeholder .icon { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
+.photo-placeholder p { font-size: 12px; letter-spacing: 1px; line-height: 1.8; }
+
+.belt-tag {
+  position: absolute; top: 16px; left: 16px;
+  background: var(--black);
+  border: 1px solid var(--red);
+  color: var(--red);
+  font-family: var(--font-en);
+  font-size: 11px; letter-spacing: 3px;
+  padding: 6px 14px;
+}
+
+.instructor-info { padding-top: 4px; }
+.instructor-role {
+  font-family: var(--font-en);
+  font-size: 12px; letter-spacing: 4px; color: var(--red);
+  margin-bottom: 12px; display: block;
+}
+.instructor-name {
+  font-size: 32px; font-weight: 900; color: var(--white);
+  margin-bottom: 4px; line-height: 1.3;
+}
+.instructor-name-en {
+  font-family: var(--font-en);
+  font-size: 16px; letter-spacing: 2px; color: var(--muted);
+  margin-bottom: 24px;
+}
+
+.stat-row {
+  display: flex; flex-wrap: wrap; gap: 12px;
+  margin-bottom: 28px;
+}
+.stat-chip {
+  background: var(--gray);
+  border: 1px solid var(--border);
+  padding: 10px 18px;
+  font-size: 13px; color: var(--white);
+}
+.stat-chip strong { color: var(--red); font-weight: 700; margin-right: 6px; }
+
+.instructor-quote {
+  border-left: 2px solid var(--red);
+  padding: 4px 0 4px 20px;
+  margin-bottom: 24px;
+  font-size: 16px; color: var(--white);
+  line-height: 1.9; font-weight: 500;
+}
+
+.instructor-desc {
+  font-size: 14px; color: var(--muted); line-height: 1.9;
+  max-width: 540px;
+}
+
+/* =====================================================================
+   Footer
+   ===================================================================== */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 48px 0 32px;
+  text-align: center;
+}
+.footer-logo {
+  font-family: var(--font-en);
+  font-size: 18px; letter-spacing: 3px; color: var(--white);
+  margin-bottom: 8px;
+}
+.footer-logo span { color: var(--red); }
+.footer-meta {
+  font-size: 12px; color: var(--gray-3); letter-spacing: 1px;
+}
+.back-link {
+  display: inline-block; margin-top: 24px;
+  font-size: 13px; color: var(--muted); text-decoration: none;
+  letter-spacing: 1px; border-bottom: 1px solid var(--border);
+  padding-bottom: 2px; transition: color 0.2s;
+}
+.back-link:hover { color: var(--red); border-color: var(--red); }
+</style>
+</head>
+<body>
+
+<!-- ナビゲーション -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">JIUJITSU <span>GUILD</span></a>
+  <div class="nav-links">
+    <a href="index.html#about">ジムについて</a>
+    <a href="index.html#classes">クラス</a>
+    <a href="index.html#pricing">料金</a>
+    <a href="instructors.html" class="active">インストラクター</a>
+    <a href="index.html#qa">Q&A</a>
+    <a href="index.html#access">アクセス</a>
+    <a href="index.html#contact" class="nav-cta">体験を予約</a>
+  </div>
+  <div class="nav-hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+<div class="nav-mobile" id="navMobile">
+  <a href="index.html#about"   onclick="toggleMenu()">ジムについて</a>
+  <a href="index.html#classes" onclick="toggleMenu()">クラス</a>
+  <a href="index.html#pricing" onclick="toggleMenu()">料金</a>
+  <a href="instructors.html"   onclick="toggleMenu()" style="color:var(--red);">インストラクター</a>
+  <a href="index.html#qa"      onclick="toggleMenu()">Q&A</a>
+  <a href="index.html#access"  onclick="toggleMenu()">アクセス</a>
+  <a href="index.html#contact" onclick="toggleMenu()" style="color:var(--red);">体験を予約 →</a>
+</div>
+
+<!-- ページヘッダー -->
+<div class="container page-hero">
+  <div class="breadcrumb">
+    <a href="index.html">HOME</a> <span>/</span> <span style="color:var(--white);">INSTRUCTORS</span>
+  </div>
+  <span class="section-label">Instructors</span>
+  <h1 class="section-title">インストラクター紹介</h1>
+  <p class="section-sub">
+    柔術ギルドを支える黒帯インストラクター。それぞれの経験と想いを込めて、日々の指導にあたっています。
+  </p>
+</div>
+
+<!-- インストラクター一覧 -->
+<div class="container">
+
+  <!-- 01: ルーカス・タヒラ（モバイル用） -->
+  <div class="instructor-block instructor-block-mobile">
+    <div class="instructor-grid">
+      <div class="instructor-photo">
+        <div class="belt-tag">BLACK BELT</div>
+        <img src="images/lucas.jpg" alt="ルーカス・タヒラ">
+      </div>
+      <div class="instructor-info">
+        <span class="instructor-role">代表 / インストラクター ・ REPRESENTATIVE & INSTRUCTOR</span>
+        <h2 class="instructor-name">ルーカス・タヒラ</h2>
+        <div class="instructor-name-en">CINTRA LUCAS TAHIRA</div>
+
+        <div class="stat-row">
+          <div class="stat-chip"><strong>柔術歴</strong>14年</div>
+          <div class="stat-chip"><strong>指導歴</strong>7年</div>
+          <div class="stat-chip"><strong>帯</strong>黒帯</div>
+          <div class="stat-chip"><strong>担当</strong>プライベートクラス可</div>
+        </div>
+
+        <p class="instructor-quote">
+          「柔術が楽しい！ここでやってて良かったと思ってくれるような環境作りと指導をしていきたいと思います！」
+        </p>
+
+        <p class="instructor-desc">
+          柔術ギルド代表。14年間の柔術経験と7年間の指導経験を持つ黒帯インストラクター。技術指導はもちろん、初心者が安心して通い続けられる環境づくりを大切にしている。プライベートクラスも担当。
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 02: 黒谷 善行（モバイル用） -->
+  <div class="instructor-block instructor-block-mobile">
+    <div class="instructor-grid">
+      <div class="instructor-photo">
+        <div class="belt-tag">BLACK BELT</div>
+        <img src="images/kuroya.jpg" alt="黒谷 善行">
+      </div>
+      <div class="instructor-info">
+        <span class="instructor-role">コーチ ・ COACH</span>
+        <h2 class="instructor-name">黒谷　善行</h2>
+        <div class="instructor-name-en">KUROYA YOSHIYUKI</div>
+
+        <div class="stat-row">
+          <div class="stat-chip"><strong>柔術歴</strong>9年</div>
+          <div class="stat-chip"><strong>帯</strong>黒帯</div>
+          <div class="stat-chip"><strong>担当</strong>プライベートクラス可</div>
+          <div class="stat-chip"><strong>得意技</strong>パスガード</div>
+          <div class="stat-chip"><strong>得意技</strong>腕十字</div>
+          <div class="stat-chip"><strong>得意技</strong>ペーパーカッターチョーク</div>
+        </div>
+
+        <p class="instructor-quote">
+          「楽しみながらも基本を大切に、一歩ずつ強くなれるよう頑張っています。」
+        </p>
+
+        <p class="instructor-desc">
+          柔術歴9年の黒帯コーチ。パスガード・腕十字・ペーパーカッターチョークを得意とする。基礎を丁寧に積み重ねる指導スタイルで、会員一人ひとりの成長をサポートする。プライベートクラスも担当。
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PC用: Netflix風カードグリッド ===== -->
+  <div class="instructors-grid">
+
+    <!-- Card 1: ルーカス・タヒラ -->
+    <div class="instructor-card">
+      <div class="card-photo">
+        <img src="images/lucas.jpg" alt="ルーカス・タヒラ">
+      </div>
+      <div class="card-belt-tag">BLACK BELT</div>
+      <div class="card-private-tag">プライベートクラス可</div>
+      <div class="card-overlay">
+        <span class="card-role">代表 / インストラクター</span>
+        <div class="card-name">ルーカス・タヒラ</div>
+        <div class="card-name-en">CINTRA LUCAS TAHIRA</div>
+        <div class="card-stats">
+          <span class="card-stat"><strong>柔術歴</strong>14年</span>
+          <span class="card-stat"><strong>指導歴</strong>7年</span>
+          <span class="card-stat"><strong>帯</strong>黒帯</span>
+        </div>
+        <div class="card-quote">
+          「柔術が楽しい！ここでやってて良かったと思ってくれるような環境作りと指導をしていきたいと思います！」
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: 黒谷 善行 -->
+    <div class="instructor-card">
+      <div class="card-photo">
+        <img src="images/kuroya.jpg" alt="黒谷 善行">
+      </div>
+      <div class="card-belt-tag">BLACK BELT</div>
+      <div class="card-private-tag">プライベートクラス可</div>
+      <div class="card-overlay">
+        <span class="card-role">コーチ</span>
+        <div class="card-name">黒谷　善行</div>
+        <div class="card-name-en">KUROYA YOSHIYUKI</div>
+        <div class="card-stats">
+          <span class="card-stat"><strong>柔術歴</strong>9年</span>
+          <span class="card-stat"><strong>帯</strong>黒帯</span>
+          <span class="card-stat"><strong>得意技</strong>パスガード</span>
+          <span class="card-stat"><strong>得意技</strong>腕十字</span>
+        </div>
+        <div class="card-quote">
+          「楽しみながらも基本を大切に、一歩ずつ強くなれるよう頑張っています。」
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- フッター -->
+<div class="footer">
+  <div class="footer-logo">JIUJITSU <span>GUILD</span></div>
+  <div class="footer-meta">JIUJITSU GUILD ／ 愛知県豊橋市吉川町13番2</div>
+  <a href="index.html" class="back-link">← ホームに戻る</a>
+</div>
+
+<script>
+function toggleMenu() {
+  document.getElementById('navMobile').classList.toggle('open');
+}
+</script>
+
+</body>
+</html>
