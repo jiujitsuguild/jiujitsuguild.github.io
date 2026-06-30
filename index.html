@@ -4,28 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>柔術ギルド｜愛知県豊橋市のブラジリアン柔術専門道場</title>
-<meta name="google-site-verification" content="XlxOFbi5FjBlIOyHtYUDiVOSQD_9VlHuNW_NzPYfy28" />
-
-<!-- SEO -->
-<meta name="description" content="愛知県豊橋市のブラジリアン柔術専門道場「柔術ギルド（JIUJITSU GUILD）」。初心者から競技者まで、6歳〜大人まで対応。無料体験あり。月会費9,900円〜。2026年7月オープン。" />
-<meta name="keywords" content="柔術,ブラジリアン柔術,BJJ,豊橋,愛知,道場,ジム,柔術ギルド,JIUJITSU GUILD,初心者,子ども,キッズ,格闘技,スポーツ,豊橋市,吉川町" />
-<meta name="author" content="柔術ギルド / JIUJITSU GUILD" />
-<meta name="robots" content="index, follow" />
-<link rel="canonical" href="https://jiujitsuguild.github.io/" />
-
-<!-- OGP（SNSシェア用） -->
-<meta property="og:title" content="柔術ギルド（JIUJITSU GUILD）｜豊橋市のブラジリアン柔術道場" />
-<meta property="og:description" content="愛知県豊橋市のBJJ専門道場。初心者から競技者まで、6歳〜大人まで。無料体験受付中。2026年7月オープン。" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://jiujitsuguild.github.io/" />
-<meta property="og:locale" content="ja_JP" />
-<meta property="og:site_name" content="柔術ギルド / JIUJITSU GUILD" />
-
-<!-- Twitter Card -->
-<meta name="twitter:card" content="summary" />
-<meta name="twitter:title" content="柔術ギルド（JIUJITSU GUILD）｜豊橋市のブラジリアン柔術道場" />
-<meta name="twitter:description" content="愛知県豊橋市のBJJ専門道場。初心者から競技者まで、6歳〜大人まで。無料体験受付中。" />
-
 <meta name="description" content="愛知県豊橋市のブラジリアン柔術専門道場「柔術ギルド」。初心者・未経験者歓迎。6歳から大人まで、年齢別クラスで安心して始められます。無料体験受付中。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -632,19 +610,6 @@ body::before {
 }
 @media (max-width: 768px) { .floating-cta { display: block; } }
 
-.lang-switch {
-  font-size: 22px; line-height: 1;
-  text-decoration: none;
-  transition: transform 0.2s, opacity 0.2s;
-  opacity: 0.85;
-  display: inline-flex; align-items: center;
-}
-.lang-switch:hover { transform: scale(1.15); opacity: 1; }
-.lang-switch-mobile { display: none; font-size: 22px; line-height: 1; text-decoration: none; opacity: 0.85; }
-@media (max-width: 768px) {
-  .lang-switch-mobile { display: inline-flex; align-items: center; }
-}
-
 /* =====================================================================
    Animations
    ===================================================================== */
@@ -677,16 +642,13 @@ body::before {
     <a href="#about">ジムについて</a>
     <a href="#classes">クラス</a>
     <a href="#pricing">料金</a>
+    <a href="instructors.html">インストラクター</a>
     <a href="#qa">Q&A</a>
     <a href="#access">アクセス</a>
     <a href="#contact" class="nav-cta">体験を予約</a>
-    <a href="index-pt.html" class="lang-switch" title="Versão em Português">🇧🇷</a>
   </div>
-  <div style="display:flex; align-items:center; gap:12px;">
-    <a href="index-pt.html" class="lang-switch-mobile" title="Versão em Português">🇧🇷</a>
-    <div class="nav-hamburger" onclick="toggleMenu()" id="hamburger">
-      <span></span><span></span><span></span>
-    </div>
+  <div class="nav-hamburger" onclick="toggleMenu()" id="hamburger">
+    <span></span><span></span><span></span>
   </div>
 </nav>
 
@@ -695,6 +657,7 @@ body::before {
   <a href="#about"   onclick="toggleMenu()">ジムについて</a>
   <a href="#classes" onclick="toggleMenu()">クラス</a>
   <a href="#pricing" onclick="toggleMenu()">料金</a>
+  <a href="instructors.html" onclick="toggleMenu()">インストラクター</a>
   <a href="#qa"      onclick="toggleMenu()">Q&A</a>
   <a href="#access"  onclick="toggleMenu()">アクセス</a>
   <a href="#contact" onclick="toggleMenu()" style="color:var(--red);">体験を予約 →</a>
@@ -802,6 +765,20 @@ body::before {
 </section>
 
 <!-- =====================================================================
+     Instructors Teaser
+     ===================================================================== -->
+<section style="padding: 56px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <div class="container" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;">
+    <div>
+      <span class="section-label" style="margin-bottom:8px;">Instructors</span>
+      <div style="font-size:20px; font-weight:700; color:var(--white);">指導するのは、現役の黒帯インストラクター</div>
+      <div style="font-size:13px; color:var(--muted); margin-top:6px;">代表・コーチの経歴と指導方針をご紹介します</div>
+    </div>
+    <a href="instructors.html" class="nav-cta" style="white-space:nowrap;">インストラクターを見る →</a>
+  </div>
+</section>
+
+<!-- =====================================================================
      Classes
      ===================================================================== -->
 <section class="section" id="classes" style="background: var(--gray);">
@@ -880,7 +857,7 @@ body::before {
         <div class="class-age">所属不問 ／ 全レベル歓迎</div>
         <div class="class-desc">インストラクター主導ではなく自由練習。他ジム所属の方、外部の方も歓迎。コミュニティ型道場の核となる場所です。</div>
         <div class="class-schedule">
-          <strong>日曜</strong> 14:30〜17:00
+          <strong>日曜</strong> 14:30〜17:30
         </div>
         <div class="class-price">
           <span class="class-price-num" style="font-size:16px;">会員無料 ／ 外部2,000円</span>
@@ -993,7 +970,7 @@ body::before {
         <div style="background:var(--gray); border:1px solid var(--border); border-left:4px solid #8b1ec4; border-radius:4px; padding:16px 18px;">
           <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:#b060e0; margin-bottom:8px;">日曜日</div>
           <div style="font-size:15px; font-weight:700; color:var(--white); margin-bottom:4px;">ギルドオープンマット</div>
-          <div style="font-size:13px; color:var(--muted);">14:30〜17:00</div>
+          <div style="font-size:13px; color:var(--muted);">14:30〜17:30</div>
           <div style="font-size:12px; color:var(--muted); margin-top:4px;">所属不問・会員無料 / 外部2,000円</div>
           <div style="margin-top:8px;"><span class="sched-tag st-open">Open Mat</span></div>
         </div>
