@@ -641,6 +641,22 @@ body::before {
 @media (max-width: 768px) { .floating-cta { display: block; } }
 
 /* =====================================================================
+   Language Switcher
+   ===================================================================== */
+.lang-switch {
+  font-size: 22px; line-height: 1;
+  text-decoration: none;
+  transition: transform 0.2s, opacity 0.2s;
+  opacity: 0.85;
+  display: inline-flex; align-items: center;
+}
+.lang-switch:hover { transform: scale(1.15); opacity: 1; }
+.lang-switch-mobile { display: none; font-size: 22px; line-height: 1; text-decoration: none; opacity: 0.85; }
+@media (max-width: 768px) {
+  .lang-switch-mobile { display: inline-flex; align-items: center; }
+}
+
+/* =====================================================================
    Animations
    ===================================================================== */
 .fade-in {
@@ -676,9 +692,13 @@ body::before {
     <a href="#qa">Q&A</a>
     <a href="#access">アクセス</a>
     <a href="#contact" class="nav-cta">体験を予約</a>
+    <a href="index-pt.html" class="lang-switch" title="Versão em Português">🇧🇷</a>
   </div>
-  <div class="nav-hamburger" onclick="toggleMenu()" id="hamburger">
-    <span></span><span></span><span></span>
+  <div style="display:flex; align-items:center; gap:12px;">
+    <a href="index-pt.html" class="lang-switch-mobile" title="Versão em Português">🇧🇷</a>
+    <div class="nav-hamburger" onclick="toggleMenu()" id="hamburger">
+      <span></span><span></span><span></span>
+    </div>
   </div>
 </nav>
 
@@ -792,7 +812,7 @@ body::before {
         <div style="margin-top:20px; background:linear-gradient(135deg, rgba(196,30,30,0.15), rgba(196,30,30,0.05)); border:1px solid var(--red-dim); border-radius:6px; padding:22px 26px; box-shadow:0 0 30px rgba(196,30,30,0.12), inset 0 1px 0 rgba(255,255,255,0.05); position:relative; overflow:hidden;">
           <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:var(--red); margin-bottom:8px;">🏆 ACHIEVEMENT</div>
           <div style="font-size:15px; color:var(--white); line-height:1.7;">
-            会員の<strong>壁谷遼介選手</strong>が、IBJJF Asian Jiu-Jitsu Championship 2026にて
+            会員の<strong>壁谷亮佑選手</strong>が、IBJJF Asian Jiu-Jitsu Championship 2026にて
             <strong style="color:#ff6b6b;">階級別・無差別級のダブルゴールド</strong>を獲得しました。
           </div>
         </div>
@@ -827,8 +847,8 @@ body::before {
     <div class="classes-grid">
       <!-- アダルト -->
       <div class="class-card adult fade-in">
-        <span class="class-tag">Adult</span>
-        <div class="class-name">Adult Class</div>
+        <span class="class-tag">アダルト</span>
+        <div class="class-name">アダルトクラス</div>
         <div class="class-age">16歳以上 ／ 初心者〜競技者</div>
         <div class="class-desc">未経験・初心者から競技志向の方まで対応。基礎の動きから試合技術まで、レベルに合わせた指導を行います。</div>
         <div class="class-schedule">
@@ -843,8 +863,8 @@ body::before {
 
       <!-- キッズA -->
       <div class="class-card kids-a fade-in">
-        <span class="class-tag">Kids A</span>
-        <div class="class-name">Kids A Class</div>
+        <span class="class-tag">キッズA</span>
+        <div class="class-name">キッズAクラス</div>
         <div class="class-age">9〜12歳</div>
         <div class="class-desc">技術習得と帯昇格制度によるモチベーション管理。子どもたちが楽しみながら成長できる環境を整えています。</div>
         <div class="class-schedule">
@@ -859,8 +879,8 @@ body::before {
 
       <!-- キッズB -->
       <div class="class-card kids-b fade-in">
-        <span class="class-tag">Kids B</span>
-        <div class="class-name">Kids B Class</div>
+        <span class="class-tag">キッズB</span>
+        <div class="class-name">キッズBクラス</div>
         <div class="class-age">13〜15歳</div>
         <div class="class-desc">競技志向にも対応できる応用技術の習得。中学生の体格・体力に合わせた本格的な指導を行います。</div>
         <div class="class-schedule">
@@ -874,8 +894,8 @@ body::before {
 
       <!-- キッズC -->
       <div class="class-card kids-c fade-in">
-        <span class="class-tag">Kids C</span>
-        <div class="class-name">Kids C Class</div>
+        <span class="class-tag">キッズC</span>
+        <div class="class-name">キッズCクラス</div>
         <div class="class-age">6〜8歳 ／ 都度参加制</div>
         <div class="class-desc">遊びの延長から柔術に触れる導入クラス。道着不要、動きやすい服装でOK。入会金も不要です。</div>
         <div class="class-schedule">
@@ -889,8 +909,8 @@ body::before {
 
       <!-- オープンマット -->
       <div class="class-card open fade-in">
-        <span class="class-tag">Open Mat</span>
-        <div class="class-name">Guild Open Mat</div>
+        <span class="class-tag">オープンマット</span>
+        <div class="class-name">ギルド・オープンマット</div>
         <div class="class-age">所属不問 ／ 全レベル歓迎</div>
         <div class="class-desc">インストラクター主導ではなく自由練習。他ジム所属の方、外部の方も歓迎。コミュニティ型道場の核となる場所です。</div>
         <div class="class-schedule">
@@ -904,7 +924,7 @@ body::before {
       <!-- 無料体験会（7月末まで） -->
       <div class="class-card fade-in" style="border-color:rgba(255,200,0,0.3); position:relative;">
         <div style="position:absolute; top:12px; right:12px; background:#C41E1E; color:white; font-size:10px; letter-spacing:2px; padding:3px 8px; border-radius:2px; font-family:var(--font-en);">〜7月末限定</div>
-        <span class="class-tag" style="background:rgba(255,200,0,0.15); color:#e8cc40; border:1px solid rgba(255,200,0,0.4);">Free Trial</span>
+        <span class="class-tag" style="background:rgba(255,200,0,0.15); color:#e8cc40; border:1px solid rgba(255,200,0,0.4);">無料体験</span>
         <div class="class-name">初心者無料体験会</div>
         <div class="class-age">未経験・初心者歓迎 ／ 道着不要</div>
         <div class="class-desc">
@@ -922,8 +942,8 @@ body::before {
 
       <!-- プライベート -->
       <div class="class-card private fade-in">
-        <span class="class-tag">Private</span>
-        <div class="class-name">Private Class</div>
+        <span class="class-tag">プライベート</span>
+        <div class="class-name">プライベートクラス</div>
         <div class="class-age">完全予約制 ／ 所属不問</div>
         <div class="class-desc">黒帯インストラクターによる1対1の指導。会員でなくても、他ジム所属でも、未経験でも受講可能です。</div>
         <div class="class-schedule">
