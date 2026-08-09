@@ -502,6 +502,38 @@ body::before {
 .campaign-note { margin-top: 16px; font-size: 12px; color: var(--muted); }
 
 /* =====================================================================
+   Testimonials
+   ===================================================================== */
+.testimonial-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+}
+@media (max-width: 880px) { .testimonial-grid { grid-template-columns: 1fr; } }
+.testimonial-card {
+  background: var(--gray); border: 1px solid var(--border);
+  border-radius: 6px; padding: 28px 26px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.03);
+  position: relative;
+}
+.testimonial-quote-mark {
+  font-family: var(--font-en); font-size: 48px; color: var(--red-dim);
+  line-height: 1; margin-bottom: 8px; opacity: 0.6;
+}
+.testimonial-text {
+  font-size: 14px; color: var(--white); line-height: 1.9; margin-bottom: 20px;
+}
+.testimonial-author { display: flex; align-items: center; gap: 12px; }
+.testimonial-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--gray-2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-en); font-size: 15px; color: var(--muted);
+  flex-shrink: 0;
+}
+.testimonial-meta { font-size: 12px; }
+.testimonial-name { color: var(--white); font-weight: 700; margin-bottom: 2px; }
+.testimonial-role { color: var(--muted); }
+
+/* =====================================================================
    Q&A
    ===================================================================== */
 .qa-list { display: flex; flex-direction: column; gap: 12px; margin-top: 48px; }
@@ -739,6 +771,25 @@ body::before {
   </div>
 </section>
 
+<!-- =====================================================================
+     Pair Enrollment Banner（トップ付近・目立たせる）
+     ===================================================================== -->
+<div class="container" style="margin: 24px 0 56px; position:relative; z-index:1;">
+  <div class="campaign-box fade-in" style="margin-top:0;">
+    <div style="position:absolute; right:-20px; top:50%; transform:translateY(-50%) rotate(90deg); font-family:var(--font-en); font-size:60px; color:rgba(196,30,30,0.06); line-height:1; pointer-events:none;">PAIR</div>
+    <div class="campaign-title">⚔ お友達・ごきょうだいと一緒なら</div>
+    <div class="campaign-items">
+      <div class="campaign-item">
+        <div>
+          <strong style="color:var(--white); font-size:15px;">2人目の入会金は不要です</strong><br>
+          <span style="font-size:13px; color:var(--muted);">お友達・ごきょうだい・親子など、どなたとでも2名以上で同時にご入会いただく場合、お一人分の入会金（10,000円）のみで、2人目以降は入会金がかかりません。</span>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:12px; color:var(--muted); margin-top:16px;">※同時にご入会される2名様以上が対象です。詳しくはお問い合わせください。</div>
+  </div>
+</div>
+
 
 <!-- =====================================================================
      About
@@ -833,6 +884,7 @@ body::before {
     <span class="section-label fade-in">Classes</span>
     <h2 class="section-title fade-in">クラス案内</h2>
     <p class="section-sub fade-in">6歳から大人まで、目的・年齢に合わせたクラスをご用意しています。</p>
+    <p class="section-sub fade-in" style="margin-top:8px; color:var(--red);">お子様のクラスは、まず見学だけでも大歓迎です。実際のマットの雰囲気を、ぜひ一度見にきてください。</p>
 
     <div class="classes-grid">
       <!-- アダルト -->
@@ -856,7 +908,7 @@ body::before {
         <span class="class-tag">キッズA</span>
         <div class="class-name">キッズAクラス</div>
         <div class="class-age">9〜12歳</div>
-        <div class="class-desc">技術習得と帯昇格制度によるモチベーション管理。子どもたちが楽しみながら成長できる環境を整えています。</div>
+        <div class="class-desc">技術習得はもちろん、挨拶や礼儀作法、最後までやり抜く心も大切にしています。帯昇格制度で、楽しみながら成長を実感できます。</div>
         <div class="class-schedule">
           <strong>火・木</strong> 19:00〜20:00<br>
           <strong>日曜</strong> 10:30〜11:30
@@ -1123,6 +1175,54 @@ body::before {
     </div>
 
     <!-- キャンペーン -->
+  </div>
+</section>
+
+<!-- =====================================================================
+     Testimonials
+     ===================================================================== -->
+<!-- ※以下は仮のプレースホルダーです。実際の会員の声に差し替えてください -->
+<section class="section" style="background: var(--gray);">
+  <div class="container">
+    <span class="section-label fade-in">Voice</span>
+    <h2 class="section-title fade-in">会員の声</h2>
+    <p class="section-sub fade-in">実際に通っている会員の皆さんの声です。</p>
+
+    <div class="testimonial-grid" style="margin-top:40px;">
+      <div class="testimonial-card fade-in">
+        <div class="testimonial-quote-mark">"</div>
+        <div class="testimonial-text">まったくの未経験でしたが、丁寧に教えてもらえるので安心して始められました。今では週に何度も通うのが楽しみになっています。</div>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">A</div>
+          <div class="testimonial-meta">
+            <div class="testimonial-name">会員名（仮）</div>
+            <div class="testimonial-role">アダルトクラス</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card fade-in">
+        <div class="testimonial-quote-mark">"</div>
+        <div class="testimonial-text">子どもが体験に行ってすぐ「また行きたい」と言い出しました。礼儀や挨拶も自然と身についてきたように感じます。</div>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">B</div>
+          <div class="testimonial-meta">
+            <div class="testimonial-name">保護者様（仮）</div>
+            <div class="testimonial-role">キッズクラス</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card fade-in">
+        <div class="testimonial-quote-mark">"</div>
+        <div class="testimonial-text">体格差があっても技術でカバーできるのが柔術の面白さだと実感しています。指導者の説明が分かりやすく、上達を感じられます。</div>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">C</div>
+          <div class="testimonial-meta">
+            <div class="testimonial-name">会員名（仮）</div>
+            <div class="testimonial-role">アダルトクラス</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
