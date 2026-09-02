@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>柔術ギルド プライベートクラス予約</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black:   #0A0A0A;
+  --white:   #FFFFFF;
+  --red:     #C41E1E;
+  --red-dim: #8B1515;
+  --gray:    #1a1a1a;
+  --gray-2:  #242424;
+  --gray-3:  #333333;
+  --muted:   #888888;
+  --border:  #2a2a2a;
+  --font-en: 'Bebas Neue', sans-serif;
+  --font-jp: 'Noto Sans JP', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--black); color: var(--white);
+  font-family: var(--font-jp);
+  min-height: 100vh;
+}
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: block; }
+
+/* ヘッダー共通 */
+.app-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px; border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; background: rgba(10,10,10,0.92);
+  backdrop-filter: blur(8px); z-index: 10;
+}
+.app-logo { font-family: var(--font-en); font-size: 18px; letter-spacing: 2px; }
+.app-logo span { color: var(--red); }
+.back-btn {
+  background: none; border: 1px solid var(--border); color: var(--white);
+  padding: 8px 16px; border-radius: 4px; font-size: 13px; cursor: pointer;
+  font-family: var(--font-jp); display: flex; align-items: center; gap: 6px;
+}
+.back-btn:hover { border-color: var(--red); color: var(--red); }
+
+.container { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+
+/* ===================== 画面①：インストラクター選択（Netflix風） ===================== */
+.page-title { font-size: 28px; font-weight: 900; margin-bottom: 6px; }
+.page-sub { color: var(--muted); font-size: 14px; margin-bottom: 40px; }
+
+.instructor-row {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+}
+.instructor-card {
+  position: relative; border-radius: 8px; overflow: hidden;
+  aspect-ratio: 2/3; cursor: pointer; border: 1px solid var(--border);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.instructor-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 20px 50px rgba(196,30,30,0.35);
+  border-color: var(--red-dim);
+}
+.instructor-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.instructor-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.92) 100%);
+  display: flex; flex-direction: column; justify-content: flex-end; padding: 20px;
+}
+.instructor-name { font-size: 19px; font-weight: 700; margin-bottom: 4px; }
+.instructor-belt {
+  display: inline-flex; align-items: center; gap: 6px; width: fit-content;
+  font-family: var(--font-en); font-size: 11px; letter-spacing: 1px;
+  color: var(--red); border: 1px solid var(--red-dim); padding: 3px 10px;
+  border-radius: 20px; margin-bottom: 8px; background: rgba(196,30,30,0.1);
+}
+.instructor-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+.availability-badge {
+  position: absolute; top: 14px; right: 14px;
+  background: rgba(10,10,10,0.8); border: 1px solid var(--border);
+  padding: 5px 10px; border-radius: 20px; font-size: 11px; color: var(--muted);
+}
+.availability-badge.open { color: #4ade80; border-color: rgba(74,222,128,0.3); }
+
+/* ===================== 画面②：時間帯選択 ===================== */
+.instructor-hero {
+  display: flex; align-items: center; gap: 24px; margin-bottom: 40px;
+  padding-bottom: 32px; border-bottom: 1px solid var(--border);
+}
+.instructor-hero-photo {
+  width: 90px; height: 90px; border-radius: 50%; overflow: hidden;
+  border: 2px solid var(--red-dim); flex-shrink: 0;
+}
+.instructor-hero-photo img { width: 100%; height: 100%; object-fit: cover; }
+.instructor-hero-name { font-size: 24px; font-weight: 900; margin-bottom: 4px; }
+.instructor-hero-meta { font-size: 13px; color: var(--muted); }
+
+.day-tabs { display: flex; gap: 10px; margin-bottom: 32px; flex-wrap: wrap; }
+.day-tab {
+  font-family: var(--font-en); font-size: 13px; letter-spacing: 1px;
+  padding: 10px 22px; border: 1px solid var(--border); border-radius: 20px;
+  background: none; color: var(--muted); cursor: pointer;
+}
+.day-tab.active { background: var(--red); color: var(--white); border-color: var(--red); }
+
+.slot-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 14px;
+}
+.slot {
+  border: 1px solid var(--border); border-radius: 6px; padding: 18px 14px;
+  text-align: center; cursor: pointer; transition: all 0.2s;
+  background: var(--gray);
+}
+.slot:hover { border-color: var(--red-dim); background: var(--gray-2); }
+.slot.selected { border-color: var(--red); background: rgba(196,30,30,0.12); }
+.slot.booked {
+  opacity: 0.35; cursor: not-allowed; position: relative;
+}
+.slot.booked::after {
+  content: '予約済み'; position: absolute; inset: 0; display: flex;
+  align-items: center; justify-content: center; font-size: 11px; color: var(--muted);
+  background: rgba(10,10,10,0.6);
+}
+.slot-time { font-family: var(--font-en); font-size: 20px; font-weight: 700; }
+.slot-label { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+.next-btn-wrap { margin-top: 40px; text-align: right; }
+.btn-primary {
+  font-family: var(--font-en); font-size: 15px; letter-spacing: 2px;
+  background: var(--red); color: var(--white); border: none;
+  padding: 15px 36px; border-radius: 4px; cursor: pointer;
+  text-transform: uppercase;
+}
+.btn-primary:disabled { background: var(--gray-3); color: var(--muted); cursor: not-allowed; }
+.btn-primary:not(:disabled):hover { background: #e02020; }
+
+/* ===================== 画面③：予約フォーム ===================== */
+.form-summary {
+  background: var(--gray); border: 1px solid var(--border); border-left: 3px solid var(--red);
+  border-radius: 4px; padding: 24px; margin-bottom: 32px;
+}
+.form-summary-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; }
+.form-summary-row span:first-child { color: var(--muted); }
+.form-summary-row span:last-child { font-weight: 700; }
+
+.form-group { margin-bottom: 20px; }
+.form-label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+.form-input {
+  width: 100%; background: var(--gray); border: 1px solid var(--border);
+  border-radius: 4px; padding: 14px 16px; color: var(--white); font-size: 15px;
+  font-family: var(--font-jp);
+}
+.form-input:focus { outline: none; border-color: var(--red-dim); }
+.form-note { font-size: 12px; color: var(--muted); margin-top: 24px; line-height: 1.8; }
+
+/* ===================== 画面④：完了 ===================== */
+.confirm-screen { text-align: center; padding: 100px 24px; }
+.confirm-icon {
+  width: 72px; height: 72px; border-radius: 50%; background: rgba(196,30,30,0.15);
+  border: 2px solid var(--red); display: flex; align-items: center; justify-content: center;
+  font-size: 32px; margin: 0 auto 28px;
+}
+.confirm-title { font-size: 24px; font-weight: 900; margin-bottom: 12px; }
+.confirm-sub { color: var(--muted); font-size: 14px; margin-bottom: 40px; }
+
+/* ===================== 管理画面（インストラクター側） ===================== */
+.admin-toggle {
+  position: fixed; bottom: 20px; right: 20px; z-index: 50;
+  background: var(--gray-2); border: 1px solid var(--border); color: var(--muted);
+  padding: 10px 16px; border-radius: 20px; font-size: 12px; cursor: pointer;
+}
+.admin-table { width: 100%; border-collapse: collapse; margin-top: 24px; }
+.admin-table th {
+  text-align: left; font-size: 11px; letter-spacing: 1px; color: var(--muted);
+  padding: 12px 16px; border-bottom: 1px solid var(--border); font-family: var(--font-en);
+  text-transform: uppercase;
+}
+.admin-table td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 14px; }
+.status-pill {
+  display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px;
+}
+.status-pill.pending { background: rgba(234,179,8,0.15); color: #eab308; }
+.status-pill.confirmed { background: rgba(74,222,128,0.15); color: #4ade80; }
+.admin-filter-row { display: flex; gap: 10px; margin-bottom: 8px; }
+.admin-filter-row .day-tab { padding: 8px 18px; font-size: 12px; }
+
+@media (max-width: 640px) {
+  .container { padding: 28px 16px; }
+  .instructor-row { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .instructor-hero { flex-direction: column; align-items: flex-start; gap: 14px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     画面① インストラクター選択（Netflix風）
+     ============================================================ -->
+<div class="screen active" id="screen-select">
+  <header class="app-header">
+    <div class="app-logo">JIUJITSU <span>GUILD</span></div>
+    <div style="font-size:12px; color:var(--muted); font-family:var(--font-en); letter-spacing:1px;">PRIVATE CLASS BOOKING</div>
+  </header>
+  <div class="container">
+    <div class="page-title">プライベートクラスを予約</div>
+    <div class="page-sub">担当してほしいインストラクターを選んでください</div>
+
+    <div class="instructor-row">
+      <div class="instructor-card" onclick="selectInstructor('lucas', 'ルーカス・タヒラ', '黒帯 / 代表', 'images/lucas.jpg')">
+        <img src="images/lucas.jpg" alt="ルーカス・タヒラ">
+        <div class="availability-badge open">◎ 空きあり</div>
+        <div class="instructor-overlay">
+          <div class="instructor-belt">● 黒帯</div>
+          <div class="instructor-name">ルーカス・タヒラ</div>
+          <div class="instructor-desc">代表 / 柔術歴14年・指導歴7年</div>
+        </div>
+      </div>
+
+      <div class="instructor-card" onclick="selectInstructor('kuroya', '黒谷 善行', '黒帯 / コーチ', 'images/kuroya.jpg')">
+        <img src="images/kuroya.jpg" alt="黒谷善行">
+        <div class="availability-badge open">◎ 空きあり</div>
+        <div class="instructor-overlay">
+          <div class="instructor-belt">● 黒帯</div>
+          <div class="instructor-name">黒谷 善行</div>
+          <div class="instructor-desc">コーチ / 柔術歴9年</div>
+        </div>
+      </div>
+
+      <div class="instructor-card" onclick="selectInstructor('matsuno', '松野 帆奈美', '茶帯 / コーチ', '')">
+        <div style="width:100%; height:100%; background:linear-gradient(135deg, var(--gray-2), var(--gray)); display:flex; align-items:center; justify-content:center; font-family:var(--font-en); font-size:48px; color:var(--gray-3);">松</div>
+        <div class="availability-badge open">◎ 空きあり</div>
+        <div class="instructor-overlay">
+          <div class="instructor-belt">● 茶帯</div>
+          <div class="instructor-name">松野 帆奈美</div>
+          <div class="instructor-desc">コーチ / 柔術歴7年</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     画面② 時間帯選択
+     ============================================================ -->
+<div class="screen" id="screen-slots">
+  <header class="app-header">
+    <button class="back-btn" onclick="goTo('screen-select')">← 戻る</button>
+    <div class="app-logo">JIUJITSU <span>GUILD</span></div>
+  </header>
+  <div class="container">
+    <div class="instructor-hero">
+      <div class="instructor-hero-photo"><img id="hero-photo" src="images/lucas.jpg" alt=""></div>
+      <div>
+        <div class="instructor-hero-name" id="hero-name">ルーカス・タヒラ</div>
+        <div class="instructor-hero-meta" id="hero-meta">黒帯 / 代表　｜　プライベートクラス 60分</div>
+      </div>
+    </div>
+
+    <div class="page-sub" style="margin-bottom:16px;">日付を選択</div>
+    <div class="day-tabs">
+      <button class="day-tab active" onclick="selectDay(this)">8/16 (土)</button>
+      <button class="day-tab" onclick="selectDay(this)">8/23 (土)</button>
+      <button class="day-tab" onclick="selectDay(this)">8/30 (土)</button>
+      <button class="day-tab" onclick="selectDay(this)">9/6 (土)</button>
+    </div>
+
+    <div class="page-sub" style="margin-bottom:16px;">時間帯を選択</div>
+    <div class="slot-grid" id="slot-grid">
+      <div class="slot" onclick="selectSlot(this)"><div class="slot-time">10:00</div><div class="slot-label">〜11:00</div></div>
+      <div class="slot" onclick="selectSlot(this)"><div class="slot-time">11:00</div><div class="slot-label">〜12:00</div></div>
+      <div class="slot booked"><div class="slot-time">12:00</div><div class="slot-label">〜13:00</div></div>
+      <div class="slot" onclick="selectSlot(this)"><div class="slot-time">13:00</div><div class="slot-label">〜14:00</div></div>
+      <div class="slot" onclick="selectSlot(this)"><div class="slot-time">14:00</div><div class="slot-label">〜15:00</div></div>
+      <div class="slot booked"><div class="slot-time">15:00</div><div class="slot-label">〜16:00</div></div>
+      <div class="slot" onclick="selectSlot(this)"><div class="slot-time">16:00</div><div class="slot-label">〜17:00</div></div>
+      <div class="slot" onclick="selectSlot(this)"><div class="slot-time">17:00</div><div class="slot-label">〜18:00</div></div>
+      <div class="slot" onclick="selectSlot(this)"><div class="slot-time">18:00</div><div class="slot-label">〜19:00</div></div>
+    </div>
+
+    <div class="next-btn-wrap">
+      <button class="btn-primary" id="next-btn" disabled onclick="goTo('screen-form')">次へ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     画面③ 予約フォーム
+     ============================================================ -->
+<div class="screen" id="screen-form">
+  <header class="app-header">
+    <button class="back-btn" onclick="goTo('screen-slots')">← 戻る</button>
+    <div class="app-logo">JIUJITSU <span>GUILD</span></div>
+  </header>
+  <div class="container" style="max-width:560px;">
+    <div class="page-title">予約情報の入力</div>
+    <div class="page-sub">最後にお名前とご連絡先をご入力ください</div>
+
+    <div class="form-summary">
+      <div class="form-summary-row"><span>担当</span><span id="sum-instructor">ルーカス・タヒラ</span></div>
+      <div class="form-summary-row"><span>日時</span><span id="sum-datetime">8/16 (土) 10:00〜11:00</span></div>
+      <div class="form-summary-row"><span>料金</span><span>各講師料（当日ご案内）</span></div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">お名前</label>
+      <input type="text" class="form-input" id="form-name" placeholder="山田 太郎">
+    </div>
+    <div class="form-group">
+      <label class="form-label">電話番号</label>
+      <input type="tel" class="form-input" id="form-phone" placeholder="090-1234-5678">
+    </div>
+    <div class="form-group">
+      <label class="form-label">会員 / 外部の別</label>
+      <input type="text" class="form-input" id="form-member" placeholder="会員 または 外部（他ジム所属など）">
+    </div>
+    <div class="form-group">
+      <label class="form-label">ご要望・メモ（任意）</label>
+      <input type="text" class="form-input" id="form-note" placeholder="例：ガードパスを重点的に見てほしい">
+    </div>
+
+    <div class="next-btn-wrap">
+      <button class="btn-primary" id="submit-btn" onclick="submitBooking()">この内容で予約する</button>
+    </div>
+    <div class="form-note">
+      ※送信すると、指定のAPIへ予約データが送信されます（BOOKING_API_URLの設定が必要です）。<br>
+      ※予約確定後、担当インストラクターより確認のご連絡をいたします。
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     画面④ 完了画面
+     ============================================================ -->
+<div class="screen" id="screen-confirm">
+  <header class="app-header">
+    <div class="app-logo">JIUJITSU <span>GUILD</span></div>
+  </header>
+  <div class="confirm-screen">
+    <div class="confirm-icon">⚔</div>
+    <div class="confirm-title">予約リクエストを受け付けました</div>
+    <div class="confirm-sub">担当インストラクターより、確認のご連絡をいたします。</div>
+    <button class="btn-primary" onclick="goTo('screen-select')">トップに戻る</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     画面⑤ インストラクター管理画面（切替表示用）
+     ============================================================ -->
+<div class="screen" id="screen-admin">
+  <header class="app-header">
+    <div class="app-logo">JIUJITSU <span>GUILD</span></div>
+    <div style="font-size:12px; color:var(--muted); font-family:var(--font-en); letter-spacing:1px;">INSTRUCTOR DASHBOARD</div>
+  </header>
+  <div class="container">
+    <div class="page-title">予約管理</div>
+    <div class="page-sub">プライベートクラスの予約状況を確認・承認できます</div>
+
+    <div class="admin-filter-row">
+      <button class="day-tab active">すべて</button>
+      <button class="day-tab">ルーカス</button>
+      <button class="day-tab">黒谷</button>
+      <button class="day-tab">松野</button>
+    </div>
+
+    <table class="admin-table">
+      <thead>
+        <tr><th>日時</th><th>担当</th><th>お名前</th><th>連絡先</th><th>会員区分</th><th>ステータス</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>8/16 (土) 10:00〜11:00</td>
+          <td>ルーカス</td>
+          <td>山田 太郎</td>
+          <td>090-1234-5678</td>
+          <td>会員</td>
+          <td><span class="status-pill pending">確認待ち</span></td>
+        </tr>
+        <tr>
+          <td>8/16 (土) 12:00〜13:00</td>
+          <td>ルーカス</td>
+          <td>佐藤 花子</td>
+          <td>080-9876-5432</td>
+          <td>外部</td>
+          <td><span class="status-pill confirmed">確定</span></td>
+        </tr>
+        <tr>
+          <td>8/16 (土) 15:00〜16:00</td>
+          <td>黒谷</td>
+          <td>鈴木 次郎</td>
+          <td>070-1111-2222</td>
+          <td>会員</td>
+          <td><span class="status-pill confirmed">確定</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="form-note">※これはダミーデータの表示例です。実際のデータ連携は未実装です。</div>
+  </div>
+</div>
+
+<!-- 開発用：予約側／管理側 切替ボタン -->
+<button class="admin-toggle" onclick="toggleAdminView()" id="admin-toggle-btn">⚙ 管理画面を見る</button>
+
+<script>
+// ★予約APIのURL（booking-apps-script.gsをデプロイしたら、
+//   ここにそのウェブアプリURLを設定してください）
+const BOOKING_API_URL = 'https://script.google.com/macros/s/AKfycbzpsQExfVkdWlXxm__pdgqM3nTJ53zFnu-8HrlaXbLWe9j1eWn17OXlFIRm5yR4WV9etw/exec';
+
+let bookingState = {
+  instructorId: null,
+  instructorName: null,
+  date: null,
+  time: null,
+};
+
+function goTo(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function selectInstructor(id, name, meta, photo) {
+  bookingState.instructorId = id;
+  bookingState.instructorName = name;
+
+  document.getElementById('hero-name').textContent = name;
+  document.getElementById('hero-meta').textContent = meta + '　｜　プライベートクラス 60分';
+  document.getElementById('sum-instructor').textContent = name;
+  const heroPhoto = document.getElementById('hero-photo');
+  if (photo) {
+    heroPhoto.src = photo;
+    heroPhoto.style.display = 'block';
+  } else {
+    heroPhoto.style.display = 'none';
+  }
+  goTo('screen-slots');
+}
+
+function selectDay(el) {
+  document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  bookingState.date = el.textContent.trim();
+}
+
+function selectSlot(el) {
+  document.querySelectorAll('.slot').forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+  const selectedSlot = el.querySelector('.slot-time').textContent + el.querySelector('.slot-label').textContent;
+  bookingState.time = selectedSlot;
+  document.getElementById('next-btn').disabled = false;
+
+  const activeDay = document.querySelector('.day-tab.active').textContent;
+  if (!bookingState.date) bookingState.date = activeDay.trim();
+  document.getElementById('sum-datetime').textContent = activeDay + ' ' + selectedSlot;
+}
+
+// ★実際に予約APIへ送信する処理
+async function submitBooking() {
+  const nameInput   = document.getElementById('form-name');
+  const phoneInput  = document.getElementById('form-phone');
+  const memberInput = document.getElementById('form-member');
+  const noteInput   = document.getElementById('form-note');
+  const submitBtn   = document.getElementById('submit-btn');
+
+  const name = nameInput.value.trim();
+  const phone = phoneInput.value.trim();
+  if (!name || !phone) {
+    alert('お名前と電話番号は必須項目です。');
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = '送信中...';
+
+  try {
+    const res = await fetch(BOOKING_API_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        date: bookingState.date,
+        time: bookingState.time,
+        instructorId: bookingState.instructorId,
+        name: name,
+        phone: phone,
+        memberType: memberInput.value.trim(),
+        note: noteInput.value.trim(),
+      }),
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      goTo('screen-confirm');
+    } else if (data.already) {
+      alert('大変申し訳ございません、その時間帯はちょうど予約が入ってしまいました。お手数ですが別の時間帯をお選びください。');
+      goTo('screen-slots');
+    } else {
+      alert('予約の送信に失敗しました。時間をおいて再度お試しください。');
+    }
+  } catch (err) {
+    alert('通信エラーが発生しました。電波の良い場所で再度お試しください。');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'この内容で予約する';
+  }
+}
+
+let adminMode = false;
+function toggleAdminView() {
+  adminMode = !adminMode;
+  if (adminMode) {
+    goTo('screen-admin');
+    document.getElementById('admin-toggle-btn').textContent = '⚔ 予約画面を見る';
+  } else {
+    goTo('screen-select');
+    document.getElementById('admin-toggle-btn').textContent = '⚙ 管理画面を見る';
+  }
+}
+</script>
+</body>
+</html>
