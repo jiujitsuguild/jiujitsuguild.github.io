@@ -261,12 +261,7 @@ body {
     </div>
 
     <div class="page-sub" style="margin-bottom:16px;">日付を選択</div>
-    <div class="day-tabs">
-      <button class="day-tab active" onclick="selectDay(this)">8/16 (土)</button>
-      <button class="day-tab" onclick="selectDay(this)">8/23 (土)</button>
-      <button class="day-tab" onclick="selectDay(this)">8/30 (土)</button>
-      <button class="day-tab" onclick="selectDay(this)">9/6 (土)</button>
-    </div>
+    <div class="day-tabs" id="day-tabs"></div>
 
     <div class="page-sub" style="margin-bottom:16px;">時間帯を選択</div>
     <div class="slot-grid" id="slot-grid">
@@ -407,7 +402,7 @@ body {
 <script>
 // ★予約APIのURL（booking-apps-script.gsをデプロイしたら、
 //   ここにそのウェブアプリURLを設定してください）
-const BOOKING_API_URL = 'https://script.google.com/macros/s/AKfycbzpsQExfVkdWlXxm__pdgqM3nTJ53zFnu-8HrlaXbLWe9j1eWn17OXlFIRm5yR4WV9etw/exec';
+const BOOKING_API_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
 
 let bookingState = {
   instructorId: null,
@@ -415,6 +410,46 @@ let bookingState = {
   date: null,
   time: null,
 };
+
+// ★プライベートクラスは土曜日開催のため、
+//   「今日以降で直近4回の土曜日」を自動計算して表示する
+//   （日付を決め打ちしないことで、時間が経っても古い日付が
+//     表示され続けるバグを防ぐ）
+function generateUpcomingSaturdays(count = 4) {
+  const dates = [];
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // 次の土曜日（今日が土曜日ならその日自身も候補に含める）
+  const dayOfWeek = today.getDay(); // 0=日, 6=土
+  let daysUntilSaturday = (6 - dayOfWeek + 7) % 7;
+  const firstSaturday = new Date(today);
+  firstSaturday.setDate(today.getDate() + daysUntilSaturday);
+
+  for (let i = 0; i < count; i++) {
+    const d = new Date(firstSaturday);
+    d.setDate(firstSaturday.getDate() + i * 7);
+    dates.push(d);
+  }
+  return dates;
+}
+
+function formatDateTab(d) {
+  const m = d.getMonth() + 1;
+  const day = d.getDate();
+  return `${m}/${day} (土)`;
+}
+
+function renderDayTabs() {
+  const container = document.getElementById('day-tabs');
+  if (!container) return;
+  const saturdays = generateUpcomingSaturdays(4);
+  container.innerHTML = saturdays.map((d, i) =>
+    `<button class="day-tab${i === 0 ? ' active' : ''}" onclick="selectDay(this)">${formatDateTab(d)}</button>`
+  ).join('');
+  // ★最初の候補日を初期状態としてbookingStateにも反映
+  bookingState.date = formatDateTab(saturdays[0]);
+}
 
 function goTo(screenId) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -436,11 +471,13 @@ function selectInstructor(id, name, meta, photo) {
   } else {
     heroPhoto.style.display = 'none';
   }
+  renderDayTabs(); // ★画面表示のたびに最新の土曜日リストを再生成
   goTo('screen-slots');
 }
 
 function selectDay(el) {
-  document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+  const container = document.getElementById('day-tabs');
+  container.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   bookingState.date = el.textContent.trim();
 }
@@ -452,7 +489,7 @@ function selectSlot(el) {
   bookingState.time = selectedSlot;
   document.getElementById('next-btn').disabled = false;
 
-  const activeDay = document.querySelector('.day-tab.active').textContent;
+  const activeDay = document.querySelector('#day-tabs .day-tab.active').textContent;
   if (!bookingState.date) bookingState.date = activeDay.trim();
   document.getElementById('sum-datetime').textContent = activeDay + ' ' + selectedSlot;
 }
