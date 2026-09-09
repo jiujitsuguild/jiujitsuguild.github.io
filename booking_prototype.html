@@ -230,12 +230,12 @@ body {
         </div>
       </div>
 
-      <div class="instructor-card" onclick="selectInstructor('matsuno', '松野 帆奈美', '茶帯 / コーチ', '')">
+      <div class="instructor-card" onclick="selectInstructor('matsuno', '松野 保奈朱', '茶帯 / コーチ', '')">
         <div style="width:100%; height:100%; background:linear-gradient(135deg, var(--gray-2), var(--gray)); display:flex; align-items:center; justify-content:center; font-family:var(--font-en); font-size:48px; color:var(--gray-3);">松</div>
         <div class="availability-badge open">◎ 空きあり</div>
         <div class="instructor-overlay">
           <div class="instructor-belt">● 茶帯</div>
-          <div class="instructor-name">松野 帆奈美</div>
+          <div class="instructor-name">松野 保奈朱</div>
           <div class="instructor-desc">コーチ / 柔術歴7年</div>
         </div>
       </div>
@@ -411,39 +411,77 @@ let bookingState = {
   time: null,
 };
 
-// ★プライベートクラスは土曜日開催のため、
-//   「今日以降で直近4回の土曜日」を自動計算して表示する
-//   （日付を決め打ちしないことで、時間が経っても古い日付が
-//     表示され続けるバグを防ぐ）
+let scheduleOverrides = { closed: [], open: [] }; // ★Apps Scriptから取得した特別スケジュール
+
+// ★プライベートクラスは基本的に土曜日開催だが、
+//   「特別スケジュール」タブの内容を反映して、
+//   休止日は除外し、特別開催日（土曜以外も含む）は追加する
 function generateUpcomingSaturdays(count = 4) {
   const dates = [];
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  // 次の土曜日（今日が土曜日ならその日自身も候補に含める）
   const dayOfWeek = today.getDay(); // 0=日, 6=土
   let daysUntilSaturday = (6 - dayOfWeek + 7) % 7;
   const firstSaturday = new Date(today);
   firstSaturday.setDate(today.getDate() + daysUntilSaturday);
 
-  for (let i = 0; i < count; i++) {
+  // まず、通常の土曜日を必要数より多めに集めておく（休止日で減る分の予備）
+  const candidateCount = count + scheduleOverrides.closed.length + 2;
+  for (let i = 0; i < candidateCount; i++) {
     const d = new Date(firstSaturday);
     d.setDate(firstSaturday.getDate() + i * 7);
     dates.push(d);
   }
-  return dates;
+
+  // ★休止日（closed）を除外
+  let filtered = dates.filter(d => !scheduleOverrides.closed.includes(formatDateTab(d)));
+
+  // ★特別開催日（open）を追加（today以降・まだ含まれていない日付のみ）
+  scheduleOverrides.open.forEach(label => {
+    const d = parseTabLabelToDate(label);
+    if (d && d >= today && !filtered.some(fd => formatDateTab(fd) === label)) {
+      filtered.push(d);
+    }
+  });
+
+  // 日付順に並べ替えて、必要な件数だけ返す
+  filtered.sort((a, b) => a - b);
+  return filtered.slice(0, count);
+}
+
+// ★「9/13 (土)」のようなラベルから、今年の日付として逆算する
+//   （年をまたぐ場合は簡易的に「今日より前なら来年」とみなす）
+function parseTabLabelToDate(label) {
+  const m = label.match(/^(\d{1,2})\/(\d{1,2})/);
+  if (!m) return null;
+  const now = new Date();
+  let year = now.getFullYear();
+  let d = new Date(year, parseInt(m[1],10) - 1, parseInt(m[2],10));
+  const today = new Date(); today.setHours(0,0,0,0);
+  if (d < today) {
+    d = new Date(year + 1, parseInt(m[1],10) - 1, parseInt(m[2],10));
+  }
+  return d;
 }
 
 function formatDateTab(d) {
+  const weekdayNames = ['日','月','火','水','木','金','土'];
   const m = d.getMonth() + 1;
   const day = d.getDate();
-  return `${m}/${day} (土)`;
+  const weekday = weekdayNames[d.getDay()]; // ★曜日を実際の日付から自動計算（特別開催日が土曜以外でも正しく表示される）
+  return `${m}/${day} (${weekday})`;
 }
 
 function renderDayTabs() {
   const container = document.getElementById('day-tabs');
   if (!container) return;
   const saturdays = generateUpcomingSaturdays(4);
+  if (saturdays.length === 0) {
+    container.innerHTML = '<div style="color:var(--muted); font-size:14px;">現在、予約可能な日程がありません</div>';
+    bookingState.date = null;
+    return;
+  }
   container.innerHTML = saturdays.map((d, i) =>
     `<button class="day-tab${i === 0 ? ' active' : ''}" onclick="selectDay(this)">${formatDateTab(d)}</button>`
   ).join('');
@@ -457,7 +495,7 @@ function goTo(screenId) {
   window.scrollTo(0, 0);
 }
 
-function selectInstructor(id, name, meta, photo) {
+async function selectInstructor(id, name, meta, photo) {
   bookingState.instructorId = id;
   bookingState.instructorName = name;
 
@@ -471,8 +509,26 @@ function selectInstructor(id, name, meta, photo) {
   } else {
     heroPhoto.style.display = 'none';
   }
-  renderDayTabs(); // ★画面表示のたびに最新の土曜日リストを再生成
+
   goTo('screen-slots');
+
+  // ★先に「読み込み中」を表示してから、最新の特別スケジュールを取得する
+  const tabsContainer = document.getElementById('day-tabs');
+  if (tabsContainer) tabsContainer.innerHTML = '<div style="color:var(--muted); font-size:14px;">日程を確認しています...</div>';
+
+  try {
+    const res = await fetch(`${BOOKING_API_URL}?t=${Date.now()}`);
+    const data = await res.json();
+    if (data.scheduleOverrides) {
+      scheduleOverrides = data.scheduleOverrides;
+    }
+  } catch (err) {
+    // ★取得に失敗しても、通常の土曜日スケジュールだけで動作を継続する
+    console.error('特別スケジュールの取得に失敗しました。通常の土曜日開催として表示します。', err);
+    scheduleOverrides = { closed: [], open: [] };
+  }
+
+  renderDayTabs(); // ★取得した特別スケジュールを反映して日程タブを再生成
 }
 
 function selectDay(el) {
