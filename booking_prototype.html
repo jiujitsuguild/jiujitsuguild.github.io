@@ -725,9 +725,8 @@ function selectDay(el) {
 // 時間帯グリッド：実際の予約データを反映
 // =====================================================================
 function isSlotBooked(dateLabel, timeStr) {
-  return apiData.bookings.some(b =>
-    b.date === dateLabel && b.time === timeStr && b.instructor === bookingState.instructorId
-  );
+  // ★マットが1面のため、講師を問わず同じ日時に予約があれば埋まっている扱いにする
+  return apiData.bookings.some(b => b.date === dateLabel && b.time === timeStr);
 }
 
 function isSlotPast(dateLabel, startTime) {
