@@ -90,6 +90,11 @@ body {
   border-color: var(--red-dim);
 }
 .instructor-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.instructor-photo-fallback {
+  width: 100%; height: 100%; background: linear-gradient(135deg, var(--gray-2), var(--gray));
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-en); font-size: 48px; color: var(--gray-3);
+}
 .instructor-overlay {
   position: absolute; inset: 0;
   background: linear-gradient(180deg, transparent 35%, rgba(0,0,0,0.94) 100%);
@@ -269,11 +274,30 @@ body {
 
 @media (max-width: 640px) {
   .container { padding: 24px 16px 70px; }
-  .instructor-row { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-  .instructor-overlay { padding: 12px; }
-  .instructor-name { font-size: 15px; }
-  .instructor-desc { display: none; }
-  .instructor-cta { display: none; }
+
+  /* ★インストラクターカード：2列グリッド＋説明文非表示をやめ、
+     横並びの1列リストにしてプロフィール全体が見えるようにする */
+  .instructor-row { display: flex; flex-direction: column; gap: 14px; }
+  .instructor-card {
+    display: flex; flex-direction: row; align-items: stretch;
+    aspect-ratio: auto; height: auto;
+  }
+  .instructor-card img, .instructor-photo-fallback {
+    width: 96px; height: auto; min-height: 130px; flex-shrink: 0;
+  }
+  .instructor-photo-fallback { font-size: 32px; }
+  .instructor-overlay {
+    position: static; background: none; flex: 1; min-width: 0;
+    padding: 12px 14px; justify-content: center;
+  }
+  .instructor-name { font-size: 16px; }
+  .instructor-desc {
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden; font-size: 11.5px;
+  }
+  .instructor-price { margin-top: 6px; }
+  .instructor-cta { display: flex; font-size: 11px; margin-top: 8px; }
+
   .instructor-hero { gap: 14px; }
   .instructor-hero-photo { width: 64px; height: 64px; }
   .instructor-hero-name { font-size: 19px; }
@@ -332,7 +356,7 @@ body {
       </div>
 
       <div class="instructor-card" onclick="selectInstructor('matsuno')">
-        <div style="width:100%; height:100%; background:linear-gradient(135deg, var(--gray-2), var(--gray)); display:flex; align-items:center; justify-content:center; font-family:var(--font-en); font-size:48px; color:var(--gray-3);">松</div>
+        <div class="instructor-photo-fallback">松</div>
         <div class="instructor-overlay">
           <div class="instructor-belt">● 茶帯</div>
           <div class="instructor-name">松野 帆奈美</div>
@@ -439,7 +463,8 @@ body {
     </div>
     <div class="form-group">
       <label class="form-label">ご要望・メモ（任意）</label>
-      <input type="text" class="form-input" id="form-note" placeholder="例：ガードパスを重点的に見てほしい">
+      <input type="text" class="form-input" id="form-note" placeholder="例：二人で参加します／ガードパスを重点的に見てほしい">
+      <div class="form-hint">※お二人で参加の場合は1,000円引きです。メモ欄に「二人で参加します」とご記入ください。</div>
     </div>
 
     <div class="next-btn-wrap">
@@ -448,7 +473,7 @@ body {
     <div class="form-note">
       ・予約完了後、確認メールを自動でお送りします。<br>
       ・ご都合が悪くなった場合は、確認メール内のリンクからいつでもキャンセルできます。<br>
-      ・お支払いは当日、道場にてお願いします。
+      ・お支払いは当日、道場にてお願いします（お二人参加の割引は当日の会計で反映します）。
     </div>
   </div>
 </div>
@@ -556,11 +581,10 @@ const INSTRUCTORS = {
   matsuno: { name: '松野 帆奈美',     meta: '茶帯 / コーチ',     photo: '',                  price: 5000 },
 };
 
-// 時間帯（10:00〜19:00 の60分枠）
+// 時間帯（60分クラス＋着替え・準備の30分休憩を挟んだ枠、10:30スタート、19:30までに収める＝6枠）
 const SLOT_TIMES = [
-  ['10:00','〜11:00'], ['11:00','〜12:00'], ['12:00','〜13:00'],
-  ['13:00','〜14:00'], ['14:00','〜15:00'], ['15:00','〜16:00'],
-  ['16:00','〜17:00'], ['17:00','〜18:00'], ['18:00','〜19:00'],
+  ['10:30','〜11:30'], ['12:00','〜13:00'], ['13:30','〜14:30'],
+  ['15:00','〜16:00'], ['16:30','〜17:30'], ['18:00','〜19:00'],
 ];
 
 let bookingState = { instructorId: null, date: null, time: null };
@@ -736,8 +760,11 @@ function isSlotPast(dateLabel, startTime) {
   const now = new Date();
   const todayLabel = formatDateTab(new Date(now.getFullYear(), now.getMonth(), now.getDate()));
   if (dateLabel !== todayLabel) return false;
-  const hour = parseInt(startTime.split(':')[0], 10);
-  return now.getHours() >= hour;
+  // ★分単位まで比較する（枠が10:30など「時：分」開始のため、時だけの比較だとズレる）
+  const [h, min] = startTime.split(':').map(n => parseInt(n, 10));
+  const startMinutes = h * 60 + min;
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+  return nowMinutes >= startMinutes;
 }
 
 function renderSlots() {
@@ -868,9 +895,12 @@ function buildCalendarUrl(instructorName) {
   const m = bookingState.time.match(/^(\d{1,2}):(\d{2})/);
   if (!d || !m) return '#';
   const pad = n => String(n).padStart(2, '0');
-  const startH = parseInt(m[1], 10);
-  const ymd = `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`;
-  const dates = `${ymd}T${pad(startH)}0000/${ymd}T${pad(startH+1)}0000`;
+  // ★分も含めて開始時刻を反映し、終了時刻はDate演算で60分後を正しく求める
+  //  （以前は分を無視していたため、10:30開始が10:00と表示されるバグがあった）
+  const start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), parseInt(m[1],10), parseInt(m[2],10));
+  const end   = new Date(start.getTime() + 60 * 60 * 1000);
+  const fmt = dt => `${dt.getFullYear()}${pad(dt.getMonth()+1)}${pad(dt.getDate())}T${pad(dt.getHours())}${pad(dt.getMinutes())}00`;
+  const dates = `${fmt(start)}/${fmt(end)}`;
   const params = new URLSearchParams({
     action: 'TEMPLATE',
     text: `柔術ギルド プライベートクラス（${instructorName}）`,
