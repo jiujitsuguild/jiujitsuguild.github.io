@@ -78,6 +78,14 @@ body {
   border-radius: 20px; margin-bottom: 8px; background: rgba(196,30,30,0.1);
 }
 .instructor-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+.instructor-price {
+  display: inline-flex; align-items: baseline; gap: 5px; width: fit-content;
+  margin-top: 10px; font-family: var(--font-en); color: var(--white);
+  background: rgba(255,255,255,0.08); border: 1px solid var(--border);
+  padding: 5px 12px; border-radius: 4px;
+}
+.instructor-price .amount { font-size: 16px; font-weight: 700; }
+.instructor-price .unit { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
 .availability-badge {
   position: absolute; top: 14px; right: 14px;
   background: rgba(10,10,10,0.8); border: 1px solid var(--border);
@@ -210,13 +218,14 @@ body {
     <div class="page-sub">担当してほしいインストラクターを選んでください</div>
 
     <div class="instructor-row">
-      <div class="instructor-card" onclick="selectInstructor('lucas', 'ルーカス・タヒラ', '黒帯 / 代表', 'images/lucas.jpg')">
+      <div class="instructor-card" onclick="selectInstructor('lucas', 'ルーカス・タヒラ', '黒帯 / ギルド代表', 'images/lucas.jpg')">
         <img src="images/lucas.jpg" alt="ルーカス・タヒラ">
         <div class="availability-badge open">◎ 空きあり</div>
         <div class="instructor-overlay">
           <div class="instructor-belt">● 黒帯</div>
           <div class="instructor-name">ルーカス・タヒラ</div>
-          <div class="instructor-desc">代表 / 柔術歴14年・指導歴7年</div>
+          <div class="instructor-desc">ギルド代表。スパイダーガードやオープンガードを扱い、三角絞めを得意とする。試合に向けた作戦立案や、立ち回りの指導も得意とする。</div>
+          <div class="instructor-price"><span class="amount">9,000円</span><span class="unit">/ 60分</span></div>
         </div>
       </div>
 
@@ -226,7 +235,8 @@ body {
         <div class="instructor-overlay">
           <div class="instructor-belt">● 黒帯</div>
           <div class="instructor-name">黒谷 善行</div>
-          <div class="instructor-desc">コーチ / 柔術歴9年</div>
+          <div class="instructor-desc">コーチ。トップポジション、投げ技、パスガードを得意とする。</div>
+          <div class="instructor-price"><span class="amount">7,000円</span><span class="unit">/ 60分</span></div>
         </div>
       </div>
 
@@ -236,7 +246,8 @@ body {
         <div class="instructor-overlay">
           <div class="instructor-belt">● 茶帯</div>
           <div class="instructor-name">松野 帆奈美</div>
-          <div class="instructor-desc">コーチ / 柔術歴7年</div>
+          <div class="instructor-desc">コーチ。トップポジション、パスガード、サイドからの極め技を得意とする。プレッシャーをかけながらパスをし、相手を確実に固めて攻めるスタイル。</div>
+          <div class="instructor-price"><span class="amount">5,000円</span><span class="unit">/ 60分</span></div>
         </div>
       </div>
     </div>
@@ -256,7 +267,7 @@ body {
       <div class="instructor-hero-photo"><img id="hero-photo" src="images/lucas.jpg" alt=""></div>
       <div>
         <div class="instructor-hero-name" id="hero-name">ルーカス・タヒラ</div>
-        <div class="instructor-hero-meta" id="hero-meta">黒帯 / 代表　｜　プライベートクラス 60分</div>
+        <div class="instructor-hero-meta" id="hero-meta">黒帯 / ギルド代表　｜　プライベートクラス 60分</div>
       </div>
     </div>
 
@@ -307,6 +318,10 @@ body {
     <div class="form-group">
       <label class="form-label">電話番号</label>
       <input type="tel" class="form-input" id="form-phone" placeholder="090-1234-5678">
+    </div>
+    <div class="form-group">
+      <label class="form-label">メールアドレス</label>
+      <input type="email" class="form-input" id="form-email" placeholder="example@mail.com">
     </div>
     <div class="form-group">
       <label class="form-label">会員 / 外部の別</label>
@@ -554,14 +569,22 @@ function selectSlot(el) {
 async function submitBooking() {
   const nameInput   = document.getElementById('form-name');
   const phoneInput  = document.getElementById('form-phone');
+  const emailInput  = document.getElementById('form-email');
   const memberInput = document.getElementById('form-member');
   const noteInput   = document.getElementById('form-note');
   const submitBtn   = document.getElementById('submit-btn');
 
   const name = nameInput.value.trim();
   const phone = phoneInput.value.trim();
-  if (!name || !phone) {
-    alert('お名前と電話番号は必須項目です。');
+  const email = emailInput.value.trim();
+
+  if (!name || !phone || !email) {
+    alert('お名前・電話番号・メールアドレスは必須項目です。');
+    return;
+  }
+  // ★簡易的なメール形式チェック（確定通知を確実に届けるため）
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    alert('メールアドレスの形式が正しくないようです。ご確認ください。');
     return;
   }
 
@@ -577,6 +600,7 @@ async function submitBooking() {
         instructorId: bookingState.instructorId,
         name: name,
         phone: phone,
+        email: email,
         memberType: memberInput.value.trim(),
         note: noteInput.value.trim(),
       }),
