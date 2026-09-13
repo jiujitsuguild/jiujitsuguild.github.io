@@ -2,999 +2,2043 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<!--
+  =====================================================================
+  柔術ギルド ランキング — 最終完全版 v4（個人NFC対応）
+
+  【NFCチェックイン】
+  カードURL例: https://あなたのURL/bjj-guild-monitor.html?id=001
+  ?id= に会員IDを付けることで個人チェックインが可能
+
+  【スプレッドシート列】
+  id | name | monthly | total | belt | category | last_reset | last_checkin | is_instructor
+  ※ is_instructor 列に「yes」を入れると、その会員は
+  　月間ランキングから除外され、下部の「INSTRUCTORS」枠に表示されます
+  　（累計・帯昇格トラッカーは通常通りカウントされます）
+  =====================================================================
+-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>柔術ギルド プライベートクラス予約</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<title>BJJ Guild Ranking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Sans+JP:wght@300;400;700;900&display=swap" rel="stylesheet">
+
 <style>
 :root {
-  --black:   #0A0A0A;
-  --white:   #FFFFFF;
-  --red:     #C41E1E;
-  --red-dim: #8B1515;
-  --gray:    #1a1a1a;
-  --gray-2:  #242424;
-  --gray-3:  #333333;
-  --muted:   #999999;
-  --border:  #2a2a2a;
-  --green:   #4ade80;
-  --font-en: 'Bebas Neue', sans-serif;
-  --font-jp: 'Noto Sans JP', sans-serif;
+  --bg:         #04060a;
+  --surface:    #0e1420;
+  --card:       #131b2a;
+  --border:     #243050;
+  --border-hi:  #3a4d70;
+  --gold:       #d4a84c;
+  --gold-light: #f0d070;
+  --gold-dim:   #7a5f28;
+  --white:      #f4f0e8;
+  --white-dim:  #c8c2b4;
+  --muted:      #6a7490;
+  --kids-a:     #5aacf0;
+  --kids-a-dim: #1a4880;
+  --kids-b:     #50d0a0;
+  --kids-b-dim: #0a5038;
+  --g1:  rgba(212,168,76,0.45);
+  --g2:  rgba(190,190,205,0.35);
+  --g3:  rgba(180,110,60,0.35);
+  --ka1: rgba(90,172,240,0.5);
+  --kb1: rgba(80,208,160,0.5);
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-  background: var(--black); color: var(--white);
-  font-family: var(--font-jp);
-  min-height: 100vh;
-  -webkit-tap-highlight-color: transparent;
+  background: var(--bg); color: var(--white);
+  font-family: 'Noto Sans JP', sans-serif;
+  overflow: hidden;
+  background-image:
+    repeating-linear-gradient(0deg,  transparent, transparent 3px, rgba(255,255,255,0.013) 3px, rgba(255,255,255,0.013) 6px),
+    repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(255,255,255,0.009) 3px, rgba(255,255,255,0.009) 6px);
 }
-.screen { display: none; min-height: 100vh; }
-.screen.active { display: block; animation: fadeIn 0.3s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+body::before {
+  content: ''; position: fixed; inset: 0;
+  background: radial-gradient(ellipse 900px 600px at 50% -80px, rgba(212,168,76,0.05) 0%, transparent 70%);
+  animation: breathe 18s ease-in-out infinite alternate;
+  pointer-events: none; z-index: 0;
+}
+@keyframes breathe { from{opacity:0.6;transform:scale(1);} to{opacity:1;transform:scale(1.08);} }
 
-/* ヘッダー共通 */
-.app-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 18px 24px; border-bottom: 1px solid var(--border);
-  position: sticky; top: 0; background: rgba(10,10,10,0.92);
-  backdrop-filter: blur(8px); z-index: 10;
-}
-.app-logo { font-family: var(--font-en); font-size: 18px; letter-spacing: 2px; }
-.app-logo span { color: var(--red); }
-.header-tag { font-size: 11px; color: var(--muted); font-family: var(--font-en); letter-spacing: 1.5px; }
-.back-btn {
-  background: none; border: 1px solid var(--border); color: var(--white);
-  padding: 8px 16px; border-radius: 4px; font-size: 13px; cursor: pointer;
-  font-family: var(--font-jp); display: flex; align-items: center; gap: 6px;
-}
-.back-btn:hover { border-color: var(--red); color: var(--red); }
-
-.container { max-width: 1100px; margin: 0 auto; padding: 36px 24px 80px; }
-
-/* ステップ表示 */
-.steps {
-  display: flex; align-items: center; gap: 8px; margin-bottom: 32px;
-  font-size: 11px; color: var(--muted); flex-wrap: wrap;
-}
-.step { display: flex; align-items: center; gap: 6px; }
-.step-num {
-  width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--border);
+/* PC画面 */
+.scale-wrapper {
+  width: 100vw; height: 100vh;
   display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-en); font-size: 11px;
+  background: var(--bg);
+  overflow: hidden;
 }
-.step.current { color: var(--white); }
-.step.current .step-num { background: var(--red); border-color: var(--red); }
-.step.done .step-num { border-color: var(--red-dim); color: var(--red); }
-.step-arrow { color: var(--gray-3); }
+.pc-screen { width:1920px; height:1080px; display:grid; grid-template-rows:110px 1fr 52px; position:relative; z-index:1; transition:opacity 0.6s ease; flex-shrink:0; }
+.pc-screen.fading { opacity:0; }
+.pc-header { display:flex; align-items:center; justify-content:space-between; padding:0 56px; border-bottom:1px solid var(--border); background:linear-gradient(180deg,rgba(212,168,76,0.04),transparent); position:relative; }
+.pc-header::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--gold) 30%,var(--gold-light) 50%,var(--gold) 70%,transparent); transition:background 0.6s ease; }
+.pc-header.kids-a-mode::before { background:linear-gradient(90deg,transparent,var(--kids-a-dim) 30%,var(--kids-a) 50%,var(--kids-a-dim) 70%,transparent); }
+.pc-header.kids-b-mode::before { background:linear-gradient(90deg,transparent,var(--kids-b-dim) 30%,var(--kids-b) 50%,var(--kids-b-dim) 70%,transparent); }
+.hdr-left { display:flex; flex-direction:column; gap:3px; }
+.hdr-eyebrow { font-family:'Cinzel',serif; font-size:12px; letter-spacing:7px; color:var(--gold-dim); text-transform:uppercase; }
+.hdr-title { font-family:'Cinzel',serif; font-size:38px; font-weight:900; letter-spacing:5px; background:linear-gradient(135deg,var(--gold-light),var(--gold) 55%,var(--gold-dim)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; line-height:1; text-transform:uppercase; }
+.hdr-center { display:flex; flex-direction:column; align-items:center; gap:6px; }
+.season-chip { display:flex; align-items:center; gap:10px; border:1px solid var(--gold-dim); background:linear-gradient(135deg,rgba(212,168,76,0.12),rgba(212,168,76,0.04)); padding:7px 22px; border-radius:2px; font-family:'Cinzel',serif; font-size:14px; letter-spacing:4px; color:var(--gold); text-transform:uppercase; }
+.month-chip { display:flex; align-items:center; gap:8px; font-family:'Cinzel',serif; font-size:11px; letter-spacing:3px; color:var(--muted); text-transform:uppercase; }
+.month-dot { width:6px; height:6px; border-radius:50%; background:var(--gold); animation:dotPulse 2s ease-in-out infinite; }
+@keyframes dotPulse { 0%,100%{opacity:0.5;} 50%{opacity:1;} }
+.hdr-right { display:flex; flex-direction:column; align-items:flex-end; gap:5px; min-width:260px; }
+.clock { font-family:'Cinzel',serif; font-size:36px; font-weight:700; letter-spacing:4px; color:var(--white); font-variant-numeric:tabular-nums; }
+.clock-date { font-size:13px; letter-spacing:3px; color:var(--muted); font-family:'Cinzel',serif; text-transform:uppercase; }
+.pc-main { display:grid; grid-template-columns:580px 1fr; overflow:hidden; position:relative; }
+.pc-main::before { content:''; position:absolute; left:580px; top:0; bottom:0; width:1px; background:linear-gradient(180deg,transparent,var(--border) 15%,var(--border) 85%,transparent); z-index:2; }
+.pc-footer { display:flex; align-items:center; justify-content:space-between; padding:0 56px; border-top:1px solid var(--border); background:linear-gradient(0deg,rgba(212,168,76,0.025),transparent); position:relative; }
+.pc-footer::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--gold) 30%,var(--gold-light) 50%,var(--gold) 70%,transparent); }
+.footer-left  { display:flex; align-items:center; gap:20px; }
+.footer-right { display:flex; align-items:center; gap:16px; }
+.footer-logo  { font-family:'Cinzel',serif; font-size:12px; letter-spacing:5px; color:var(--gold-dim); text-transform:uppercase; }
+.footer-sep   { width:1px; height:18px; background:var(--border); }
+.last-upd     { font-family:'Cinzel',serif; font-size:11px; letter-spacing:2px; color:var(--muted); }
+.next-fetch   { font-family:'Cinzel',serif; font-size:11px; letter-spacing:2px; color:var(--muted); }
+.bar-wrap { width:180px; height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
+.bar-fill { height:100%; background:linear-gradient(90deg,var(--gold-dim),var(--gold)); border-radius:2px; width:0%; transition:width 1s linear; }
+.slide-indicator { display:flex; align-items:center; gap:8px; }
+.s-pip { width:8px; height:8px; border-radius:50%; border:1px solid var(--border); transition:all 0.4s ease; }
+.s-pip.adult-on  { background:var(--gold);   border-color:var(--gold); }
+.s-pip.kids-a-on { background:var(--kids-a); border-color:var(--kids-a); }
+.s-pip.kids-b-on { background:var(--kids-b); border-color:var(--kids-b); }
+.s-pip.off       { background:transparent; }
+.slide-bar-wrap { width:160px; height:2px; background:var(--border); border-radius:2px; overflow:hidden; }
+.slide-bar { height:100%; border-radius:2px; width:0%; }
+.slide-bar.adult  { background:linear-gradient(90deg,var(--gold-dim),var(--gold)); }
+.slide-bar.kids-a { background:linear-gradient(90deg,var(--kids-a-dim),var(--kids-a)); }
+.slide-bar.kids-b { background:linear-gradient(90deg,var(--kids-b-dim),var(--kids-b)); }
 
-.page-title { font-size: 27px; font-weight: 900; margin-bottom: 6px; }
-.page-sub { color: var(--muted); font-size: 14px; margin-bottom: 32px; line-height: 1.7; }
-.section-label {
-  font-size: 12px; color: var(--muted); margin: 28px 0 12px;
-  letter-spacing: 1px; display: flex; align-items: center; gap: 8px;
-}
-.section-label::before { content: ''; width: 14px; height: 2px; background: var(--red); }
+/* Podium */
+.podium-col { display:flex; flex-direction:column; padding:28px 36px 24px 56px; gap:14px; }
+.col-label { font-family:'Cinzel',serif; font-size:10px; letter-spacing:6px; color:var(--gold-dim); text-transform:uppercase; display:flex; align-items:center; gap:12px; }
+.col-label.kids-a { color:var(--kids-a-dim); }
+.col-label.kids-b { color:var(--kids-b-dim); }
+.col-label::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,currentColor,transparent); opacity:0.5; }
+.cat-label { font-family:'Cinzel',serif; font-size:10px; letter-spacing:4px; text-transform:uppercase; padding:3px 10px; border-radius:2px; border:1px solid; }
+.cat-adult  { color:var(--gold);   border-color:var(--gold-dim);   background:rgba(212,168,76,0.1); }
+.cat-kids-a { color:var(--kids-a); border-color:var(--kids-a-dim); background:rgba(90,172,240,0.1); }
+.cat-kids-b { color:var(--kids-b); border-color:var(--kids-b-dim); background:rgba(80,208,160,0.1); }
+.p-card { display:grid; grid-template-columns:60px 1fr auto; align-items:center; gap:18px; padding:20px 22px; border:1px solid var(--border); border-radius:4px; background:var(--card); position:relative; overflow:hidden; animation:slideInLeft 0.7s cubic-bezier(0.22,1,0.36,1) both; }
+.p-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; }
+.p-card::after  { content:''; position:absolute; inset:0; background:linear-gradient(90deg,rgba(255,255,255,0.012),transparent 40%); pointer-events:none; }
+.p-card.a-r1  { border-color:var(--gold-dim); background:linear-gradient(135deg,#1a2235,var(--card) 60%); animation:slideInLeft 0.7s cubic-bezier(0.22,1,0.36,1) 0.05s both,rank1Pulse 6s ease-in-out 1s infinite; }
+.p-card.a-r1::before { background:linear-gradient(180deg,var(--gold-light),var(--gold)); }
+.p-card.a-r2  { border-color:rgba(180,180,195,0.3); box-shadow:0 0 24px var(--g2); animation-delay:0.15s; }
+.p-card.a-r2::before { background:linear-gradient(180deg,#d8d8e8,#909098); }
+.p-card.a-r3  { border-color:rgba(170,105,55,0.3); box-shadow:0 0 20px var(--g3); animation-delay:0.25s; }
+.p-card.a-r3::before { background:linear-gradient(180deg,#d08860,#7a4828); }
+.p-card.ka-r1 { border-color:var(--kids-a-dim); background:linear-gradient(135deg,#0e1e35,var(--card) 60%); animation:slideInLeft 0.7s cubic-bezier(0.22,1,0.36,1) 0.05s both,kaRank1Pulse 6s ease-in-out 1s infinite; }
+.p-card.ka-r1::before { background:linear-gradient(180deg,#90d0f8,var(--kids-a)); }
+.p-card.ka-r2 { border-color:rgba(40,130,200,0.3); box-shadow:0 0 24px rgba(40,130,200,0.3); animation-delay:0.15s; }
+.p-card.ka-r2::before { background:linear-gradient(180deg,#4090d0,#205090); }
+.p-card.ka-r3 { border-color:rgba(80,100,200,0.3); box-shadow:0 0 20px rgba(80,100,200,0.3); animation-delay:0.25s; }
+.p-card.ka-r3::before { background:linear-gradient(180deg,#6080d8,#304090); }
+.p-card.kb-r1 { border-color:var(--kids-b-dim); background:linear-gradient(135deg,#0a1e18,var(--card) 60%); animation:slideInLeft 0.7s cubic-bezier(0.22,1,0.36,1) 0.05s both,kbRank1Pulse 6s ease-in-out 1s infinite; }
+.p-card.kb-r1::before { background:linear-gradient(180deg,#80e8c0,var(--kids-b)); }
+.p-card.kb-r2 { border-color:rgba(40,160,120,0.3); box-shadow:0 0 24px rgba(40,160,120,0.3); animation-delay:0.15s; }
+.p-card.kb-r2::before { background:linear-gradient(180deg,#40b890,#207860); }
+.p-card.kb-r3 { border-color:rgba(60,140,100,0.3); box-shadow:0 0 20px rgba(60,140,100,0.3); animation-delay:0.25s; }
+.p-card.kb-r3::before { background:linear-gradient(180deg,#50a878,#285840); }
+@keyframes rank1Pulse  { 0%,100%{box-shadow:0 0 40px var(--g1),inset 0 1px 0 rgba(212,168,76,0.25);} 50%{box-shadow:0 0 70px rgba(212,168,76,0.6),inset 0 1px 0 rgba(212,168,76,0.4);} }
+@keyframes kaRank1Pulse { 0%,100%{box-shadow:0 0 40px var(--ka1),inset 0 1px 0 rgba(90,172,240,0.25);} 50%{box-shadow:0 0 70px rgba(90,172,240,0.6),inset 0 1px 0 rgba(90,172,240,0.4);} }
+@keyframes kbRank1Pulse { 0%,100%{box-shadow:0 0 40px var(--kb1),inset 0 1px 0 rgba(80,208,160,0.25);} 50%{box-shadow:0 0 70px rgba(80,208,160,0.6),inset 0 1px 0 rgba(80,208,160,0.4);} }
+@keyframes slideInLeft { from{opacity:0;transform:translateX(-20px);} to{opacity:1;transform:translateX(0);} }
+@keyframes fadeInRow   { from{opacity:0;transform:translateX(14px);} to{opacity:1;transform:translateX(0);} }
+.p-avatar { width:54px; height:54px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Cinzel',serif; font-size:20px; font-weight:700; color:var(--bg); flex-shrink:0; }
+.a-r1  .p-avatar { width:62px; height:62px; font-size:24px; background:linear-gradient(135deg,var(--gold-light),var(--gold)); box-shadow:0 0 18px rgba(212,168,76,0.6); }
+.a-r2  .p-avatar { background:linear-gradient(135deg,#d8d8e4,#9898a8); }
+.a-r3  .p-avatar { background:linear-gradient(135deg,#c87850,#7a4828); }
+.ka-r1 .p-avatar { width:62px; height:62px; font-size:24px; background:linear-gradient(135deg,#90d0f8,var(--kids-a)); box-shadow:0 0 18px rgba(90,172,240,0.6); }
+.ka-r2 .p-avatar { background:linear-gradient(135deg,#5090d0,#205090); }
+.ka-r3 .p-avatar { background:linear-gradient(135deg,#6080d8,#304090); }
+.kb-r1 .p-avatar { width:62px; height:62px; font-size:24px; background:linear-gradient(135deg,#80e8c0,var(--kids-b)); box-shadow:0 0 18px rgba(80,208,160,0.6); }
+.kb-r2 .p-avatar { background:linear-gradient(135deg,#40b890,#207860); }
+.kb-r3 .p-avatar { background:linear-gradient(135deg,#50a878,#285840); }
+.p-info { min-width:0; }
+.p-rank-label { font-family:'Cinzel',serif; font-size:10px; letter-spacing:4px; text-transform:uppercase; display:flex; align-items:center; gap:5px; margin-bottom:3px; }
+.a-r1  .p-rank-label,.ka-r1 .p-rank-label,.kb-r1 .p-rank-label { color:var(--gold); }
+.a-r2  .p-rank-label { color:#b0b0c0; }
+.a-r3  .p-rank-label { color:#c08860; }
+.ka-r2 .p-rank-label { color:var(--kids-a); }
+.ka-r3 .p-rank-label { color:#6080d8; }
+.kb-r2 .p-rank-label { color:var(--kids-b); }
+.kb-r3 .p-rank-label { color:#50a878; }
+.p-name { font-size:26px; font-weight:900; color:var(--white); line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:7px; }
+.a-r1 .p-name,.ka-r1 .p-name,.kb-r1 .p-name { font-size:32px; }
+.p-badges { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.p-count-wrap { text-align:right; flex-shrink:0; }
+.p-monthly { font-family:'Cinzel',serif; font-weight:900; line-height:1; display:block; }
+.a-r1  .p-monthly,.ka-r1 .p-monthly,.kb-r1 .p-monthly { font-size:48px; color:var(--gold); }
+.a-r2  .p-monthly { font-size:36px; color:#d0d0dc; }
+.a-r3  .p-monthly { font-size:36px; color:#d09070; }
+.ka-r2 .p-monthly { font-size:36px; color:var(--kids-a); }
+.ka-r3 .p-monthly { font-size:36px; color:#6080d8; }
+.kb-r2 .p-monthly { font-size:36px; color:var(--kids-b); }
+.kb-r3 .p-monthly { font-size:36px; color:#50a878; }
+.p-unit  { font-size:10px; letter-spacing:3px; color:var(--muted); text-transform:uppercase; display:block; margin-top:1px; }
+.p-total { font-size:11px; color:var(--muted); display:block; margin-top:4px; }
+.p-total span { color:var(--white-dim); font-weight:700; }
+.crown { font-size:16px; animation:crownPulse 3s ease-in-out infinite; }
+@keyframes crownPulse { 0%,100%{filter:drop-shadow(0 0 4px rgba(212,168,76,0.5));} 50%{filter:drop-shadow(0 0 12px rgba(212,168,76,1));} }
 
-/* ===================== 画面①：インストラクター選択 ===================== */
-.instructor-row {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 24px;
+/* Ranking List */
+.list-col { display:flex; flex-direction:column; padding:22px 56px 16px 36px; gap:0; overflow:hidden; }
+.list-header { display:grid; grid-template-columns:60px 1fr 300px 100px 130px; gap:0; padding:8px 18px; margin-top:6px; border-bottom:1px solid var(--border-hi); }
+.list-header span { font-family:'Cinzel',serif; font-size:12px; letter-spacing:4px; color:var(--muted); text-transform:uppercase; }
+.lh-monthly,.lh-total { text-align:right; }
+.r-row { display:grid; grid-template-columns:60px 1fr 300px 100px 130px; align-items:center; gap:0; height:52px; padding:0 18px; border-bottom:1px solid rgba(36,48,80,0.55); animation:fadeInRow 0.5s ease both; }
+.r-row:nth-child(even) { background:rgba(255,255,255,0.012); }
+.r-row:nth-child(1)  { animation-delay:0.03s; }
+.r-row:nth-child(2)  { animation-delay:0.06s; }
+.r-row:nth-child(3)  { animation-delay:0.09s; }
+.r-row:nth-child(4)  { animation-delay:0.12s; }
+.r-row:nth-child(5)  { animation-delay:0.15s; }
+.r-row:nth-child(6)  { animation-delay:0.18s; }
+.r-row:nth-child(7)  { animation-delay:0.21s; }
+.r-row:nth-child(8)  { animation-delay:0.24s; }
+.r-row:nth-child(9)  { animation-delay:0.27s; }
+.r-row:nth-child(10) { animation-delay:0.30s; }
+.r-row:nth-child(11) { animation-delay:0.33s; }
+.r-row:nth-child(12) { animation-delay:0.36s; }
+.r-row:nth-child(13) { animation-delay:0.39s; }
+.r-row:nth-child(14) { animation-delay:0.42s; }
+.r-row:nth-child(15) { animation-delay:0.45s; }
+.r-row:nth-child(16) { animation-delay:0.48s; }
+.r-row:nth-child(17) { animation-delay:0.51s; }
+.r-row:nth-child(18) { animation-delay:0.54s; }
+
+/* インストラクター枠（PC/TV画面 左下固定ウィジェット・コンパクト版） */
+.instructor-widget {
+  position: absolute; left: 20px; bottom: 72px; z-index: 500;
+  background: rgba(10,14,26,0.94);
+  border: 1px solid rgba(224,180,0,0.4);
+  border-radius: 8px;
+  padding: 10px 16px;
+  width: 340px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.5);
 }
-.instructor-card {
-  position: relative; border-radius: 8px; overflow: hidden;
-  aspect-ratio: 2/3; cursor: pointer; border: 1px solid var(--border);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-.instructor-card:hover, .instructor-card:active {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 20px 50px rgba(196,30,30,0.35);
-  border-color: var(--red-dim);
-}
-.instructor-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.instructor-photo-fallback {
-  width: 100%; height: 100%; background: linear-gradient(135deg, var(--gray-2), var(--gray));
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-en); font-size: 48px; color: var(--gray-3);
-}
-.instructor-overlay {
-  position: absolute; inset: 0;
-  background: linear-gradient(180deg, transparent 35%, rgba(0,0,0,0.94) 100%);
-  display: flex; flex-direction: column; justify-content: flex-end; padding: 20px;
-}
-.instructor-name { font-size: 19px; font-weight: 700; margin-bottom: 4px; }
-.instructor-belt {
-  display: inline-flex; align-items: center; gap: 6px; width: fit-content;
-  font-family: var(--font-en); font-size: 11px; letter-spacing: 1px;
-  color: var(--red); border: 1px solid var(--red-dim); padding: 3px 10px;
-  border-radius: 20px; margin-bottom: 8px; background: rgba(196,30,30,0.1);
-}
-.instructor-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
-.instructor-price {
-  display: inline-flex; align-items: baseline; gap: 5px; width: fit-content;
-  margin-top: 10px; font-family: var(--font-en); color: var(--white);
-  background: rgba(255,255,255,0.08); border: 1px solid var(--border);
-  padding: 5px 12px; border-radius: 4px;
-}
-.instructor-price .amount { font-size: 16px; font-weight: 700; }
-.instructor-price .unit { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
-.instructor-cta {
-  margin-top: 12px; font-size: 12px; color: var(--white);
+.instructor-widget-label {
+  font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 3px;
+  color: #e0b400; text-transform: uppercase; margin-bottom: 6px;
   display: flex; align-items: center; gap: 6px;
+  border-bottom: 1px solid rgba(224,180,0,0.2); padding-bottom: 6px;
 }
-.instructor-cta::after { content: '→'; color: var(--red); transition: transform 0.2s; }
-.instructor-card:hover .instructor-cta::after { transform: translateX(4px); }
+.instr-card {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 0;
+}
+.instr-card + .instr-card { border-top: 1px solid rgba(224,180,0,0.1); }
+.instr-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, #e0b400, #a87d00);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cinzel', serif; font-weight: 700; font-size: 12px; color: #0a0e1a;
+  flex-shrink: 0;
+}
+.instr-info { min-width: 0; flex: 1; }
+.instr-name { font-size: 13px; font-weight: 700; color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 3px; }
+.instr-badges { display: flex; align-items: center; gap: 4px; flex-wrap: nowrap; overflow: hidden; }
+.instr-badges .t-badge { font-size: 9px !important; padding: 2px 6px !important; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.instr-badges .b-badge { font-size: 9px !important; padding: 2px 6px !important; flex-shrink: 0; }
+.instr-stats { text-align: right; flex-shrink: 0; }
+.instr-total { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; color: #e0b400; line-height: 1; }
+.instr-total-label { font-size: 6.5px; color: var(--muted); letter-spacing: 0.5px; margin-top: 2px; }
 
-.select-footnote {
-  margin-top: 36px; padding: 20px; background: var(--gray); border: 1px solid var(--border);
-  border-radius: 6px; font-size: 13px; color: var(--muted); line-height: 2;
+/* バージョン表示（フッター内） */
+.version-tag {
+  font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px;
+  color: var(--gold-dim); background: rgba(224,180,0,0.08);
+  border: 1px solid rgba(224,180,0,0.25); border-radius: 10px;
+  padding: 2px 9px; margin-left: 10px;
 }
-.select-footnote strong { color: var(--white); font-weight: 500; }
+.r-num  { font-family:'Cinzel',serif; font-size:22px; font-weight:700; color:var(--muted); }
+.r-row.top6 .r-num { color:var(--white-dim); }
+.r-name { font-size:21px; font-weight:700; color:var(--white); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding-right:10px; }
 
-/* ===================== 画面②：時間帯選択 ===================== */
-.instructor-hero {
-  display: flex; align-items: center; gap: 20px; margin-bottom: 32px;
-  padding-bottom: 28px; border-bottom: 1px solid var(--border);
+/* 本日チェックイン済みインジケーター */
+.checkin-dot {
+  display: inline-block; width: 9px; height: 9px; border-radius: 50%;
+  background: #4ade80; margin-left: 7px; box-shadow: 0 0 6px rgba(74,222,128,0.8);
+  vertical-align: middle; flex-shrink: 0;
 }
-.instructor-hero-photo {
-  width: 84px; height: 84px; border-radius: 50%; overflow: hidden;
-  border: 2px solid var(--red-dim); flex-shrink: 0;
-  background: var(--gray-2); display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-en); font-size: 30px; color: var(--gray-3);
-}
-.instructor-hero-photo img { width: 100%; height: 100%; object-fit: cover; }
-.instructor-hero-name { font-size: 23px; font-weight: 900; margin-bottom: 4px; }
-.instructor-hero-meta { font-size: 13px; color: var(--muted); }
+.checkin-dot.m-dot { width: 7px; height: 7px; margin-left: 5px; }
+.r-title-cell { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.r-monthly-cell { text-align:right; }
+.r-monthly { font-family:'Cinzel',serif; font-size:24px; font-weight:700; color:var(--white); line-height:1; display:block; }
+.r-m-unit  { font-size:9px; letter-spacing:1.5px; color:var(--muted); text-transform:uppercase; }
+.r-total-cell { text-align:right; padding-left:8px; }
+.r-total { font-size:13px; color:var(--muted); }
+.r-total span { color:var(--white-dim); font-weight:700; font-size:14px; }
 
-.day-tabs { display: flex; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
-.day-tab {
-  font-family: var(--font-jp); font-size: 13px; letter-spacing: 0.5px;
-  padding: 10px 20px; border: 1px solid var(--border); border-radius: 20px;
-  background: none; color: var(--muted); cursor: pointer; transition: all 0.15s;
-}
-.day-tab:hover { border-color: var(--gray-3); color: var(--white); }
-.day-tab.active { background: var(--red); color: var(--white); border-color: var(--red); }
-.day-tab .sp-mark { font-size: 10px; color: #ffd166; margin-left: 4px; }
-.day-tab.active .sp-mark { color: #ffe8a3; }
+/* 称号バッジ */
+.t-badge { display:inline-flex; align-items:center; gap:5px; padding:4px 12px 4px 9px; border-radius:2px; border:1px solid; font-family:'Noto Sans JP',sans-serif; font-size:13px; letter-spacing:0.5px; font-weight:700; white-space:nowrap; position:relative; overflow:hidden; }
+.t-icon { font-size:13px; }
+.t-low  { color:#8090b0; border-color:rgba(128,144,176,0.35); background:rgba(128,144,176,0.07); }
+.t-mid  { color:#70a8e0; border-color:rgba(80,140,210,0.45);  background:rgba(80,140,210,0.08);  box-shadow:0 0 10px rgba(80,140,210,0.2); }
+.t-high { color:var(--gold-light); border-color:rgba(212,168,76,0.75); background:rgba(212,168,76,0.11); animation:highPulse 2.5s ease-in-out infinite; }
+.t-high::after { content:''; position:absolute; top:0; left:-100%; width:55%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent); animation:shimmer 2.4s ease-in-out infinite; }
+@keyframes highPulse { 0%,100%{box-shadow:0 0 10px rgba(212,168,76,0.35);} 50%{box-shadow:0 0 28px rgba(212,168,76,0.8),0 0 50px rgba(212,168,76,0.25);} }
+@keyframes shimmer { 0%{left:-60%;} 100%{left:140%;} }
 
-.slot-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 14px; min-height: 90px;
-}
-.slot {
-  border: 1px solid var(--border); border-radius: 6px; padding: 18px 14px;
-  text-align: center; cursor: pointer; transition: all 0.2s;
-  background: var(--gray);
-}
-.slot:hover { border-color: var(--red-dim); background: var(--gray-2); }
-.slot.selected { border-color: var(--red); background: rgba(196,30,30,0.14); box-shadow: 0 0 0 1px var(--red); }
-.slot.booked { opacity: 0.35; cursor: not-allowed; position: relative; pointer-events: none; }
-.slot.booked::after {
-  content: '予約済み'; position: absolute; inset: 0; display: flex;
-  align-items: center; justify-content: center; font-size: 11px; color: var(--muted);
-  background: rgba(10,10,10,0.6); border-radius: 6px;
-}
-.slot.past { opacity: 0.35; cursor: not-allowed; position: relative; pointer-events: none; }
-.slot.past::after {
-  content: '受付終了'; position: absolute; inset: 0; display: flex;
-  align-items: center; justify-content: center; font-size: 11px; color: var(--muted);
-  background: rgba(10,10,10,0.6); border-radius: 6px;
-}
-.slot-time { font-family: var(--font-en); font-size: 20px; font-weight: 700; }
-.slot-label { font-size: 11px; color: var(--muted); margin-top: 4px; }
+/* 帯バッジ */
+.b-badge { display:inline-flex; align-items:center; gap:5px; padding:4px 12px 4px 9px; border-radius:2px; border:1px solid; font-size:13px; letter-spacing:1px; font-weight:700; text-transform:uppercase; }
+.b-badge.b-pt { font-size:11px; letter-spacing:0.3px; padding:5px 8px; white-space:nowrap; gap:5px; }
+.b-dot { width:11px; height:11px; border-radius:50%; flex-shrink:0; }
+.b-white  { color:#e8e4dc; border-color:rgba(232,228,220,0.3); background:rgba(232,228,220,0.07); }
+.b-white .b-dot   { background:#e8e4dc; }
+.b-blue   { color:#70b0f0; border-color:rgba(30,95,168,0.55);  background:rgba(30,95,168,0.12); }
+.b-blue .b-dot    { background:#1e5fa8; }
+.b-purple { color:#c090f0; border-color:rgba(112,48,184,0.55); background:rgba(112,48,184,0.12); }
+.b-purple .b-dot  { background:#7030b8; }
+.b-brown  { color:#d09878; border-color:rgba(138,72,32,0.55);  background:rgba(138,72,32,0.15); }
+.b-brown .b-dot   { background:#8a4820; }
+.b-black  { color:#b0b0b8; border-color:rgba(110,110,120,0.45); background:rgba(80,80,90,0.12); }
+.b-black .b-dot   { background:#505058; box-shadow:0 0 5px rgba(255,255,255,0.18); }
+.b-gray   { color:#c0c0c8; border-color:rgba(140,140,155,0.45); background:rgba(140,140,155,0.1); }
+.b-gray .b-dot    { background:#909098; }
+.b-yellow { color:#e8cc40; border-color:rgba(212,184,32,0.5);  background:rgba(212,184,32,0.1); }
+.b-yellow .b-dot  { background:#d4b820; }
+.b-orange { color:#e89040; border-color:rgba(208,104,32,0.5);  background:rgba(208,104,32,0.1); }
+.b-orange .b-dot  { background:#d06820; }
+.b-orange-black { color:#c87830; border-color:rgba(180,80,20,0.5); background:linear-gradient(135deg,rgba(208,104,32,0.15),rgba(30,30,30,0.15)); }
+.b-orange-black .b-dot { background:linear-gradient(135deg,#d06820,#222); }
+.b-green  { color:#50c870; border-color:rgba(42,136,64,0.5);   background:rgba(42,136,64,0.1); }
+.b-green .b-dot   { background:#2a8840; }
+.b-green-black { color:#40a860; border-color:rgba(42,136,64,0.5); background:linear-gradient(135deg,rgba(42,136,64,0.15),rgba(30,30,30,0.15)); }
+.b-green-black .b-dot { background:linear-gradient(135deg,#2a8840,#222); }
 
-.loading-box {
-  grid-column: 1 / -1; display: flex; align-items: center; gap: 12px;
-  color: var(--muted); font-size: 14px; padding: 24px 0;
-}
-.spinner {
-  width: 18px; height: 18px; border: 2px solid var(--gray-3);
-  border-top-color: var(--red); border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+/* 称号エフェクト */
+.title-flash { position:fixed; inset:0; z-index:200; pointer-events:none; opacity:0; }
+.title-flash.fire { animation:flashAnim 1.2s ease-out forwards; }
+@keyframes flashAnim { 0%{opacity:0;background:rgba(212,168,76,0);} 15%{opacity:1;background:rgba(212,168,76,0.25);} 100%{opacity:0;background:rgba(212,168,76,0);} }
+.title-popup { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) scale(0.5); z-index:210; pointer-events:none; opacity:0; text-align:center; }
+.title-popup.fire { animation:popupAnim 2.8s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+@keyframes popupAnim { 0%{opacity:0;transform:translate(-50%,-50%) scale(0.5);} 20%{opacity:1;transform:translate(-50%,-50%) scale(1.05);} 35%{transform:translate(-50%,-50%) scale(1);} 75%{opacity:1;transform:translate(-50%,-50%) scale(1);} 100%{opacity:0;transform:translate(-50%,-50%) scale(0.9);} }
+.popup-inner { background:linear-gradient(135deg,#0e1a2e,#1a2840); border:2px solid var(--gold-dim); border-radius:8px; padding:28px 48px; box-shadow:0 0 60px rgba(212,168,76,0.5),0 0 120px rgba(212,168,76,0.2); }
+.popup-label { font-family:'Cinzel',serif; font-size:13px; letter-spacing:6px; color:var(--gold-dim); text-transform:uppercase; margin-bottom:8px; }
+.popup-name  { font-family:'Noto Sans JP',sans-serif; font-size:28px; font-weight:900; color:var(--white); margin-bottom:12px; }
+.popup-title { font-family:'Noto Sans JP',sans-serif; font-size:36px; font-weight:900; color:var(--gold-light); text-shadow:0 0 20px rgba(212,168,76,0.8); }
+#confettiCanvas { position:fixed; inset:0; z-index:205; pointer-events:none; opacity:0; }
 
-.next-btn-wrap { margin-top: 36px; text-align: right; }
-.btn-primary {
-  font-family: var(--font-jp); font-weight: 700; font-size: 15px; letter-spacing: 1px;
-  background: var(--red); color: var(--white); border: none;
-  padding: 16px 40px; border-radius: 4px; cursor: pointer; transition: background 0.15s;
-}
-.btn-primary:disabled { background: var(--gray-3); color: var(--muted); cursor: not-allowed; }
-.btn-primary:not(:disabled):hover { background: #e02020; }
-.btn-secondary {
-  font-family: var(--font-jp); font-size: 14px;
-  background: none; color: var(--white); border: 1px solid var(--border);
-  padding: 14px 32px; border-radius: 4px; cursor: pointer;
-}
-.btn-secondary:hover { border-color: var(--red); color: var(--red); }
-.btn-danger {
-  font-family: var(--font-jp); font-weight: 700; font-size: 15px;
-  background: var(--red); color: var(--white); border: none;
-  padding: 16px 40px; border-radius: 4px; cursor: pointer;
-}
-.btn-danger:hover { background: #e02020; }
-.btn-danger:disabled { background: var(--gray-3); color: var(--muted); cursor: not-allowed; }
+/* オーバーレイ */
+.overlay { position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; z-index:100; opacity:0; pointer-events:none; transition:opacity 0.5s ease; background:rgba(4,6,10,0.94); }
+.overlay.show { opacity:1; }
+.ov-title { font-family:'Cinzel',serif; font-size:26px; letter-spacing:7px; color:var(--gold); text-transform:uppercase; }
+.ov-bar-wrap { width:360px; height:2px; background:var(--border); border-radius:2px; overflow:hidden; }
+.ov-bar { height:100%; background:linear-gradient(90deg,var(--gold-dim),var(--gold-light)); border-radius:2px; animation:ovAnim 1.6s ease-in-out infinite; }
+@keyframes ovAnim { 0%{width:0%;margin-left:0} 50%{width:60%} 100%{width:0%;margin-left:100%} }
 
-/* ===================== 画面③：予約フォーム ===================== */
-.form-summary {
-  background: var(--gray); border: 1px solid var(--border); border-left: 3px solid var(--red);
-  border-radius: 4px; padding: 22px 24px; margin-bottom: 32px;
+/* =====================================================================
+   スマホUI
+   ===================================================================== */
+.mobile-screen { display:none; min-height:100vh; background:var(--bg); flex-direction:column; }
+@media (max-width:1024px) {
+  body { overflow:auto; }
+  .scale-wrapper { display:none !important; }
+  .pc-screen     { display:none !important; }
+  .mobile-screen { display:flex; }
+  .overlay       { display:none !important; }
+  #confettiCanvas,.title-flash,.title-popup { display:none !important; }
 }
-.form-summary-row { display: flex; justify-content: space-between; gap: 16px; padding: 6px 0; font-size: 14px; }
-.form-summary-row span:first-child { color: var(--muted); flex-shrink: 0; }
-.form-summary-row span:last-child { font-weight: 700; text-align: right; }
+/* TV/FireTVブラウザ対策：?pc=1 をURLに付けるとPC画面を強制表示 */
+html.force-pc .mobile-screen { display:none !important; }
+html.force-pc .scale-wrapper { display:flex !important; }
+html.force-pc .pc-screen     { display:grid !important; }
+html.force-pc body { overflow:hidden !important; }
+.m-header { padding:18px 20px 12px; border-bottom:1px solid var(--border); background:linear-gradient(180deg,rgba(212,168,76,0.06),transparent); position:relative; }
+.m-header::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--gold) 40%,var(--gold-light) 50%,var(--gold) 60%,transparent); }
+.m-title { font-family:'Cinzel',serif; font-size:22px; font-weight:900; letter-spacing:3px; background:linear-gradient(135deg,var(--gold-light),var(--gold) 55%,var(--gold-dim)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; text-transform:uppercase; }
+.m-sub { font-size:11px; letter-spacing:3px; color:var(--muted); margin-top:2px; font-family:'Cinzel',serif; text-transform:uppercase; }
 
-.form-group { margin-bottom: 22px; }
-.form-label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 8px; }
-.form-label .req { color: var(--red); font-size: 11px; margin-left: 6px; }
-.form-input {
-  width: 100%; background: var(--gray); border: 1px solid var(--border);
-  border-radius: 4px; padding: 14px 16px; color: var(--white); font-size: 16px;
-  font-family: var(--font-jp);
+/* ===== チェックインセクション（NFC対応） ===== */
+.m-checkin-section { padding:14px 20px; border-bottom:1px solid var(--border); }
+
+/* NFCで自動検出された場合の個人チェックイン */
+.m-checkin-personal { background:var(--card); border:1px solid var(--gold-dim); border-radius:4px; padding:16px; margin-bottom:10px; display:none; }
+.m-checkin-personal.show { display:block; }
+.mcp-greeting { font-size:12px; letter-spacing:2px; color:var(--muted); font-family:'Cinzel',serif; text-transform:uppercase; margin-bottom:6px; }
+.mcp-name { font-size:20px; font-weight:700; color:var(--white); margin-bottom:4px; }
+.mcp-info { font-size:12px; color:var(--muted); margin-bottom:12px; }
+.mcp-info span { color:var(--gold); font-weight:700; }
+.mcp-btn { width:100%; padding:14px; background:linear-gradient(135deg,var(--gold-light),var(--gold)); border:none; border-radius:3px; cursor:pointer; font-family:'Cinzel',serif; font-size:14px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--bg); transition:all 0.2s; position:relative; overflow:hidden; }
+.mcp-btn:active { transform:scale(0.98); }
+.mcp-btn::after { content:''; position:absolute; top:0; left:-100%; width:60%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent); animation:shimmer 2.4s ease-in-out infinite; }
+.mcp-btn:disabled { opacity:0.5; cursor:not-allowed; }
+
+/* 汎用チェックインボタン（IDなしの場合） */
+.m-checkin-btn { width:100%; padding:15px; background:linear-gradient(135deg,rgba(212,168,76,0.15),rgba(212,168,76,0.05)); border:1px solid var(--gold-dim); border-radius:4px; cursor:pointer; font-family:'Cinzel',serif; font-size:13px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--gold); transition:all 0.2s ease; }
+.m-checkin-btn:hover { background:linear-gradient(135deg,rgba(212,168,76,0.25),rgba(212,168,76,0.1)); }
+.m-checkin-hint { font-size:11px; color:var(--muted); text-align:center; margin-top:8px; }
+
+/* チェックイン完了画面 */
+.m-checkin-done { background:var(--card); border:1px solid rgba(80,200,120,0.4); border-radius:4px; padding:16px; text-align:center; display:none; }
+.m-checkin-done.show { display:block; }
+.mcd-icon  { font-size:32px; margin-bottom:8px; }
+.mcd-title { font-family:'Cinzel',serif; font-size:16px; letter-spacing:3px; color:#50c878; text-transform:uppercase; margin-bottom:6px; }
+.mcd-name  { font-size:18px; font-weight:700; color:var(--white); margin-bottom:4px; }
+.mcd-count { font-size:13px; color:var(--muted); }
+.mcd-count span { color:var(--gold); font-weight:700; }
+
+.m-search-section { padding:14px 20px; border-bottom:1px solid var(--border); background:rgba(212,168,76,0.03); }
+.m-search-label { font-family:'Cinzel',serif; font-size:10px; letter-spacing:3px; color:var(--gold-dim); text-transform:uppercase; margin-bottom:8px; display:block; }
+.m-search-row { display:flex; gap:8px; }
+.m-search-input { flex:1; background:var(--card); border:1px solid var(--border); border-radius:3px; color:var(--white); font-family:'Noto Sans JP',sans-serif; font-size:15px; padding:10px 14px; outline:none; transition:border-color 0.2s; }
+.m-search-input:focus { border-color:var(--gold-dim); }
+.m-search-input::placeholder { color:var(--muted); }
+.m-search-btn { padding:10px 16px; background:linear-gradient(135deg,var(--gold-light),var(--gold)); border:none; border-radius:3px; cursor:pointer; font-family:'Cinzel',serif; font-size:11px; letter-spacing:2px; color:var(--bg); font-weight:700; text-transform:uppercase; white-space:nowrap; }
+.m-tracker { margin-top:12px; background:var(--card); border:1px solid var(--border); border-radius:4px; padding:16px; display:none; animation:fadeInRow 0.4s ease both; }
+.m-tracker.show { display:block; }
+.m-tracker-header { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+.m-tracker-avatar { width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,var(--gold-light),var(--gold)); display:flex; align-items:center; justify-content:center; font-family:'Cinzel',serif; font-size:16px; font-weight:700; color:var(--bg); flex-shrink:0; }
+.m-tracker-name { font-size:18px; font-weight:700; color:var(--white); }
+.m-tracker-meta { font-size:12px; color:var(--muted); margin-top:2px; }
+.m-tracker-meta span { color:var(--white-dim); font-weight:700; }
+.tracker-steps { display:flex; flex-direction:column; gap:10px; }
+.ts-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:5px; }
+.ts-label { font-size:12px; font-weight:700; color:var(--white-dim); display:flex; align-items:center; gap:8px; }
+.ts-count { font-family:'Cinzel',serif; font-size:12px; color:var(--muted); }
+.ts-count.done { color:var(--gold); }
+.ts-bar-wrap { height:6px; background:var(--surface); border-radius:3px; overflow:hidden; }
+.ts-bar { height:100%; border-radius:3px; transition:width 0.8s cubic-bezier(0.22,1,0.36,1); }
+.ts-bar.done { background:linear-gradient(90deg,var(--gold-dim),var(--gold)); }
+.ts-bar.prog { background:linear-gradient(90deg,var(--gold-dim),var(--gold-light)); }
+.ts-bar.none { background:var(--border); }
+.tracker-total { margin-top:14px; padding-top:12px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:baseline; }
+.tt-label { font-size:11px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; font-family:'Cinzel',serif; }
+.tt-val   { font-family:'Cinzel',serif; font-size:22px; font-weight:700; color:var(--gold); }
+.tt-unit  { font-size:11px; color:var(--muted); margin-left:4px; }
+.tracker-not-found { padding:16px; text-align:center; color:var(--muted); font-size:13px; border:1px dashed var(--border); border-radius:4px; margin-top:12px; }
+.tracker-kids-note { padding:10px 14px; background:rgba(90,172,240,0.06); border:1px solid rgba(90,172,240,0.2); border-radius:3px; margin-top:12px; font-size:12px; color:var(--kids-a); text-align:center; }
+.m-tabs { display:flex; border-bottom:1px solid var(--border); }
+.m-tab { flex:1; padding:12px; text-align:center; font-family:'Cinzel',serif; font-size:10px; letter-spacing:2px; text-transform:uppercase; cursor:pointer; border:none; background:transparent; color:var(--muted); border-bottom:2px solid transparent; transition:all 0.2s; }
+.m-tab.active-adult  { color:var(--gold);   border-bottom-color:var(--gold); }
+.m-tab.active-kids-a { color:var(--kids-a); border-bottom-color:var(--kids-a); }
+.m-tab.active-kids-b { color:var(--kids-b); border-bottom-color:var(--kids-b); }
+.m-list { flex:1; overflow-y:auto; padding:0 0 80px; }
+.m-month-banner { display:flex; align-items:center; justify-content:space-between; padding:10px 20px; background:rgba(212,168,76,0.05); border-bottom:1px solid var(--border); }
+.m-month-label { font-family:'Cinzel',serif; font-size:10px; letter-spacing:3px; color:var(--gold-dim); text-transform:uppercase; }
+.m-month-val   { font-family:'Cinzel',serif; font-size:12px; color:var(--gold); }
+.m-podium { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; padding:14px 16px; }
+.m-p-card { border:1px solid var(--border); border-radius:4px; background:var(--card); padding:12px 10px; text-align:center; }
+.m-p-card.p1-adult  { border-color:var(--gold-dim);   box-shadow:0 0 20px rgba(212,168,76,0.3); }
+.m-p-card.p1-kids-a { border-color:var(--kids-a-dim); box-shadow:0 0 20px rgba(90,172,240,0.3); }
+.m-p-card.p1-kids-b { border-color:var(--kids-b-dim); box-shadow:0 0 20px rgba(80,208,160,0.3); }
+.m-p-rank  { font-family:'Cinzel',serif; font-size:9px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:4px; }
+.m-p-av    { width:36px; height:36px; border-radius:50%; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; font-family:'Cinzel',serif; font-size:14px; font-weight:700; color:var(--bg); }
+.m-p-name    { font-size:12px; font-weight:700; color:var(--white); margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.m-p-title   { font-size:8.5px; color:var(--gold); letter-spacing:0.5px; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; opacity:0.9; }
+.m-p-monthly { font-family:'Cinzel',serif; font-size:18px; font-weight:700; color:var(--gold); }
+.m-p-total   { font-size:9px; color:var(--muted); margin-top:2px; }
+.m-r-row { display:grid; grid-template-columns:36px 1fr auto; align-items:center; gap:12px; padding:12px 20px; border-bottom:1px solid rgba(36,48,80,0.5); }
+.m-r-num  { font-family:'Cinzel',serif; font-size:16px; font-weight:700; color:var(--muted); text-align:center; }
+.m-r-info { min-width:0; }
+.m-r-name { font-size:15px; font-weight:700; color:var(--white); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:4px; }
+.m-r-badges { display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
+.m-r-right { text-align:right; flex-shrink:0; }
+.m-r-monthly { font-family:'Cinzel',serif; font-size:20px; font-weight:700; color:var(--white); line-height:1; }
+.m-instructor-section { margin-top:10px; padding-top:10px; border-top:1px solid var(--border-hi); }
+.m-instructor-label { font-family:'Cinzel',serif; font-size:11px; letter-spacing:3px; color:#e0b400; text-transform:uppercase; padding:6px 20px; }
+.m-instr-row { background:rgba(224,180,0,0.04); border-bottom-color:rgba(224,180,0,0.12); }
+.m-r-unit    { font-size:9px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; }
+.m-r-total   { font-size:10px; color:var(--muted); margin-top:2px; }
+.m-r-total span { color:var(--white-dim); font-weight:700; }
+.m-toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); background:var(--card); border:1px solid var(--gold-dim); color:var(--gold-light); font-family:'Cinzel',serif; font-size:12px; letter-spacing:2px; padding:12px 24px; border-radius:2px; box-shadow:0 4px 24px rgba(0,0,0,0.5); opacity:0; transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1); z-index:1000; pointer-events:none; white-space:nowrap; text-transform:uppercase; }
+.m-toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+.m-footer { padding:12px 20px; border-top:1px solid var(--border); text-align:center; }
+.m-last-upd { font-size:10px; letter-spacing:2px; color:var(--muted); font-family:'Cinzel',serif; text-transform:uppercase; }
+
+/* =====================================================================
+   🎃 HALLOWEEN THEME（期間限定装飾）2026
+   手動で戻す場合は、このブロックを丸ごと削除してください
+   （この下から「🎃 HALLOWEEN THEME ここまで」のコメントの直前まで）
+   ===================================================================== */
+:root {
+  --bg:         #0a0612;
+  --surface:    #150c22;
+  --card:       #1c1030;
+  --border:     #3d2a55;
+  --border-hi:  #5a3d7a;
+  --gold:       #ff8c1a;
+  --gold-light: #ffb347;
+  --gold-dim:   #cc5c00;
+  --white:      #f5ecff;
+  --white-dim:  #cdb8e6;
+  --muted:      #8a76a8;
+  --kids-a:     #5fd068;
+  --kids-a-dim: #1e5c26;
+  --kids-b:     #c86bf0;
+  --kids-b-dim: #5a1f78;
+  --g1:  rgba(255,140,26,0.5);
+  --g2:  rgba(200,107,240,0.4);
+  --g3:  rgba(95,208,104,0.35);
+  --ka1: rgba(95,208,104,0.5);
+  --kb1: rgba(200,107,240,0.5);
 }
-.form-input:focus { outline: none; border-color: var(--red-dim); }
-.form-input.invalid { border-color: var(--red); }
-.form-error { display: none; font-size: 12px; color: #ff6b6b; margin-top: 6px; }
-.form-error.show { display: block; }
-.form-hint { font-size: 11px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
-
-.segmented { display: flex; gap: 10px; }
-.seg-btn {
-  flex: 1; padding: 14px 10px; border: 1px solid var(--border); border-radius: 4px;
-  background: var(--gray); color: var(--muted); font-size: 14px; cursor: pointer;
-  font-family: var(--font-jp); transition: all 0.15s; text-align: center;
+body {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse 640px 420px at 12% 8%,  rgba(255,140,26,0.10), transparent 60%),
+    radial-gradient(ellipse 640px 420px at 88% 92%, rgba(200,107,240,0.12), transparent 60%),
+    repeating-linear-gradient(0deg,  transparent, transparent 3px, rgba(255,255,255,0.013) 3px, rgba(255,255,255,0.013) 6px),
+    repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(255,255,255,0.009) 3px, rgba(255,255,255,0.009) 6px);
 }
-.seg-btn:hover { border-color: var(--gray-3); color: var(--white); }
-.seg-btn.selected { border-color: var(--red); background: rgba(196,30,30,0.14); color: var(--white); font-weight: 700; }
-.seg-btn small { display: block; font-size: 11px; color: var(--muted); margin-top: 3px; font-weight: 400; }
-
-.form-note { font-size: 12px; color: var(--muted); margin-top: 28px; line-height: 2; }
-
-/* ===================== 画面④：完了 / キャンセル ===================== */
-.confirm-screen { text-align: center; padding: 70px 24px 90px; max-width: 560px; margin: 0 auto; }
-.confirm-icon {
-  width: 72px; height: 72px; border-radius: 50%; background: rgba(196,30,30,0.15);
-  border: 2px solid var(--red); display: flex; align-items: center; justify-content: center;
-  font-size: 32px; margin: 0 auto 28px;
+body::before {
+  background: radial-gradient(ellipse 900px 600px at 50% -80px, rgba(255,140,26,0.12) 0%, transparent 70%);
 }
-.confirm-icon.gray { background: var(--gray-2); border-color: var(--gray-3); }
-.confirm-title { font-size: 24px; font-weight: 900; margin-bottom: 12px; }
-.confirm-sub { color: var(--muted); font-size: 14px; margin-bottom: 32px; line-height: 2; }
-.confirm-card {
-  background: var(--gray); border: 1px solid var(--border); border-left: 3px solid var(--red);
-  border-radius: 4px; padding: 22px 24px; margin-bottom: 28px; text-align: left;
+/* ヘッダー見出しに🎃を追加（グラデーション文字は透明クリップされるため、絵文字部分だけ色指定を上書き） */
+.hdr-title::before, .hdr-title::after,
+.m-title::before,   .m-title::after {
+  -webkit-text-fill-color: initial;
+  background: none;
+  color: var(--gold);
 }
-.confirm-card .form-summary-row { font-size: 14px; }
-.confirm-actions { display: flex; flex-direction: column; gap: 12px; align-items: center; }
-.confirm-actions .btn-primary, .confirm-actions .btn-secondary, .confirm-actions .btn-danger { min-width: 260px; }
-.cancel-hint {
-  margin-top: 28px; padding: 16px 20px; background: var(--gray); border: 1px solid var(--border);
-  border-radius: 6px; font-size: 12px; color: var(--muted); line-height: 2; text-align: left;
+.hdr-title::before { content: '🎃 '; }
+.hdr-title::after  { content: ' 🎃'; }
+.m-title::before   { content: '🎃 '; }
+.m-title::after    { content: ' 🎃'; }
+.hdr-eyebrow::before { content: '🦇 '; }
+.hdr-eyebrow::after  { content: ' 🦇'; }
+/* 四隅のクモの巣 */
+.pc-screen::before, .pc-screen::after {
+  content: '🕸️'; position: absolute; font-size: 60px; opacity: 0.32;
+  z-index: 5; pointer-events: none; line-height: 1;
 }
-.cancel-hint strong { color: var(--white); font-weight: 500; }
-
-@media (max-width: 640px) {
-  .container { padding: 24px 16px 70px; }
-
-  /* ★インストラクターカード：2列グリッド＋説明文非表示をやめ、
-     横並びの1列リストにしてプロフィール全体が見えるようにする */
-  .instructor-row { display: flex; flex-direction: column; gap: 14px; }
-  .instructor-card {
-    display: flex; flex-direction: row; align-items: stretch;
-    aspect-ratio: auto; height: auto;
-  }
-  .instructor-card img, .instructor-photo-fallback {
-    width: 96px; height: auto; min-height: 130px; flex-shrink: 0;
-  }
-  .instructor-photo-fallback { font-size: 32px; }
-  .instructor-overlay {
-    position: static; background: none; flex: 1; min-width: 0;
-    padding: 12px 14px; justify-content: center;
-  }
-  .instructor-name { font-size: 16px; }
-  .instructor-desc {
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-    overflow: hidden; font-size: 11.5px;
-  }
-  .instructor-price { margin-top: 6px; }
-  .instructor-cta { display: flex; font-size: 11px; margin-top: 8px; }
-
-  .instructor-hero { gap: 14px; }
-  .instructor-hero-photo { width: 64px; height: 64px; }
-  .instructor-hero-name { font-size: 19px; }
-  .page-title { font-size: 22px; }
-  .next-btn-wrap { text-align: stretch; }
-  .next-btn-wrap .btn-primary { width: 100%; }
-  .slot-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
-  .slot { padding: 14px 8px; }
-  .slot-time { font-size: 17px; }
+.pc-screen::before { top: -8px; left: -8px; }
+.pc-screen::after  { top: -8px; right: -8px; transform: scaleX(-1); }
+/* 浮遊するコウモリ（JS側で生成した要素に適用） */
+.hw-bat {
+  position: fixed; z-index: 6; pointer-events: none; opacity: 0.85;
+  animation: hwBatFly linear infinite;
+  filter: drop-shadow(0 0 6px rgba(0,0,0,0.6));
 }
+@keyframes hwBatFly {
+  0%   { transform: translateX(-60px) translateY(0) scale(1); }
+  25%  { transform: translateX(520px) translateY(-36px) scale(1); }
+  50%  { transform: translateX(1040px) translateY(18px) scale(-1,1); }
+  75%  { transform: translateX(1560px) translateY(-24px) scale(-1,1); }
+  100% { transform: translateX(2020px) translateY(0) scale(1); }
+}
+/* PODIUM 1〜3位カードを枠色ごとハロウィン仕様に */
+.p-card.a-r1::before { background: linear-gradient(180deg, var(--gold-light), var(--gold)); }
+.p-card.a-r2::before { background: linear-gradient(180deg, #e0b8f8, var(--kids-b)); }
+.p-card.a-r3::before { background: linear-gradient(180deg, #90e8a0, var(--kids-a)); }
+
+/* 浮遊する幽霊（コウモリとは違う、ふわふわ上下する軌道） */
+.hw-ghost {
+  position: fixed; z-index: 6; pointer-events: none; opacity: 0.65;
+  animation: hwGhostFloat linear infinite;
+  filter: drop-shadow(0 0 8px rgba(200,107,240,0.5));
+}
+@keyframes hwGhostFloat {
+  0%   { transform: translateX(-60px) translateY(0); }
+  20%  { transform: translateX(420px) translateY(-50px); }
+  40%  { transform: translateX(840px) translateY(10px); }
+  60%  { transform: translateX(1260px) translateY(-40px); }
+  80%  { transform: translateX(1680px) translateY(20px); }
+  100% { transform: translateX(2100px) translateY(0); }
+}
+
+/* 天井からぶら下がって揺れるクモ */
+.hw-spider-wrap {
+  position: fixed; top: -20px; z-index: 6; pointer-events: none;
+  transform-origin: top center;
+  animation: hwSpiderSwing ease-in-out infinite;
+}
+.hw-spider-thread {
+  width: 1px; margin: 0 auto; background: rgba(220,210,235,0.5);
+}
+.hw-spider-icon { display: block; text-align: center; filter: drop-shadow(0 0 5px rgba(0,0,0,0.6)); }
+@keyframes hwSpiderSwing {
+  0%, 100% { transform: rotate(-12deg); }
+  50%      { transform: rotate(12deg); }
+}
+
+/* たまに登場するバンパイア（コウモリより遅く、目立つ） */
+.hw-vampire {
+  position: fixed; z-index: 6; pointer-events: none; opacity: 0.9;
+  animation: hwVampireWalk linear infinite;
+  filter: drop-shadow(0 0 8px rgba(255,140,26,0.5));
+}
+@keyframes hwVampireWalk {
+  0%   { transform: translateX(-80px) scaleX(1); }
+  48%  { transform: translateX(1060px) scaleX(1); }
+  50%  { transform: translateX(1060px) scaleX(-1); }
+  98%  { transform: translateX(-80px) scaleX(-1); }
+  100% { transform: translateX(-80px) scaleX(1); }
+}
+
+/* タイトルがたまにオレンジ⇄パープルでゆらめく演出 */
+.hdr-title, .m-title { animation: hwTitleFlicker 6s ease-in-out infinite; }
+@keyframes hwTitleFlicker {
+  0%, 88%, 100% { filter: none; }
+  90%  { filter: hue-rotate(35deg) brightness(1.15); }
+  93%  { filter: none; }
+  95%  { filter: hue-rotate(-20deg) brightness(1.1); }
+  97%  { filter: none; }
+}
+
+/* ===== 常時演出：満月・流れる雲・足元の霧 ===== */
+.hw-moon {
+  position: fixed; top: 40px; right: 120px; width: 180px; height: 180px;
+  border-radius: 50%; z-index: 0; pointer-events: none;
+  background: radial-gradient(circle at 40% 38%, #fff6d8 0%, #ffe6a8 45%, #f0c878 100%);
+  box-shadow: 0 0 60px 20px rgba(255,220,150,0.25), 0 0 140px 60px rgba(255,180,80,0.12);
+  animation: hwMoonGlow 8s ease-in-out infinite;
+}
+@keyframes hwMoonGlow {
+  0%, 100% { box-shadow: 0 0 60px 20px rgba(255,220,150,0.25), 0 0 140px 60px rgba(255,180,80,0.12); }
+  50%      { box-shadow: 0 0 80px 30px rgba(255,220,150,0.35), 0 0 180px 80px rgba(255,180,80,0.18); }
+}
+.hw-cloud {
+  position: fixed; z-index: 0; pointer-events: none;
+  width: 320px; height: 70px; border-radius: 60px;
+  background: rgba(60,40,90,0.85); filter: blur(14px);
+  animation: hwCloudDrift linear infinite;
+}
+@keyframes hwCloudDrift {
+  0%   { transform: translateX(-400px); }
+  100% { transform: translateX(2300px); }
+}
+.hw-fog {
+  position: fixed; left: 0; right: 0; bottom: 0; height: 220px;
+  z-index: 4; pointer-events: none;
+  background: linear-gradient(180deg, transparent 0%, rgba(160,140,200,0.10) 50%, rgba(160,140,200,0.22) 100%);
+  animation: hwFogPulse 10s ease-in-out infinite;
+}
+.hw-fog.f2 {
+  height: 140px; animation-duration: 14s; animation-delay: 4s;
+  background: linear-gradient(180deg, transparent 0%, rgba(200,107,240,0.08) 60%, rgba(200,107,240,0.18) 100%);
+}
+@keyframes hwFogPulse {
+  0%, 100% { opacity: 0.6; transform: translateX(0); }
+  50%      { opacity: 1;   transform: translateX(40px); }
+}
+
+/* ===== サプライズ演出①：雷（画面が一瞬光って揺れる） ===== */
+.hw-flash {
+  position: fixed; inset: 0; z-index: 50; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 20%, rgba(255,255,255,0.95), rgba(200,160,255,0.6) 40%, transparent 75%);
+  opacity: 0; animation: hwFlash 1.6s ease-out forwards;
+}
+@keyframes hwFlash {
+  0%   { opacity: 0; }
+  6%   { opacity: 1; }
+  12%  { opacity: 0.1; }
+  20%  { opacity: 0.9; }
+  30%  { opacity: 0; }
+  55%  { opacity: 0.6; }
+  70%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+.hw-shake { animation: hwShake 0.6s ease-in-out; }
+@keyframes hwShake {
+  0%, 100% { transform: translate(0,0); }
+  20%  { transform: translate(-6px, 4px); }
+  40%  { transform: translate(6px, -3px); }
+  60%  { transform: translate(-4px, 3px); }
+  80%  { transform: translate(4px, -2px); }
+}
+
+/* ===== サプライズ演出②：巨大な幽霊が「BOO!」と叫びながら横切る ===== */
+.hw-boo {
+  position: fixed; top: 30%; left: 0; z-index: 45; pointer-events: none;
+  font-size: 220px; line-height: 1;
+  filter: drop-shadow(0 0 30px rgba(200,107,240,0.8));
+  animation: hwBooSwoop 4.5s ease-in-out forwards;
+}
+.hw-boo-text {
+  position: absolute; top: -40px; left: 180px;
+  font-family: 'Cinzel', serif; font-weight: 900; font-size: 90px;
+  color: var(--gold); letter-spacing: 6px;
+  text-shadow: 0 0 20px rgba(255,140,26,0.9), 0 0 50px rgba(255,140,26,0.5);
+  animation: hwBooTextPop 4.5s ease-out forwards;
+}
+@keyframes hwBooSwoop {
+  0%   { transform: translateX(-400px) translateY(60px) rotate(-8deg); opacity: 0; }
+  15%  { opacity: 1; }
+  50%  { transform: translateX(900px) translateY(-40px) rotate(6deg); }
+  85%  { opacity: 1; }
+  100% { transform: translateX(2200px) translateY(40px) rotate(-6deg); opacity: 0; }
+}
+@keyframes hwBooTextPop {
+  0%, 25% { transform: scale(0); opacity: 0; }
+  35%  { transform: scale(1.3); opacity: 1; }
+  45%  { transform: scale(1); }
+  80%  { opacity: 1; }
+  100% { transform: scale(1.1); opacity: 0; }
+}
+
+/* ===== サプライズ演出③：カボチャの雨 ===== */
+.hw-drop {
+  position: fixed; top: -80px; z-index: 45; pointer-events: none;
+  animation: hwDropFall linear forwards;
+  filter: drop-shadow(0 0 6px rgba(0,0,0,0.5));
+}
+@keyframes hwDropFall {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(1250px) rotate(720deg); opacity: 0; }
+}
+
+/* ===== サプライズ演出④：コウモリの大群 ===== */
+.hw-swarm {
+  position: fixed; z-index: 45; pointer-events: none;
+  animation: hwSwarmFly linear forwards;
+  filter: drop-shadow(0 0 5px rgba(0,0,0,0.6));
+}
+@keyframes hwSwarmFly {
+  0%   { transform: translateX(-80px) translateY(0); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateX(2100px) translateY(-60px); opacity: 0; }
+}
+/* ===== スマホ表示用の調整（モニター/TVの ?pc=1 表示には影響しない） =====
+   狭い画面では満月・雲・バンパイアが邪魔になるので非表示にし、
+   霧と巨大幽霊は小さくする */
+@media (max-width:1024px) {
+  html:not(.force-pc) .hw-moon,
+  html:not(.force-pc) .hw-cloud,
+  html:not(.force-pc) .hw-vampire { display:none !important; }
+  html:not(.force-pc) .hw-fog    { height:90px; }
+  html:not(.force-pc) .hw-fog.f2 { height:60px; }
+  html:not(.force-pc) .hw-boo      { font-size:110px; top:38%; }
+  html:not(.force-pc) .hw-boo-text { font-size:40px; left:95px; top:-18px; letter-spacing:3px; }
+}
+/* 🎃 HALLOWEEN THEME ここまで */
 </style>
 </head>
 <body>
 
-<!-- ============================================================
-     画面① インストラクター選択
-     ============================================================ -->
-<div class="screen active" id="screen-select">
-  <header class="app-header">
-    <div class="app-logo">JIUJITSU <span>GUILD</span></div>
-    <div class="header-tag">PRIVATE CLASS BOOKING</div>
-  </header>
-  <div class="container">
-    <div class="steps">
-      <div class="step current"><div class="step-num">1</div>インストラクター</div>
-      <div class="step-arrow">→</div>
-      <div class="step"><div class="step-num">2</div>日時</div>
-      <div class="step-arrow">→</div>
-      <div class="step"><div class="step-num">3</div>お客様情報</div>
-    </div>
-
-    <div class="page-title">プライベートクラスを予約</div>
-    <div class="page-sub">マンツーマンの60分。あなたの課題に合わせて、集中的に指導します。<br>担当してほしいインストラクターを選んでください。</div>
-
-    <div class="instructor-row">
-      <div class="instructor-card" onclick="selectInstructor('lucas')">
-        <img src="images/lucas.jpg" alt="ルーカス・タヒラ">
-        <div class="instructor-overlay">
-          <div class="instructor-belt">● 黒帯</div>
-          <div class="instructor-name">ルーカス・タヒラ</div>
-          <div class="instructor-desc">ギルド代表。スパイダーガードやオープンガードを扱い、三角絞めを得意とする。試合に向けた作戦立案や、立ち回りの指導も得意とする。</div>
-          <div class="instructor-price"><span class="amount">9,000円</span><span class="unit">/ 60分</span></div>
-          <div class="instructor-cta">このインストラクターで予約</div>
-        </div>
-      </div>
-
-      <div class="instructor-card" onclick="selectInstructor('kuroya')">
-        <img src="images/kuroya.jpg" alt="黒谷善行">
-        <div class="instructor-overlay">
-          <div class="instructor-belt">● 黒帯</div>
-          <div class="instructor-name">黒谷 善行</div>
-          <div class="instructor-desc">コーチ。トップポジション、投げ技、パスガードを得意とする。</div>
-          <div class="instructor-price"><span class="amount">7,000円</span><span class="unit">/ 60分</span></div>
-          <div class="instructor-cta">このインストラクターで予約</div>
-        </div>
-      </div>
-
-      <div class="instructor-card" onclick="selectInstructor('matsuno')">
-        <div class="instructor-photo-fallback">松</div>
-        <div class="instructor-overlay">
-          <div class="instructor-belt">● 茶帯</div>
-          <div class="instructor-name">松野 保奈朱</div>
-          <div class="instructor-desc">コーチ。トップポジション、パスガード、サイドからの極め技を得意とする。プレッシャーをかけながらパスをし、相手を確実に固めて攻めるスタイル。</div>
-          <div class="instructor-price"><span class="amount">5,000円</span><span class="unit">/ 60分</span></div>
-          <div class="instructor-cta">このインストラクターで予約</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="select-footnote">
-      <strong>会員以外の方も予約できます。</strong>他ジム所属の方、出張・帰省中の方も歓迎です。<br>
-      予約後の<strong>キャンセルは、確認メールのリンクからワンタップで完了</strong>します。お電話は不要です。
-    </div>
+<div class="title-flash" id="titleFlash"></div>
+<canvas id="confettiCanvas"></canvas>
+<div class="title-popup" id="titlePopup">
+  <div class="popup-inner">
+    <div class="popup-label">称号 昇格</div>
+    <div class="popup-name"  id="popupName"></div>
+    <div class="popup-title" id="popupTitle"></div>
   </div>
 </div>
 
-<!-- ============================================================
-     画面② 時間帯選択
-     ============================================================ -->
-<div class="screen" id="screen-slots">
-  <header class="app-header">
-    <button class="back-btn" onclick="goTo('screen-select')">← 戻る</button>
-    <div class="app-logo">JIUJITSU <span>GUILD</span></div>
-  </header>
-  <div class="container">
-    <div class="steps">
-      <div class="step done"><div class="step-num">✓</div>インストラクター</div>
-      <div class="step-arrow">→</div>
-      <div class="step current"><div class="step-num">2</div>日時</div>
-      <div class="step-arrow">→</div>
-      <div class="step"><div class="step-num">3</div>お客様情報</div>
-    </div>
-
-    <div class="instructor-hero">
-      <div class="instructor-hero-photo" id="hero-photo-box"><img id="hero-photo" src="" alt=""></div>
-      <div>
-        <div class="instructor-hero-name" id="hero-name"></div>
-        <div class="instructor-hero-meta" id="hero-meta"></div>
-      </div>
-    </div>
-
-    <div class="section-label">日付を選択</div>
-    <div class="day-tabs" id="day-tabs"></div>
-
-    <div class="section-label">時間帯を選択</div>
-    <div class="slot-grid" id="slot-grid"></div>
-
-    <div class="next-btn-wrap">
-      <button class="btn-primary" id="next-btn" disabled onclick="goToForm()">次へ進む</button>
-    </div>
-  </div>
+<div class="overlay" id="loadingOv">
+  <div style="font-size:40px;">⚔</div>
+  <div class="ov-title">Loading Ranking</div>
+  <div class="ov-bar-wrap"><div class="ov-bar"></div></div>
+</div>
+<div class="overlay" id="refreshOv">
+  <div class="ov-title">⟳ Updating</div>
+  <div class="ov-bar-wrap"><div class="ov-bar"></div></div>
 </div>
 
-<!-- ============================================================
-     画面③ 予約フォーム
-     ============================================================ -->
-<div class="screen" id="screen-form">
-  <header class="app-header">
-    <button class="back-btn" onclick="goTo('screen-slots')">← 戻る</button>
-    <div class="app-logo">JIUJITSU <span>GUILD</span></div>
+<!-- PC画面 -->
+<div class="scale-wrapper" id="scaleWrapper">
+<div class="pc-screen" id="pcScreen">
+  <header class="pc-header" id="pcHeader">
+    <div class="hdr-left">
+      <span class="hdr-eyebrow">Brazilian Jiu-Jitsu</span>
+      <h1 class="hdr-title">Guild Ranking</h1>
+    </div>
+    <div class="hdr-center">
+      <span class="season-chip">⚔ Season 2026</span>
+      <div class="month-chip"><div class="month-dot"></div><span id="pcMonthLabel">— Monthly —</span></div>
+    </div>
+    <div class="hdr-right">
+      <div class="clock"      id="pcClock">00:00:00</div>
+      <div class="clock-date" id="pcDate">— —</div>
+    </div>
   </header>
-  <div class="container" style="max-width:560px;">
-    <div class="steps">
-      <div class="step done"><div class="step-num">✓</div>インストラクター</div>
-      <div class="step-arrow">→</div>
-      <div class="step done"><div class="step-num">✓</div>日時</div>
-      <div class="step-arrow">→</div>
-      <div class="step current"><div class="step-num">3</div>お客様情報</div>
+  <main class="pc-main" id="pcMain"></main>
+  <footer class="pc-footer">
+    <div class="footer-left">
+      <span class="footer-logo">⚔ BJJ Guild Monitor</span>
+      <span class="version-tag">v2.1</span>
+      <div class="footer-sep"></div>
+      <span class="last-upd" id="pcLastUpd">Last Updated: —</span>
     </div>
-
-    <div class="page-title">予約情報の入力</div>
-    <div class="page-sub">あと少しです。お名前とご連絡先をご入力ください。</div>
-
-    <div class="form-summary">
-      <div class="form-summary-row"><span>担当</span><span id="sum-instructor"></span></div>
-      <div class="form-summary-row"><span>日時</span><span id="sum-datetime"></span></div>
-      <div class="form-summary-row"><span>料金</span><span id="sum-price"></span></div>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">お名前<span class="req">必須</span></label>
-      <input type="text" class="form-input" id="form-name" placeholder="山田 太郎" autocomplete="name">
-      <div class="form-error" id="err-name">お名前をご入力ください</div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">電話番号<span class="req">必須</span></label>
-      <input type="tel" class="form-input" id="form-phone" placeholder="090-1234-5678" inputmode="tel" autocomplete="tel">
-      <div class="form-error" id="err-phone">電話番号をご入力ください</div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">メールアドレス<span class="req">必須</span></label>
-      <input type="email" class="form-input" id="form-email" placeholder="example@mail.com" inputmode="email" autocomplete="email">
-      <div class="form-error" id="err-email">メールアドレスをご確認ください</div>
-      <div class="form-hint">確認メールと、キャンセル用のリンクをお送りします。</div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">会員区分<span class="req">必須</span></label>
-      <div class="segmented">
-        <button type="button" class="seg-btn" id="seg-member" onclick="setMemberType('会員')">ギルド会員<small>柔術ギルドの会員の方</small></button>
-        <button type="button" class="seg-btn" id="seg-visitor" onclick="setMemberType('外部')">ビジター<small>他ジム所属・一般の方</small></button>
+    <div class="footer-right">
+      <div class="slide-indicator">
+        <div class="s-pip adult-on" id="pipAdult"></div>
+        <div class="s-pip off"      id="pipKidsA"></div>
+        <div class="s-pip off"      id="pipKidsB"></div>
       </div>
-      <div class="form-error" id="err-member">どちらかをお選びください</div>
+      <div class="slide-bar-wrap"><div class="slide-bar adult" id="slideBar"></div></div>
+      <span class="next-fetch" id="pcNextFetch">Next: 5:00</span>
+      <div class="bar-wrap"><div class="bar-fill" id="fetchBar"></div></div>
     </div>
-    <div class="form-group">
-      <label class="form-label">ご要望・メモ（任意）</label>
-      <input type="text" class="form-input" id="form-note" placeholder="例：二人で参加します／ガードパスを重点的に見てほしい">
-      <div class="form-hint">※お二人でご参加の場合、お一人あたりの受講料からそれぞれ1,000円引きになります（合計＝担当講師の料金×2－2,000円）。メモ欄に「二人で参加します」とご記入ください（割引は当日の会計で反映します）。</div>
-    </div>
-
-    <div class="next-btn-wrap">
-      <button class="btn-primary" id="submit-btn" onclick="submitBooking()" style="width:100%;">この内容で予約する</button>
-    </div>
-    <div class="form-note">
-      ・予約完了後、確認メールを自動でお送りします。<br>
-      ・ご都合が悪くなった場合は、確認メール内のリンクからいつでもキャンセルできます。<br>
-      ・お支払いは当日、道場にてお願いします（お二人参加の割引は当日の会計で反映します）。
-    </div>
-  </div>
+  </footer>
+</div>
 </div>
 
-<!-- ============================================================
-     画面④ 予約完了
-     ============================================================ -->
-<div class="screen" id="screen-confirm">
-  <header class="app-header">
-    <div class="app-logo">JIUJITSU <span>GUILD</span></div>
-  </header>
-  <div class="confirm-screen">
-    <div class="confirm-icon">⚔</div>
-    <div class="confirm-title">ご予約ありがとうございます</div>
-    <div class="confirm-sub">以下の内容で予約を承りました。<br>確認メールをお送りしましたので、ご確認ください。</div>
-
-    <div class="confirm-card">
-      <div class="form-summary-row"><span>担当</span><span id="done-instructor"></span></div>
-      <div class="form-summary-row"><span>日時</span><span id="done-datetime"></span></div>
-      <div class="form-summary-row"><span>料金</span><span id="done-price"></span></div>
-      <div class="form-summary-row"><span>場所</span><span>柔術ギルド（豊橋市）</span></div>
-    </div>
-
-    <div class="confirm-actions">
-      <a id="calendar-link" class="btn-secondary" href="#" target="_blank" rel="noopener" style="text-decoration:none; display:inline-block; text-align:center;">📅 Googleカレンダーに追加</a>
-      <button class="btn-secondary" onclick="resetAll()">トップに戻る</button>
-    </div>
-
-    <div class="cancel-hint">
-      <strong>キャンセルしたい場合</strong><br>
-      確認メール内の「キャンセル用リンク」を開き、ボタンを押すだけで手続き完了です。<br>
-      お電話やメッセージでのご連絡は不要です。お気軽にどうぞ。
-    </div>
+<!-- スマホ画面 -->
+<div class="mobile-screen" id="mobileScreen">
+  <div class="m-header" style="position:relative;">
+    <div class="m-title">Guild Ranking</div>
+    <div class="m-sub">柔術ギルド — <span id="mMonthLabel">Monthly</span></div>
+    <button id="langToggle" onclick="toggleLang()"
+      style="position:absolute; top:8px; right:8px; background:rgba(255,255,255,0.08); border:1px solid var(--border); color:var(--muted); font-size:11px; letter-spacing:1px; padding:5px 10px; border-radius:20px; cursor:pointer; font-family:'Cinzel',serif;">🇧🇷 PT</button>
   </div>
-</div>
 
-<!-- ============================================================
-     画面⑤ キャンセル確認（確認メールのリンクから開く）
-     ============================================================ -->
-<div class="screen" id="screen-cancel">
-  <header class="app-header">
-    <div class="app-logo">JIUJITSU <span>GUILD</span></div>
-    <div class="header-tag">CANCEL BOOKING</div>
-  </header>
-  <div class="confirm-screen">
-    <div id="cancel-loading">
-      <div class="loading-box" style="justify-content:center;"><div class="spinner"></div>ご予約内容を確認しています...</div>
+  <!-- チェックインセクション -->
+  <div class="m-checkin-section">
+    <!-- NFCで個人特定できた場合 -->
+    <div class="m-checkin-personal" id="checkinPersonal">
+      <div class="mcp-greeting">Welcome Back</div>
+      <div class="mcp-name" id="checkinName">—</div>
+      <div class="mcp-info">今月 <span id="checkinMonthly">0</span> 回 ／ 累計 <span id="checkinTotal">0</span> 回</div>
+      <button class="mcp-btn" id="checkinBtn" onclick="doCheckin()">⚔ チェックイン</button>
     </div>
-
-    <div id="cancel-body" style="display:none;">
-      <div class="confirm-icon gray">🗓</div>
-      <div class="confirm-title">ご予約のキャンセル</div>
-      <div class="confirm-sub">以下のご予約をキャンセルしますか？</div>
-
-      <div class="confirm-card">
-        <div class="form-summary-row"><span>お名前</span><span id="cancel-name"></span></div>
-        <div class="form-summary-row"><span>担当</span><span id="cancel-instructor"></span></div>
-        <div class="form-summary-row"><span>日時</span><span id="cancel-datetime"></span></div>
-      </div>
-
-      <div class="confirm-actions">
-        <button class="btn-danger" id="cancel-exec-btn" onclick="executeCancel()">この予約をキャンセルする</button>
-        <button class="btn-secondary" onclick="resetAll()">キャンセルせずに戻る</button>
-      </div>
-      <div class="confirm-sub" style="margin-top:24px; margin-bottom:0;">キャンセル料はかかりません。ギルドへの連絡も自動で行われます。</div>
+    <!-- チェックイン完了 -->
+    <div class="m-checkin-done" id="checkinDone">
+      <div class="mcd-icon">✅</div>
+      <div class="mcd-title">チェックイン完了</div>
+      <div class="mcd-name" id="doneeName">—</div>
+      <div class="mcd-count">今月 <span id="doneMonthly">0</span> 回 ／ 累計 <span id="doneTotal">0</span> 回</div>
     </div>
-
-    <div id="cancel-notfound" style="display:none;">
-      <div class="confirm-icon gray">？</div>
-      <div class="confirm-title">予約が見つかりませんでした</div>
-      <div class="confirm-sub">リンクが正しくないか、すでに処理済みの可能性があります。<br>お手数ですが、確認メールのリンクをもう一度お試しください。</div>
-      <div class="confirm-actions">
-        <button class="btn-secondary" onclick="resetAll()">予約画面へ</button>
-      </div>
-    </div>
+    <!-- IDなし汎用 -->
+    <button class="m-checkin-btn" id="genericCheckinBtn" onclick="showCheckinHint()" style="display:none;">⚔ チェックイン</button>
+    <div class="m-checkin-hint" id="checkinHint"></div>
   </div>
-</div>
 
-<!-- ============================================================
-     画面⑥ キャンセル完了
-     ============================================================ -->
-<div class="screen" id="screen-cancel-done">
-  <header class="app-header">
-    <div class="app-logo">JIUJITSU <span>GUILD</span></div>
-  </header>
-  <div class="confirm-screen">
-    <div class="confirm-icon gray">✓</div>
-    <div class="confirm-title">キャンセルを承りました</div>
-    <div class="confirm-sub" id="cancel-done-sub">ご予約のキャンセルが完了しました。<br>ギルドと担当インストラクターへの連絡も自動で行われましたので、<br>お電話などは不要です。</div>
-    <div class="confirm-sub">またのご予約をお待ちしています。</div>
-    <div class="confirm-actions">
-      <button class="btn-primary" onclick="resetAll()">あらためて予約する</button>
+  <div class="m-search-section">
+    <span class="m-search-label">▸ 帯昇格トラッカー</span>
+    <div style="display:flex; gap:6px; margin-bottom:8px;">
+      <button id="trackerTabAdult" onclick="switchTrackerTab('adult')"
+        style="flex:1; padding:7px; background:var(--red); color:#fff; border:none; border-radius:3px; font-size:11px; letter-spacing:2px; font-family:'Cinzel',serif; cursor:pointer;">ADULT</button>
+      <button id="trackerTabKids" onclick="switchTrackerTab('kids')"
+        style="flex:1; padding:7px; background:var(--card); color:var(--muted); border:1px solid var(--border); border-radius:3px; font-size:11px; letter-spacing:2px; font-family:'Cinzel',serif; cursor:pointer;">KIDS</button>
     </div>
+    <div class="m-search-row">
+      <input class="m-search-input" id="searchInput" type="text" placeholder="名前を入力..." maxlength="20">
+      <button class="m-search-btn" onclick="searchTracker()">検索</button>
+    </div>
+    <div id="trackerResult"></div>
   </div>
+
+  <div class="m-tabs">
+    <button class="m-tab active-adult" id="tabAdult"  onclick="switchMobileTab('adult')">アダルト</button>
+    <button class="m-tab"              id="tabKidsA"  onclick="switchMobileTab('kids_a')">キッズA</button>
+    <button class="m-tab"              id="tabKidsB"  onclick="switchMobileTab('kids_b')">キッズB</button>
+  </div>
+  <div class="m-list" id="mList"></div>
+  <div class="m-footer"><div class="m-last-upd" id="mLastUpd">Last Updated: —</div></div>
 </div>
+<div class="m-toast" id="mToast"></div>
 
 <script>
-// ★予約APIのURL（Apps Scriptのウェブアプリ URL）
-const BOOKING_API_URL = 'https://script.google.com/macros/s/AKfycbzpsQExfVkdWlXxm__pdgqM3nTJ53zFnu-8HrlaXbLWe9j1eWn17OXlFIRm5yR4WV9etw/exec';
+// ============================================================
+// ★★★ 画面解像度の自動スケーリング ★★★
+// 1920x1080デザインを基準に、どんな解像度でも
+// 16:9比率を保ったまま画面いっぱいに自動調整
+// ============================================================
+function fitScale() {
+  const wrapper = document.getElementById('scaleWrapper');
+  const screen  = document.getElementById('pcScreen');
+  if (!wrapper || !screen) return;
+  const forcePC = document.documentElement.classList.contains('force-pc');
+  if (window.innerWidth <= 1024 && !forcePC) return; // スマホ表示時はスケーリング処理をスキップ
+  const scaleX = window.innerWidth  / 1920;
+  const scaleY = window.innerHeight / 1080;
+  const scale  = Math.min(scaleX, scaleY);
+  screen.style.transform = `scale(${scale})`;
+  screen.style.transformOrigin = 'center center';
+}
+// TV/FireTVブラウザがウィンドウ幅を誤検知してスマホUIになってしまう場合の対策
+// URLに ?pc=1 を付けると強制的にPC画面（ランキングモニター）を表示する
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('pc') === '1') {
+    document.documentElement.classList.add('force-pc');
+  }
+})();
+window.addEventListener('resize', fitScale);
+window.addEventListener('orientationchange', fitScale);
+fitScale();
 
-// インストラクター情報（表示・料金の一元管理）
-const INSTRUCTORS = {
-  lucas:   { name: 'ルーカス・タヒラ', meta: '黒帯 / ギルド代表', photo: 'images/lucas.jpg',  price: 9000 },
-  kuroya:  { name: '黒谷 善行',       meta: '黒帯 / コーチ',     photo: 'images/kuroya.jpg', price: 7000 },
-  matsuno: { name: '松野 保奈朱',     meta: '茶帯 / コーチ',     photo: '',                  price: 5000 },
+// ============================================================
+// ★★★ 設定 ★★★
+// ============================================================
+const SHEET_API_URL     = 'https://script.google.com/macros/s/AKfycbyIRtKTtXtNX04KCIqkv2mNvDesQFW5OkyJxRBaFcmQz4chR8XTBmUxVi2EPEDy5bvJYg/exec';
+
+// ============================================================
+// 言語切り替え（スマホ画面のみ）
+// ============================================================
+let currentLang = 'ja';
+const LANG = {
+  ja: {
+    welcomeBack: 'Welcome Back',
+    checkinBtn: '⚔ チェックイン',
+    checkinSending: '送信中...',
+    checkinDoneTitle: 'チェックイン完了',
+    monthlyLabel: '今月',
+    totalLabel: '累計',
+    times: '回',
+    trackerLabel: '▸ 帯昇格トラッカー',
+    searchPlaceholder: '名前を入力...',
+    searchBtn: '検索',
+    tabAdult: 'アダルト',
+    tabKidsA: 'キッズA',
+    tabKidsB: 'キッズB',
+    trackerAdult: 'ADULT',
+    trackerKids: 'KIDS',
+    achieved: '達成 ✓',
+    cumulativeParticipation: '累計参加回数',
+    notFound: (q) => `「${q}」が見つかりませんでした`,
+    isAdultMember: (name) => `「${name}」はアダルト会員です。<br>ADULTタブに切り替えて検索してください`,
+    isKidsMember: (name) => `「${name}」はキッズ会員です。<br>KIDSタブに切り替えて検索してください`,
+    lastUpdated: 'Last Updated',
+    errorGeneric: 'エラーが発生しました',
+    errorNetwork: '通信エラーです',
+    nfcHint: 'NFCカードでチェックインしてください',
+  },
+  pt: {
+    welcomeBack: 'Bem-vindo(a)',
+    checkinBtn: '⚔ Check-in',
+    checkinSending: 'Enviando...',
+    checkinDoneTitle: 'Check-in concluído',
+    monthlyLabel: 'Este mês',
+    totalLabel: 'Total',
+    times: 'vezes',
+    trackerLabel: '▸ Rastreador de Faixa',
+    searchPlaceholder: 'Digite o nome...',
+    searchBtn: 'Buscar',
+    tabAdult: 'Adulto',
+    tabKidsA: 'Kids A',
+    tabKidsB: 'Kids B',
+    trackerAdult: 'ADULTO',
+    trackerKids: 'KIDS',
+    achieved: 'Concluído ✓',
+    cumulativeParticipation: 'Total de participações',
+    notFound: (q) => `"${q}" não foi encontrado`,
+    isAdultMember: (name) => `"${name}" é membro Adulto.<br>Mude para a aba ADULTO para buscar`,
+    isKidsMember: (name) => `"${name}" é membro Kids.<br>Mude para a aba KIDS para buscar`,
+    lastUpdated: 'Última atualização',
+    errorGeneric: 'Ocorreu um erro',
+    errorNetwork: 'Erro de conexão',
+    nfcHint: 'Use o cartão NFC para fazer check-in',
+  },
+};
+function t(key, ...args) {
+  const entry = LANG[currentLang][key];
+  return typeof entry === 'function' ? entry(...args) : entry;
+}
+function toggleLang() {
+  currentLang = currentLang === 'ja' ? 'pt' : 'ja';
+  const btn = document.getElementById('langToggle');
+  if (btn) btn.textContent = currentLang === 'ja' ? '🇧🇷 PT' : '🇯🇵 JP';
+  applyMobileTranslations();
+  renderMobile();
+}
+function applyMobileTranslations() {
+  const wb = document.querySelector('#checkinPersonal .mcp-greeting'); if (wb) wb.textContent = t('welcomeBack');
+  const cb = document.getElementById('checkinBtn'); if (cb && !cb.disabled) cb.textContent = t('checkinBtn');
+  const gcb = document.getElementById('genericCheckinBtn'); if (gcb) gcb.textContent = t('checkinBtn');
+  const cdt = document.querySelector('#checkinDone .mcd-title'); if (cdt) cdt.textContent = t('checkinDoneTitle');
+  const tl = document.querySelector('.m-search-label'); if (tl) tl.textContent = t('trackerLabel');
+  const si = document.getElementById('searchInput'); if (si) si.placeholder = t('searchPlaceholder');
+  const sb = document.querySelector('.m-search-btn'); if (sb) sb.textContent = t('searchBtn');
+  const ta = document.getElementById('tabAdult'); if (ta) ta.textContent = t('tabAdult');
+  const tka = document.getElementById('tabKidsA'); if (tka) tka.textContent = t('tabKidsA');
+  const tkb = document.getElementById('tabKidsB'); if (tkb) tkb.textContent = t('tabKidsB');
+  const trA = document.getElementById('trackerTabAdult'); if (trA) trA.textContent = t('trackerAdult');
+  const trK = document.getElementById('trackerTabKids'); if (trK) trK.textContent = t('trackerKids');
+  document.querySelectorAll('.mcp-info').forEach(el => {
+    const monthlyVal = document.getElementById('checkinMonthly') ? document.getElementById('checkinMonthly').textContent : '0';
+    const totalVal = document.getElementById('checkinTotal') ? document.getElementById('checkinTotal').textContent : '0';
+    el.innerHTML = t('monthlyLabel') + ' <span id="checkinMonthly">' + monthlyVal + '</span> ' + t('times') + ' ／ ' + t('totalLabel') + ' <span id="checkinTotal">' + totalVal + '</span> ' + t('times');
+  });
+  document.querySelectorAll('.mcd-count').forEach(el => {
+    const monthlyVal = document.getElementById('doneMonthly') ? document.getElementById('doneMonthly').textContent : '0';
+    const totalVal = document.getElementById('doneTotal') ? document.getElementById('doneTotal').textContent : '0';
+    el.innerHTML = t('monthlyLabel') + ' <span id="doneMonthly">' + monthlyVal + '</span> ' + t('times') + ' ／ ' + t('totalLabel') + ' <span id="doneTotal">' + totalVal + '</span> ' + t('times');
+  });
+}
+const FETCH_INTERVAL_MS = 10 * 1000;  // 10秒ごとに取得（画面の再描画は変化があった時だけ）
+const SLIDE_INTERVAL_MS = 8 * 1000;
+const SLIDES            = ['adult', 'kids_a', 'kids_b'];
+let lastDataSnapshot = null; // ★前回取得したデータのスナップショット（変化検知用）
+
+// ============================================================
+// URLパラメータから会員IDを取得
+// NFCカードのURL例: ...?id=001
+// ============================================================
+const URL_PARAMS  = new URLSearchParams(window.location.search);
+const NFC_MEMBER_ID = URL_PARAMS.get('id') || '';
+
+// ============================================================
+// 称号システム
+// ============================================================
+const ADULT_TITLES = {
+  white:  [
+    {min:0,name:'荒削りの拳',namePt:'Punho em Bruto',level:'low'},
+    {min:70,name:'転がる石',namePt:'Pedra Rolante',level:'mid'},
+    {min:140,name:'這い上がる者',namePt:'O Que Se Ergue do Chão',level:'high'},
+  ],
+  blue:   [
+    {min:200,name:'双脚の狩人',namePt:'Caçador de Pernas',level:'low'},
+    {min:285,name:'崩しの使い手',namePt:'Mestre do Desequilíbrio',level:'mid'},
+    {min:370,name:'制圧の申し子',namePt:'Nascido para Dominar',level:'high'},
+  ],
+  purple: [
+    {min:450,name:'千手の術師',namePt:'Mestre das Mil Mãos',level:'low'},
+    {min:535,name:'背後霊',namePt:'Fantasma nas Costas',level:'mid'},
+    {min:620,name:'関節の支配者',namePt:'Senhor das Articulações',level:'high'},
+  ],
+  brown:  [
+    {min:700,name:'呼吸の読者',namePt:'Leitor do Ritmo',level:'low'},
+    {min:820,name:'沈黙の絞首人',namePt:'O Estrangulador Silencioso',level:'mid'},
+    {min:940,name:'畳の亡霊',namePt:'Fantasma do Tatame',level:'high'},
+  ],
+  black:  [
+    {min:1050,name:'拳に道を見る者',namePt:'Quem Vê o Caminho no Punho',level:'low'},
+    {min:1150,name:'間を制す者',namePt:'Senhor do Tempo e Distância',level:'low'},
+    {min:1250,name:'無音の一手',namePt:'O Golpe Silencioso',level:'low'},
+    {min:1400,name:'影なき技',namePt:'Técnica Sem Sombra',level:'low'},
+    {min:1550,name:'流転の理を知る者',namePt:'Quem Entende o Fluxo das Coisas',level:'mid'},
+    {min:1700,name:'千の組手を超えた者',namePt:'Quem Superou Mil Combates',level:'mid'},
+    {min:1900,name:'道場を支える柱',namePt:'O Pilar da Academia',level:'mid'},
+    {min:2100,name:'技の継承者',namePt:'Herdeiro da Técnica',level:'mid'},
+    {min:2350,name:'静寂を纏う者',namePt:'Quem Veste o Silêncio',level:'mid'},
+    {min:2600,name:'不動の境地',namePt:'O Inabalável',level:'high'},
+    {min:2900,name:'柔術の化身👑',namePt:'A Encarnação do Jiu-Jitsu👑',level:'high'},
+    {min:3300,name:'時を超えた達人👑',namePt:'O Mestre Além do Tempo👑',level:'high'},
+    {min:3800,name:'ギルドの永遠👑',namePt:'O Eterno do Guild👑',level:'high'},
+  ],
+};
+const KIDS_TITLES = {
+  white:          [
+    {min:0,name:'ガードの見習い',namePt:'Aprendiz da Guarda',level:'low'},
+    {min:27,name:'タップの洗礼',namePt:'O Batismo do Tap',level:'mid'},
+    {min:54,name:'スイープの使い手',namePt:'Mestre da Raspagem',level:'high'},
+  ],
+  gray:           [
+    {min:80,name:'マウントの狩人',namePt:'Caçador da Montada',level:'low'},
+    {min:107,name:'エスケープの達人',namePt:'Mestre da Fuga',level:'mid'},
+    {min:134,name:'サブミッションの影',namePt:'A Sombra da Finalização',level:'high'},
+  ],
+  yellow:         [
+    {min:160,name:'トライアングルの閃光',namePt:'O Relâmpago do Triângulo',level:'low'},
+    {min:190,name:'パスの鬼',namePt:'O Demônio da Passagem',level:'mid'},
+    {min:220,name:'バックの支配者',namePt:'O Senhor das Costas',level:'high'},
+  ],
+  orange:         [
+    {min:250,name:'チョークの刺客',namePt:'O Assassino do Estrangulamento',level:'low'},
+    {min:284,name:'トランジションの魔術師',namePt:'O Mago das Transições',level:'mid'},
+    {min:317,name:'フローの使い手',namePt:'Mestre do Fluxo',level:'high'},
+  ],
+  'orange-black': [
+    {min:350,name:'猛者の片鱗',namePt:'Um Vislumbre do Guerreiro',level:'low'},
+    {min:384,name:'修羅への目覚め',namePt:'O Despertar da Fera Interior',level:'mid'},
+    {min:417,name:'黒の胎動',namePt:'O Chamado do Preto',level:'high'},
+  ],
+  green:          [
+    {min:450,name:'ポジションの王',namePt:'O Rei da Posição',level:'low'},
+    {min:484,name:'フィニッシャー',namePt:'O Finalizador',level:'mid'},
+    {min:517,name:'道場の伝説👑',namePt:'A Lenda da Academia👑',level:'high'},
+  ],
+  'green-black':  [
+    {min:550,name:'緑の覇者',namePt:'O Soberano do Verde',level:'low'},
+    {min:600,name:'若き武人',namePt:'O Jovem Guerreiro',level:'mid'},
+    {min:650,name:'道場の至宝👑',namePt:'O Tesouro da Academia👑',level:'high'},
+  ],
 };
 
-// 時間帯（60分クラス＋着替え・準備の30分休憩を挟んだ枠、10:30スタート、19:30までに収める＝6枠）
-const SLOT_TIMES = [
-  ['10:30','〜11:30'], ['12:00','〜13:00'], ['13:30','〜14:30'],
-  ['15:00','〜16:00'], ['16:30','〜17:30'], ['18:00','〜19:00'],
-];
-
-let bookingState = { instructorId: null, date: null, time: null };
-let apiData = { bookings: [], scheduleOverrides: { global: { closed: [], open: [] }, byInstructor: {} } };
-let cancelTokenFromUrl = null;
-
-// =====================================================================
-// 画面遷移
-// =====================================================================
-function goTo(screenId) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(screenId).classList.add('active');
-  window.scrollTo(0, 0);
-}
-
-function resetAll() {
-  bookingState = { instructorId: null, date: null, time: null };
-  ['form-name','form-phone','form-email','form-note'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
-  });
-  setMemberType(null);
-  clearErrors();
-  // キャンセル用URLパラメータを消してトップへ
-  if (location.search) {
-    history.replaceState(null, '', location.pathname);
+// キッズ帯昇格トラッカー閾値
+const KIDS_BELT_THRESHOLDS = (() => {
+  const steps = [
+    {from:'white',        to:'gray',         need:80},
+    {from:'gray',         to:'yellow',       need:80},
+    {from:'yellow',       to:'orange',       need:90},
+    {from:'orange',       to:'orange-black', need:100},
+    {from:'orange-black', to:'green',        need:100},
+    {from:'green',        to:'green-black',  need:100},
+  ];
+  let acc=0;
+  return steps.map(s=>{const start=acc; acc+=s.need; return {...s,start,end:acc};});
+})();
+function getTitle(member) {
+  const isKids = member.category !== 'adult';
+  const table  = isKids ? KIDS_TITLES : ADULT_TITLES;
+  const steps  = table[member.belt] || Object.values(table)[0];
+  const total  = member.total || 0;
+  let result   = steps[0];
+  for (const s of steps) { if (total >= s.min) result = s; }
+  if (currentLang === 'pt' && result.namePt) {
+    return Object.assign({}, result, { name: result.namePt });
   }
-  goTo('screen-select');
+  return result;
+}
+function titleBadgeHTML(member) {
+  if (currentLang === 'pt') return '';
+  const t = getTitle(member);
+  return `<span class="t-badge t-${t.level}"><span class="t-icon">${t.level==='high'?'⭐':t.level==='mid'?'🔥':'◆'}</span>${t.name}</span>`;
 }
 
-// =====================================================================
-// 画面①→②：インストラクター選択
-// =====================================================================
-async function selectInstructor(id) {
-  const inst = INSTRUCTORS[id];
-  if (!inst) return;
-  bookingState.instructorId = id;
-  bookingState.date = null;
-  bookingState.time = null;
-
-  document.getElementById('hero-name').textContent = inst.name;
-  document.getElementById('hero-meta').textContent = inst.meta + '　｜　プライベートクラス 60分';
-  const heroPhoto = document.getElementById('hero-photo');
-  const heroBox   = document.getElementById('hero-photo-box');
-  // 前回のイニシャル表示が残らないよう、テキストノードを毎回消してから設定する
-  [...heroBox.childNodes].forEach(n => { if (n.nodeType === 3) heroBox.removeChild(n); });
-  if (inst.photo) {
-    heroPhoto.src = inst.photo;
-    heroPhoto.style.display = 'block';
-  } else {
-    heroPhoto.style.display = 'none';
-    heroBox.appendChild(document.createTextNode(inst.name.charAt(0)));
-  }
-
-  goTo('screen-slots');
-
-  // 読み込み中表示 → 最新の予約状況＋特別スケジュールを取得
-  document.getElementById('day-tabs').innerHTML =
-    '<div style="color:var(--muted); font-size:14px;">日程を確認しています...</div>';
-  document.getElementById('slot-grid').innerHTML =
-    '<div class="loading-box"><div class="spinner"></div>空き状況を確認しています...</div>';
-  document.getElementById('next-btn').disabled = true;
-
-  await fetchApiData();
-  renderDayTabs();
-  renderSlots();
+// 帯バッジ
+const ADULT_BELT_LABELS = {white:'白帯',blue:'青帯',purple:'紫帯',brown:'茶帯',black:'黒帯'};
+const KIDS_BELT_LABELS  = {white:'白帯',gray:'グレー',yellow:'イエロー',orange:'オレンジ','orange-black':'オレンジ黒',green:'グリーン','green-black':'グリーン黒'};
+const ADULT_BELT_LABELS_PT = {white:'Faixa Branca',blue:'Faixa Azul',purple:'Faixa Roxa',brown:'Faixa Marrom',black:'Faixa Preta'};
+const KIDS_BELT_LABELS_PT  = {white:'Branca',gray:'Cinza',yellow:'Amarela',orange:'Laranja','orange-black':'Laranja e Preta',green:'Verde','green-black':'Verde e Preta'};
+function beltHTML(belt, category) {
+  const isKids = category !== 'adult';
+  const labelsJa = isKids ? KIDS_BELT_LABELS : ADULT_BELT_LABELS;
+  const labelsPt = isKids ? KIDS_BELT_LABELS_PT : ADULT_BELT_LABELS_PT;
+  const labels = currentLang === 'pt' ? labelsPt : labelsJa;
+  const valid  = isKids ? ['white','gray','yellow','orange','orange-black','green','green-black'] : ['white','blue','purple','brown','black'];
+  const safe   = valid.includes(belt) ? belt : valid[0];
+  const ptCls  = currentLang === 'pt' ? ' b-pt' : '';
+  return `<span class="b-badge${ptCls} b-${safe}"><span class="b-dot"></span>${labels[safe]||safe}</span>`;
 }
 
-async function fetchApiData() {
-  try {
-    const res = await fetch(`${BOOKING_API_URL}?t=${Date.now()}`);
-    const data = await res.json();
-    apiData.bookings = Array.isArray(data.bookings) ? data.bookings : [];
-    apiData.scheduleOverrides = data.scheduleOverrides || { global: { closed: [], open: [] }, byInstructor: {} };
-  } catch (err) {
-    // 取得に失敗しても、通常の土曜日スケジュールで動作を継続する
-    // （空き状況は表示されないが、重複予約はサーバー側で防がれる）
-    console.error('予約状況の取得に失敗しました。', err);
-    apiData = { bookings: [], scheduleOverrides: { global: { closed: [], open: [] }, byInstructor: {} } };
-  }
+// 帯昇格トラッカー
+const BELT_THRESHOLDS = (() => {
+  const steps = [{from:'white',to:'blue',need:200},{from:'blue',to:'purple',need:250},{from:'purple',to:'brown',need:250},{from:'brown',to:'black',need:350}];
+  let acc = 0;
+  return steps.map(s => { const start=acc; acc+=s.need; return {...s,start,end:acc}; });
+})();
+
+// ============================================================
+// 状態
+// ============================================================
+let allMembers   = [];
+let slideIndex   = 0;
+let mobileTab    = 'adult';
+let slideRaf     = null;
+let slideStart   = null;
+let fetchElapsed = 0;
+let prevTitles   = {};
+let prevBelts    = {};
+let nfcMember    = null; // NFCで特定された会員
+let checkinDone  = false;
+
+const CAT_LABEL = {adult:'Adult', kids_a:'Kids A', kids_b:'Kids B'};
+function rankLabel(r) { return r===1?'1ST':r===2?'2ND':r===3?'3RD':`${r}`; }
+function initial(name) { return (name||'?')[0]; }
+
+// ★本日チェックイン済みなら緑ドットのHTMLを返す（未チェックインなら空文字）
+function checkinDotHTML(m, small) {
+  if (!m.checkedInToday) return '';
+  return `<span class="checkin-dot${small ? ' m-dot' : ''}" title="本日チェックイン済み"></span>`;
 }
-
-// 現在選択中の講師について、有効な休止日・特別開催日を返す
-// （「全講師共通」の設定 ＋ その講師だけの個別設定をあわせたもの）
-function getEffectiveOverrides() {
-  const so = apiData.scheduleOverrides || { global: { closed: [], open: [] }, byInstructor: {} };
-  const global = so.global || { closed: [], open: [] };
-  const mine   = (so.byInstructor && so.byInstructor[bookingState.instructorId]) || { closed: [], open: [] };
-  return {
-    closed: [...global.closed, ...mine.closed],
-    open:   [...global.open,   ...mine.open],
-  };
+function getCurrentMonthLabel() {
+  const now=new Date();
+  return `${now.getFullYear()} / ${String(now.getMonth()+1).padStart(2,'0')} Monthly`;
 }
+const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-// =====================================================================
-// 日付タブ：土曜日ベース＋特別スケジュール反映
-// =====================================================================
-function generateUpcomingSaturdays(count = 4) {
-  const dates = [];
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+// ============================================================
+// チェックイン機能（NFC個人対応）
+// auto=1 パラメータがあれば自動でチェックイン実行
+// ============================================================
+const AUTO_CHECKIN = URL_PARAMS.get('auto') === '1';
 
-  const dayOfWeek = today.getDay();
-  const daysUntilSaturday = (6 - dayOfWeek + 7) % 7;
-  const firstSaturday = new Date(today);
-  firstSaturday.setDate(today.getDate() + daysUntilSaturday);
+function initCheckin() {
+  const personal    = document.getElementById('checkinPersonal');
+  const genericBtn  = document.getElementById('genericCheckinBtn');
+  const checkinHint = document.getElementById('checkinHint');
 
-  const overrides = getEffectiveOverrides();
+  if (NFC_MEMBER_ID && nfcMember) {
+    // カテゴリに合わせてタブを切り替え
+    if (nfcMember.category) switchMobileTab(nfcMember.category);
 
-  const candidateCount = count + overrides.closed.length + 2;
-  for (let i = 0; i < candidateCount; i++) {
-    const d = new Date(firstSaturday);
-    d.setDate(firstSaturday.getDate() + i * 7);
-    dates.push(d);
-  }
-
-  let filtered = dates.filter(d => !overrides.closed.includes(formatDateTab(d)));
-
-  overrides.open.forEach(label => {
-    const d = parseTabLabelToDate(label);
-    if (d && d >= today && !filtered.some(fd => formatDateTab(fd) === label)) {
-      filtered.push(d);
+    if (AUTO_CHECKIN) {
+      // auto=1 → データ取得完了後に自動チェックイン実行
+      // 少し待ってから実行（画面描画完了を待つ）
+      setTimeout(() => doCheckin(), 300);
+    } else {
+      // 手動チェックイン画面を表示
+      personal.classList.add('show');
+      document.getElementById('checkinName').textContent    = nfcMember.name;
+      document.getElementById('checkinMonthly').textContent = nfcMember.monthly;
+      document.getElementById('checkinTotal').textContent   = nfcMember.total.toLocaleString();
     }
-  });
-
-  filtered.sort((a, b) => a - b);
-  return filtered.slice(0, count);
-}
-
-function parseTabLabelToDate(label) {
-  const m = String(label).match(/^(\d{1,2})\/(\d{1,2})/);
-  if (!m) return null;
-  const now = new Date();
-  let d = new Date(now.getFullYear(), parseInt(m[1],10) - 1, parseInt(m[2],10));
-  const today = new Date(); today.setHours(0,0,0,0);
-  if (d < today) {
-    d = new Date(now.getFullYear() + 1, parseInt(m[1],10) - 1, parseInt(m[2],10));
+  } else if (NFC_MEMBER_ID && !nfcMember) {
+    checkinHint.textContent  = `ID: ${NFC_MEMBER_ID} が見つかりませんでした`;
+    genericBtn.style.display = 'block';
+  } else {
+    genericBtn.style.display = 'block';
+    checkinHint.textContent  = 'NFCカードをタップするか、スタッフに声をかけてください';
   }
-  return d;
 }
 
-function formatDateTab(d) {
-  const weekdayNames = ['日','月','火','水','木','金','土'];
-  return `${d.getMonth() + 1}/${d.getDate()} (${weekdayNames[d.getDay()]})`;
+async function doCheckin() {
+  if (!nfcMember || checkinDone) return;
+  checkinDone = true;
+
+  // ボタンがある場合のみ操作（手動モード）
+  const btn = document.getElementById('checkinBtn');
+  if (btn) { btn.disabled = true; btn.textContent = t('checkinSending'); }
+
+  // auto=1 の場合はすぐに「処理中」表示
+  if (AUTO_CHECKIN) {
+    const done = document.getElementById('checkinDone');
+    document.getElementById('doneeName').textContent   = nfcMember.name;
+    document.getElementById('doneMonthly').textContent = nfcMember.monthly;
+    document.getElementById('doneTotal').textContent   = nfcMember.total.toLocaleString();
+    done.classList.add('show');
+  }
+
+  try {
+    const res  = await fetch(SHEET_API_URL, {
+      method: 'POST',
+      body:   JSON.stringify({ id: NFC_MEMBER_ID }),
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      // 完了画面を更新（実際の数値に）
+      document.getElementById('checkinPersonal').classList.remove('show');
+      const done = document.getElementById('checkinDone');
+      done.classList.add('show');
+      document.getElementById('doneeName').textContent    = nfcMember.name;
+      document.getElementById('doneMonthly').textContent  = data.monthly;
+      document.getElementById('doneTotal').textContent    = data.total.toLocaleString();
+      // チェックイン直後に即座にランキングを更新
+      fetchData(true);
+      // 4秒後にページをリセット（次の人のために）
+      setTimeout(() => {
+        window.location.href = window.location.pathname;
+      }, 4000);
+    } else {
+      checkinDone = false;
+      if (btn) { btn.disabled = false; btn.textContent = t('checkinBtn'); }
+      showMobileToast(t('errorGeneric'));
+    }
+  } catch(e) {
+    checkinDone = false;
+    if (btn) { btn.disabled = false; btn.textContent = t('checkinBtn'); }
+    showMobileToast(t('errorNetwork'));
+  }
 }
 
-function renderDayTabs() {
-  const container = document.getElementById('day-tabs');
-  const days = generateUpcomingSaturdays(4);
-  if (days.length === 0) {
-    container.innerHTML = '<div style="color:var(--muted); font-size:14px;">現在、予約可能な日程がありません。恐れ入りますが、日を改めてご確認ください。</div>';
-    document.getElementById('slot-grid').innerHTML = '';
-    bookingState.date = null;
+function showCheckinHint() {
+  showMobileToast(t('nfcHint'));
+}
+
+// ============================================================
+// 称号エフェクト
+// ============================================================
+function checkTitleChanges(members) {
+  for (const m of members) {
+    const key      = `${m.name}_${m.category}`;
+    const newTitle = getTitle(m).name;
+    const oldTitle = prevTitles[key];
+    // 帯昇格チェック（称号より優先・より派手な演出）
+    const newBelt = m.belt;
+    const oldBelt = prevBelts[key];
+    if (oldBelt && oldBelt !== newBelt) {
+      firePromotionEffect(m.name, newBelt, m.category);
+    } else if (oldTitle && oldTitle !== newTitle) {
+      fireTitleEffect(m.name, newTitle);
+    }
+    prevTitles[key] = newTitle;
+    prevBelts[key]  = newBelt;
+  }
+}
+// 帯昇格の専用演出（称号変化よりド派手に）
+function firePromotionEffect(name, newBelt, category) {
+  const labels = (category === 'adult') ? ADULT_BELT_LABELS : KIDS_BELT_LABELS;
+  const beltLabel = (labels && labels[newBelt]) || newBelt;
+  const flash = document.getElementById('titleFlash');
+  flash.className = 'title-flash'; void flash.offsetWidth;
+  flash.className = 'title-flash fire';
+  document.getElementById('popupName').textContent  = name;
+  document.getElementById('popupTitle').textContent = `🎊 ${beltLabel} 昇格！ 🎊`;
+  const popup = document.getElementById('titlePopup');
+  popup.className = 'title-popup'; void popup.offsetWidth;
+  popup.className = 'title-popup fire';
+  // 紙吹雪を3連発で豪華に
+  fireConfetti();
+  setTimeout(fireConfetti, 700);
+  setTimeout(fireConfetti, 1400);
+}
+function fireTitleEffect(name, titleName) {
+  const flash = document.getElementById('titleFlash');
+  flash.className = 'title-flash'; void flash.offsetWidth;
+  flash.className = 'title-flash fire';
+  document.getElementById('popupName').textContent  = name;
+  document.getElementById('popupTitle').textContent = titleName;
+  const popup = document.getElementById('titlePopup');
+  popup.className = 'title-popup'; void popup.offsetWidth;
+  popup.className = 'title-popup fire';
+  fireConfetti();
+}
+function fireConfetti() {
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx    = canvas.getContext('2d');
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  canvas.style.opacity = '1';
+  const colors = ['#f0d070','#d4a84c','#ffffff','#5aacf0','#50d0a0','#c090f0'];
+  const pieces = Array.from({length:120}, () => ({
+    x:Math.random()*canvas.width, y:-20,
+    w:Math.random()*10+5, h:Math.random()*5+3,
+    color:colors[Math.floor(Math.random()*colors.length)],
+    speed:Math.random()*4+2, angle:Math.random()*360,
+    spin:Math.random()*6-3, drift:Math.random()*2-1,
+  }));
+  let frame=0;
+  function draw() {
+    ctx.clearRect(0,0,canvas.width,canvas.height); let alive=false;
+    for (const p of pieces) {
+      p.y+=p.speed; p.x+=p.drift; p.angle+=p.spin;
+      if (p.y<canvas.height+20) alive=true;
+      ctx.save(); ctx.translate(p.x+p.w/2,p.y+p.h/2); ctx.rotate(p.angle*Math.PI/180);
+      ctx.fillStyle=p.color; ctx.globalAlpha=Math.max(0,1-p.y/canvas.height);
+      ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore();
+    }
+    if (alive&&frame<180){frame++;requestAnimationFrame(draw);}
+    else{ctx.clearRect(0,0,canvas.width,canvas.height);canvas.style.opacity='0';}
+  }
+  draw();
+}
+
+// ============================================================
+// データ取得
+// ============================================================
+async function fetchData(isRefresh = false) {
+  fetchElapsed = 0;
+  if (!isRefresh) showOverlay('loadingOv');
+
+  let newMembers = null;
+  let fetchFailed = false;
+  try {
+    // ★通信が固まって無制限に待ち続けないよう、6秒でタイムアウトさせる
+    // （AbortController非対応の古いTVブラウザでは、この保護なしで通常のfetchを行う）
+    let fetchOptions = {};
+    let timeoutId = null;
+    if (typeof AbortController !== 'undefined') {
+      const controller = new AbortController();
+      timeoutId = setTimeout(() => controller.abort(), 6000);
+      fetchOptions = { signal: controller.signal };
+    }
+    const res  = await fetch(`${SHEET_API_URL}?t=${Date.now()}`, fetchOptions);
+    if (timeoutId) clearTimeout(timeoutId);
+    const data = await res.json();
+    if (data.error || !Array.isArray(data.members)) throw new Error(data.error||'invalid');
+    newMembers = data.members;
+    isOnline = true;
+    lastGoodFetch = Date.now();
+  } catch(e) {
+    console.error(e);
+    // サンプルデータは使わない：前回の正常データを表示し続ける
+    isOnline = false;
+    fetchFailed = true;
+  }
+  updateConnBadge();
+
+  // ★データに実際の変化があったかを比較（順位・回数・帯などが1つでも変わっていればtrue）
+  const newSnapshot = newMembers ? JSON.stringify(newMembers) : null;
+  const hasChanged  = newMembers && newSnapshot !== lastDataSnapshot;
+
+  if (!isRefresh) {
+    // 初回読み込みは必ず描画
+    if (newMembers) allMembers = newMembers;
+    lastDataSnapshot = newSnapshot;
+    if (NFC_MEMBER_ID) {
+      nfcMember = allMembers.find(m => String(m.id).trim() === String(NFC_MEMBER_ID).trim()) || null;
+    }
+    checkTitleChanges(allMembers);
+    hideAllOverlays();
+    setLastUpdate();
+    renderPC();
+    renderMobile();
+    initCheckin();
+  } else if (hasChanged) {
+    // ★変化があった時だけ、フェード演出つきで再描画
+    document.getElementById('pcScreen').classList.add('fading');
+    await sleep(550); showOverlay('refreshOv');
+
+    allMembers = newMembers;
+    lastDataSnapshot = newSnapshot;
+    if (NFC_MEMBER_ID) {
+      nfcMember = allMembers.find(m => String(m.id).trim() === String(NFC_MEMBER_ID).trim()) || null;
+    }
+    checkTitleChanges(allMembers);
+    hideAllOverlays();
+    document.getElementById('pcScreen').classList.remove('fading');
+    setLastUpdate();
+    renderPC();
+    renderMobile();
+  } else {
+    // ★変化なし：画面は一切さわらず、最終更新時刻だけ静かに更新
+    if (newMembers) setLastUpdate();
+  }
+
+  // ★通信に失敗した時は10秒待たず、3秒後にすぐ再試行して早期復帰を狙う
+  const nextInterval = fetchFailed ? 3 * 1000 : FETCH_INTERVAL_MS;
+  setTimeout(() => fetchData(true), nextInterval);
+}
+
+// ============================================================
+// PC レンダリング
+// ============================================================
+function renderPC() { renderPCSlide(SLIDES[slideIndex]); }
+// インストラクター枠（左下固定ウィジェット・PC/TV画面のみ・拡張版）
+function renderInstructorWidget(instructors) {
+  const pcScreen = document.getElementById('pcScreen');
+  if (!pcScreen) return;
+  let widget = document.getElementById('instructorWidget');
+  if (!widget) {
+    widget = document.createElement('div');
+    widget.id = 'instructorWidget';
+    widget.className = 'instructor-widget';
+    pcScreen.appendChild(widget); // ★1920x1080のPC画面内に配置（scale対象に含める）
+  }
+  if (!instructors || !instructors.length) {
+    widget.style.display = 'none';
     return;
   }
-  container.innerHTML = days.map((d, i) => {
-    const label = formatDateTab(d);
-    const isSpecial = d.getDay() !== 6; // 土曜以外＝特別開催日
-    return `<button class="day-tab${i === 0 ? ' active' : ''}" onclick="selectDay(this)">${label}${isSpecial ? '<span class="sp-mark">特別</span>' : ''}</button>`;
-  }).join('');
-  bookingState.date = formatDateTab(days[0]);
+  widget.style.display = 'block';
+  widget.innerHTML = `
+    <div class="instructor-widget-label">⚑ Instructors</div>
+    ${instructors.map(m => `
+      <div class="instr-card">
+        <div class="instr-avatar">${initial(m.name)}</div>
+        <div class="instr-info">
+          <div class="instr-name">${m.name}${checkinDotHTML(m)}</div>
+          <div class="instr-badges">${titleBadgeHTML(m)}${beltHTML(m.belt, m.category)}</div>
+        </div>
+        <div class="instr-stats">
+          <div class="instr-total">${m.total.toLocaleString()}</div>
+          <div class="instr-total-label">累計 / TOTAL</div>
+        </div>
+      </div>`).join('')}
+  `;
 }
 
-function selectDay(el) {
-  document.querySelectorAll('#day-tabs .day-tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  // 「特別」マークを除いた日付部分だけを保存する
-  bookingState.date = el.childNodes[0].textContent.trim();
-  // ★日付を変えたら時間帯の選択はリセット（前の日の選択が残るバグを修正）
-  bookingState.time = null;
-  document.getElementById('next-btn').disabled = true;
-  renderSlots();
+function renderPCSlide(cat) {
+  const hdr = document.getElementById('pcHeader');
+  hdr.className = 'pc-header'+(cat==='kids_a'?' kids-a-mode':cat==='kids_b'?' kids-b-mode':'');
+  document.getElementById('pipAdult').className = 's-pip '+(cat==='adult' ?'adult-on':'off');
+  document.getElementById('pipKidsA').className = 's-pip '+(cat==='kids_a'?'kids-a-on':'off');
+  document.getElementById('pipKidsB').className = 's-pip '+(cat==='kids_b'?'kids-b-on':'off');
+  const sb = document.getElementById('slideBar');
+  sb.className='slide-bar '+(cat==='adult'?'adult':cat==='kids_a'?'kids-a':'kids-b');
+  sb.style.width='0%';
+  const members = allMembers.filter(m=>m.category===cat && !m.isInstructor).sort((a,b)=>b.monthly-a.monthly);
+  const instructors = allMembers.filter(m=>m.isInstructor).sort((a,b)=>b.total-a.total);
+  const top3=members.slice(0,3); const rest=members.slice(3,18);
+  const rClass={adult:['a-r1','a-r2','a-r3'],kids_a:['ka-r1','ka-r2','ka-r3'],kids_b:['kb-r1','kb-r2','kb-r3']}[cat];
+  const catLabelClass={adult:'cat-adult',kids_a:'cat-kids-a',kids_b:'cat-kids-b'}[cat];
+  const colLabelClass={adult:'',kids_a:'kids-a',kids_b:'kids-b'}[cat];
+  const podiumHTML=`
+    <div class="podium-col">
+      <div class="col-label ${colLabelClass}">
+        <span class="cat-label ${catLabelClass}">${CAT_LABEL[cat]}</span>▸ Top Fighters
+      </div>
+      ${top3.map((m,i)=>`
+      <div class="p-card ${rClass[i]}">
+        <div class="p-avatar">${initial(m.name)}</div>
+        <div class="p-info">
+          <div class="p-rank-label">${i===0?'<span class="crown">👑</span>':''}${rankLabel(i+1)} Place</div>
+          <div class="p-name">${m.name}${checkinDotHTML(m)}</div>
+          <div class="p-badges">${titleBadgeHTML(m)}${beltHTML(m.belt,cat)}</div>
+        </div>
+        <div class="p-count-wrap">
+          <span class="p-monthly">${m.monthly}</span>
+          <span class="p-unit">sessions / month</span>
+          <span class="p-total">累計 <span>${m.total.toLocaleString()}</span> 回</span>
+        </div>
+      </div>`).join('')}
+    </div>`;
+  const listHTML=`
+    <div class="list-col">
+      <div class="col-label ${colLabelClass}" style="justify-content:flex-end;">▸ Full Rankings</div>
+      <div class="list-header">
+        <span>Rank</span><span>Fighter</span><span>称号 / 帯</span>
+        <span class="lh-monthly">Monthly</span><span class="lh-total">Total</span>
+      </div>
+      <div>${rest.map((m,i)=>`
+        <div class="r-row ${i<3?'top6':''}" style="animation-delay:${i*0.04}s">
+          <div class="r-num">${i+4}</div>
+          <div class="r-name">${m.name}${checkinDotHTML(m)}</div>
+          <div class="r-title-cell">${titleBadgeHTML(m)}${beltHTML(m.belt,cat)}</div>
+          <div class="r-monthly-cell"><span class="r-monthly">${m.monthly}</span><span class="r-m-unit">sessions</span></div>
+          <div class="r-total-cell"><span class="r-total">累計 <span>${m.total.toLocaleString()}</span> 回</span></div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  const main=document.getElementById('pcMain');
+  main.innerHTML=podiumHTML+listHTML;
+  renderInstructorWidget(instructors);
+  startSlideProgress();
 }
 
-// =====================================================================
-// 時間帯グリッド：実際の予約データを反映
-// =====================================================================
-function isSlotBooked(dateLabel, timeStr) {
-  // ★マットが1面のため、講師を問わず同じ日時に予約があれば埋まっている扱いにする
-  return apiData.bookings.some(b => b.date === dateLabel && b.time === timeStr);
+function startSlideProgress() {
+  if (slideRaf) cancelAnimationFrame(slideRaf);
+  slideStart=null;
+  function animate(ts) {
+    if (!slideStart) slideStart=ts;
+    const elapsed=ts-slideStart;
+    const pct=Math.min((elapsed/SLIDE_INTERVAL_MS)*100,100);
+    const bar=document.getElementById('slideBar');
+    if (bar) bar.style.width=pct+'%';
+    if (elapsed<SLIDE_INTERVAL_MS) { slideRaf=requestAnimationFrame(animate); }
+    else { toggleSlide(); }
+  }
+  slideRaf=requestAnimationFrame(animate);
+}
+function toggleSlide() {
+  slideIndex=(slideIndex+1)%SLIDES.length;
+  const main=document.getElementById('pcMain');
+  main.style.opacity='0'; main.style.transition='opacity 0.5s ease';
+  setTimeout(()=>{renderPCSlide(SLIDES[slideIndex]);main.style.opacity='1';},500);
 }
 
-function isSlotPast(dateLabel, startTime) {
-  // 選択中の日付が今日の場合、開始時刻を過ぎた枠は受付終了にする
-  const d = parseTabLabelToDate(dateLabel);
-  if (!d) return false;
+// ============================================================
+// スマホ レンダリング
+// ============================================================
+function renderMobile() { switchMobileTab(mobileTab); }
+function switchMobileTab(cat) {
+  mobileTab=cat;
+  document.getElementById('tabAdult').className='m-tab '+(cat==='adult' ?'active-adult':'');
+  document.getElementById('tabKidsA').className='m-tab '+(cat==='kids_a'?'active-kids-a':'');
+  document.getElementById('tabKidsB').className='m-tab '+(cat==='kids_b'?'active-kids-b':'');
+  const members=allMembers.filter(m=>m.category===cat && !m.isInstructor).sort((a,b)=>b.monthly-a.monthly);
+  const instructors=allMembers.filter(m=>m.category===cat && m.isInstructor).sort((a,b)=>b.total-a.total);
+  const top3=members.slice(0,3); const rest=members.slice(3);
+  const pClass1={adult:'p1-adult',kids_a:'p1-kids-a',kids_b:'p1-kids-b'}[cat];
+  function avatarBg(rank,cat) {
+    if (cat==='adult') return rank===1?'linear-gradient(135deg,#f0d070,#d4a84c)':rank===2?'linear-gradient(135deg,#d8d8e4,#9898a8)':'linear-gradient(135deg,#c87850,#7a4828)';
+    if (cat==='kids_a') return rank===1?'linear-gradient(135deg,#90d0f8,#5aacf0)':rank===2?'linear-gradient(135deg,#5090d0,#205090)':'linear-gradient(135deg,#6080d8,#304090)';
+    return rank===1?'linear-gradient(135deg,#80e8c0,#50d0a0)':rank===2?'linear-gradient(135deg,#40b890,#207860)':'linear-gradient(135deg,#50a878,#285840)';
+  }
+  const podHTML=`
+    <div class="m-month-banner">
+      <span class="m-month-label">${CAT_LABEL[cat]} Monthly</span>
+      <span class="m-month-val">${getCurrentMonthLabel()}</span>
+    </div>
+    <div class="m-podium">
+      ${[top3[1],top3[0],top3[2]].filter(Boolean).map((m,i)=>{
+        const rn=[2,1,3][i]; const isFirst=rn===1;
+        return `<div class="m-p-card ${isFirst?pClass1:''}">
+          <div class="m-p-rank">${isFirst?'👑':''} ${rankLabel(rn)}</div>
+          <div class="m-p-av" style="background:${avatarBg(rn,cat)}">${initial(m.name)}</div>
+          <div class="m-p-name">${m.name}${checkinDotHTML(m, true)}</div>
+          <div class="m-p-title">${currentLang === 'pt' ? '' : getTitle(m).name}</div>
+          <div class="m-p-monthly" style="color:${isFirst?'var(--gold)':'var(--white-dim)'}">${m.monthly}</div>
+          <div class="m-p-total">${t('totalLabel')} ${m.total.toLocaleString()}${t('times')}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  const listHTML=rest.map((m,i)=>`
+    <div class="m-r-row">
+      <div class="m-r-num">${i+4}</div>
+      <div class="m-r-info">
+        <div class="m-r-name">${m.name}${checkinDotHTML(m, true)}</div>
+        <div class="m-r-badges">${titleBadgeHTML(m)}${beltHTML(m.belt,cat)}</div>
+      </div>
+      <div class="m-r-right">
+        <div class="m-r-monthly">${m.monthly}</div>
+        <div class="m-r-unit">${currentLang === 'pt' ? 'vezes' : 'sessions'}</div>
+        <div class="m-r-total">${t('totalLabel')} <span>${m.total.toLocaleString()}</span>${t('times')}</div>
+      </div>
+    </div>`).join('');
+  const instrHTML = instructors.length ? `
+    <div class="m-instructor-section">
+      <div class="m-instructor-label">⚑ Instructors</div>
+      ${instructors.map(m=>`
+      <div class="m-r-row m-instr-row">
+        <div class="m-r-num">⚑</div>
+        <div class="m-r-info">
+          <div class="m-r-name">${m.name}${checkinDotHTML(m, true)}</div>
+          <div class="m-r-badges">${titleBadgeHTML(m)}${beltHTML(m.belt,cat)}</div>
+        </div>
+        <div class="m-r-right">
+          <div class="m-r-monthly">${m.monthly}</div>
+          <div class="m-r-unit">${currentLang === 'pt' ? 'vezes' : 'sessions'}</div>
+          <div class="m-r-total">${t('totalLabel')} <span>${m.total.toLocaleString()}</span>${t('times')}</div>
+        </div>
+      </div>`).join('')}
+    </div>` : '';
+  document.getElementById('mList').innerHTML=podHTML+listHTML+instrHTML;
+}
+
+// 帯昇格トラッカー
+let trackerMode = 'adult';
+function switchTrackerTab(mode) {
+  trackerMode = mode;
+  const btnA = document.getElementById('trackerTabAdult');
+  const btnK = document.getElementById('trackerTabKids');
+  if (mode === 'adult') {
+    btnA.style.background='var(--red)'; btnA.style.color='#fff'; btnA.style.border='none';
+    btnK.style.background='var(--card)'; btnK.style.color='var(--muted)'; btnK.style.border='1px solid var(--border)';
+    document.getElementById('searchInput').placeholder='名前を入力...';
+  } else {
+    btnK.style.background='var(--kids-a,#5aaff0)'; btnK.style.color='#fff'; btnK.style.border='none';
+    btnA.style.background='var(--card)'; btnA.style.color='var(--muted)'; btnA.style.border='1px solid var(--border)';
+    document.getElementById('searchInput').placeholder='名前を入力...';
+  }
+  document.getElementById('trackerResult').innerHTML='';
+}
+
+function searchTracker() {
+  const query=document.getElementById('searchInput').value.trim();
+  const result=document.getElementById('trackerResult');
+  if (!query){result.innerHTML='';return;}
+
+  if (trackerMode==='adult') {
+    const member=allMembers.find(m=>m.name.includes(query)&&m.category==='adult');
+    if (!member) {
+      const km=allMembers.find(m=>m.name.includes(query)&&m.category!=='adult');
+      result.innerHTML=km
+        ?`<div class="tracker-kids-note">${t('isKidsMember', km.name)}</div>`
+        :`<div class="tracker-not-found">${t('notFound', query)}</div>`;
+      return;
+    }
+    const total=member.total;
+    const stepsHTML=BELT_THRESHOLDS.map(step=>{
+      const isDone=total>=step.end; const isInProg=!isDone&&total>=step.start;
+      const filled=isDone?step.need:isInProg?total-step.start:0;
+      const pct=isDone?100:isInProg?Math.round((filled/step.need)*100):0;
+      const barCls=isDone?'done':isInProg?'prog':'none';
+      const countTxt=isDone?t('achieved'):`${filled} / ${step.need} ${t('times')}`;
+      return `<div class="tracker-step">
+        <div class="ts-header">
+          <div class="ts-label">${beltHTML(step.from,'adult')}<span style="color:var(--muted)">→</span>${beltHTML(step.to,'adult')}</div>
+          <span class="ts-count ${isDone?'done':''}">${countTxt}</span>
+        </div>
+        <div class="ts-bar-wrap"><div class="ts-bar ${barCls}" style="width:${Math.max(pct,barCls==='none'?0:2)}%"></div></div>
+      </div>`;
+    }).join('');
+    result.innerHTML=`
+      <div class="m-tracker show">
+        <div class="m-tracker-header">
+          <div class="m-tracker-avatar">${initial(member.name)}</div>
+          <div>
+            <div class="m-tracker-name">${member.name}</div>
+            <div class="m-tracker-meta">${beltHTML(member.belt,'adult')} &nbsp; ${t('monthlyLabel')} <span>${member.monthly}</span> ${t('times')}</div>
+          </div>
+        </div>
+        <div class="tracker-steps">${stepsHTML}</div>
+        <div class="tracker-total">
+          <span class="tt-label">${t('cumulativeParticipation')}</span>
+          <div><span class="tt-val">${total.toLocaleString()}</span><span class="tt-unit">${t('times')}</span></div>
+        </div>
+      </div>`;
+  } else {
+    // キッズトラッカー
+    const member=allMembers.find(m=>m.name.includes(query)&&m.category!=='adult');
+    if (!member) {
+      const am=allMembers.find(m=>m.name.includes(query)&&m.category==='adult');
+      result.innerHTML=am
+        ?`<div class="tracker-kids-note">${t('isAdultMember', am.name)}</div>`
+        :`<div class="tracker-not-found">${t('notFound', query)}</div>`;
+      return;
+    }
+    const total=member.total;
+    const stepsHTML=KIDS_BELT_THRESHOLDS.map(step=>{
+      const isDone=total>=step.end; const isInProg=!isDone&&total>=step.start;
+      const filled=isDone?step.need:isInProg?total-step.start:0;
+      const pct=isDone?100:isInProg?Math.round((filled/step.need)*100):0;
+      const barCls=isDone?'done':isInProg?'prog':'none';
+      const countTxt=isDone?t('achieved'):`${filled} / ${step.need} ${t('times')}`;
+      return `<div class="tracker-step">
+        <div class="ts-header">
+          <div class="ts-label">${beltHTML(step.from,'kids_a')}<span style="color:var(--muted)">→</span>${beltHTML(step.to,'kids_a')}</div>
+          <span class="ts-count ${isDone?'done':''}">${countTxt}</span>
+        </div>
+        <div class="ts-bar-wrap"><div class="ts-bar ${barCls}" style="width:${Math.max(pct,barCls==='none'?0:2)}%"></div></div>
+      </div>`;
+    }).join('');
+    result.innerHTML=`
+      <div class="m-tracker show">
+        <div class="m-tracker-header">
+          <div class="m-tracker-avatar" style="background:linear-gradient(135deg,var(--kids-a,#5aaff0),#3888cc);">${initial(member.name)}</div>
+          <div>
+            <div class="m-tracker-name">${member.name}</div>
+            <div class="m-tracker-meta">${beltHTML(member.belt,member.category)} &nbsp; ${t('monthlyLabel')} <span>${member.monthly}</span> ${t('times')}</div>
+          </div>
+        </div>
+        <div class="tracker-steps">${stepsHTML}</div>
+        <div class="tracker-total">
+          <span class="tt-label">${t('cumulativeParticipation')}</span>
+          <div><span class="tt-val">${total.toLocaleString()}</span><span class="tt-unit">${t('times')}</span></div>
+        </div>
+      </div>`;
+  }
+}
+document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==='Enter')searchTracker();});
+
+// Toast
+function showMobileToast(msg) {
+  const el=document.getElementById('mToast');
+  el.textContent=msg; void el.offsetWidth;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2600);
+}
+
+// 時計
+const DAYS_JP=['日','月','火','水','木','金','土'];
+function updateClock() {
+  const now=new Date();
+  const hh=String(now.getHours()).padStart(2,'0');
+  const mm=String(now.getMinutes()).padStart(2,'0');
+  const ss=String(now.getSeconds()).padStart(2,'0');
+  const ce=document.getElementById('pcClock'); if(ce) ce.textContent=`${hh}:${mm}:${ss}`;
+  const de=document.getElementById('pcDate');  if(de) de.textContent=`${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}（${DAYS_JP[now.getDay()]}）`;
+}
+setInterval(updateClock,1000); updateClock();
+
+function tickFetch() {
+  fetchElapsed+=1000;
+  const remain=Math.max(0,FETCH_INTERVAL_MS-fetchElapsed);
+  const rm=Math.floor(remain/60000); const rs=Math.floor((remain%60000)/1000);
+  const ne=document.getElementById('pcNextFetch'); if(ne) ne.textContent=`Next: ${rm}:${String(rs).padStart(2,'0')}`;
+  const fb=document.getElementById('fetchBar');    if(fb) fb.style.width=Math.min((fetchElapsed/FETCH_INTERVAL_MS)*100,100)+'%';
+}
+setInterval(tickFetch,1000);
+
+function setLastUpdate() {
+  const now=new Date();
+  const ts=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const pe=document.getElementById('pcLastUpd');    if(pe) pe.textContent=`Last Updated: ${ts}`;
+  const me=document.getElementById('mLastUpd');     if(me) me.textContent=`Last Updated: ${ts}`;
+  const pm=document.getElementById('pcMonthLabel'); if(pm) pm.textContent=getCurrentMonthLabel();
+  const mm=document.getElementById('mMonthLabel');  if(mm) mm.textContent=getCurrentMonthLabel();
+}
+
+function showOverlay(id)   { var el=document.getElementById(id); if(el) el.classList.add('show'); }
+function hideAllOverlays() { ['loadingOv','refreshOv'].forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('show'); }); }
+
+// ============================================================
+// 接続状態バッジ（LIVE / OFFLINE）
+// ============================================================
+let isOnline = true;
+let lastGoodFetch = 0;
+function updateConnBadge() {
+  let badge = document.getElementById('connBadge');
+  if (!badge) {
+    badge = document.createElement('div');
+    badge.id = 'connBadge';
+    badge.style.cssText = 'position:fixed;top:12px;left:14px;z-index:9999;font-family:sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;padding:4px 12px;border-radius:20px;pointer-events:none;transition:all 0.3s;';
+    document.body.appendChild(badge);
+  }
+  if (isOnline) {
+    badge.textContent = '● LIVE';
+    badge.style.background = 'rgba(80,200,120,0.15)';
+    badge.style.color = '#50c878';
+    badge.style.border = '1px solid rgba(80,200,120,0.4)';
+  } else {
+    const mins = lastGoodFetch ? Math.floor((Date.now()-lastGoodFetch)/60000) : '?';
+    badge.textContent = `⚠ 接続待ち（${mins}分前のデータ）`;
+    badge.style.background = 'rgba(228,90,90,0.15)';
+    badge.style.color = '#e45a5a';
+    badge.style.border = '1px solid rgba(228,90,90,0.4)';
+  }
+}
+
+// ============================================================
+// 画面スリープ防止（Wake Lock API・対応ブラウザのみ）
+// ============================================================
+let wakeLock = null;
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => { wakeLock = null; });
+    }
+  } catch(e) { /* 非対応・省電力モードなどは無視 */ }
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') requestWakeLock();
+});
+requestWakeLock();
+
+// ============================================================
+// 毎日1回の自動リロード（午前4時・メモリリフレッシュ）
+// ※キャッシュを使わない完全リロード（下の🧹メンテナンス機能と連携）
+// ============================================================
+(function scheduleDailyReload() {
   const now = new Date();
-  const todayLabel = formatDateTab(new Date(now.getFullYear(), now.getMonth(), now.getDate()));
-  if (dateLabel !== todayLabel) return false;
-  // ★分単位まで比較する（枠が10:30など「時：分」開始のため、時だけの比較だとズレる）
-  const [h, min] = startTime.split(':').map(n => parseInt(n, 10));
-  const startMinutes = h * 60 + min;
-  const nowMinutes = now.getHours() * 60 + now.getMinutes();
-  return nowMinutes >= startMinutes;
-}
+  const next = new Date(now);
+  next.setHours(4, 0, 0, 0);
+  if (next <= now) next.setDate(next.getDate() + 1);
+  setTimeout(() => (window.guildHardReload || (() => location.reload()))('daily'), next - now);
+})();
 
-function renderSlots() {
-  const grid = document.getElementById('slot-grid');
-  if (!bookingState.date) { grid.innerHTML = ''; return; }
+fetchData();
+</script>
 
-  grid.innerHTML = SLOT_TIMES.map(([start, label]) => {
-    const timeStr = start + label;
-    const booked = isSlotBooked(bookingState.date, timeStr);
-    const past   = !booked && isSlotPast(bookingState.date, start);
-    const cls = booked ? ' booked' : (past ? ' past' : '');
-    const click = (booked || past) ? '' : ` onclick="selectSlot(this, '${start}', '${label}')"`;
-    return `<div class="slot${cls}"${click}><div class="slot-time">${start}</div><div class="slot-label">${label}</div></div>`;
-  }).join('');
-}
+<!-- 🧹 MAINTENANCE（常設）— メモリ解放・キャッシュ更新・自動アップデート検知。季節演出とは無関係なので消さないでください -->
+<script>
+(function () {
+  // モニター/TV表示のときだけ動かす（スマホでチェックイン中に勝手にリロードしないため）
+  const isMonitor = () => window.innerWidth > 1024 || document.documentElement.classList.contains('force-pc');
 
-function selectSlot(el, start, label) {
-  document.querySelectorAll('.slot').forEach(s => s.classList.remove('selected'));
-  el.classList.add('selected');
-  bookingState.time = start + label;
-  document.getElementById('next-btn').disabled = false;
-}
+  // ---- キャッシュを使わない完全リロード（?pc=1 などの既存パラメータは維持） ----
+  window.guildHardReload = function (reason) {
+    try {
+      const url = new URL(location.href);
+      url.searchParams.set('_r', Date.now().toString()); // キャッシュ回避用
+      console.log('[maintenance] reload:', reason || 'manual');
+      location.replace(url.toString());
+    } catch (e) {
+      location.reload();
+    }
+  };
 
-// =====================================================================
-// 画面②→③：フォームへ
-// =====================================================================
-function goToForm() {
-  if (!bookingState.date || !bookingState.time) return;
-  const inst = INSTRUCTORS[bookingState.instructorId];
-  document.getElementById('sum-instructor').textContent = inst.name;
-  document.getElementById('sum-datetime').textContent = bookingState.date + ' ' + bookingState.time;
-  document.getElementById('sum-price').textContent = inst.price.toLocaleString() + '円（当日、道場にてお支払い）';
-  goTo('screen-form');
-}
+  // ---- ① メモリ監視：使用量が上限を超えたらリロードして解放（Chrome系のみ計測可能） ----
+  const MEMORY_LIMIT_MB = 350;
+  setInterval(() => {
+    if (!isMonitor()) return;
+    const mem = performance && performance.memory;
+    if (!mem) return;
+    const usedMB = mem.usedJSHeapSize / (1024 * 1024);
+    if (usedMB > MEMORY_LIMIT_MB) window.guildHardReload('memory ' + Math.round(usedMB) + 'MB');
+  }, 5 * 60 * 1000);
 
-// 会員区分の選択
-let memberType = null;
-function setMemberType(type) {
-  memberType = type;
-  document.getElementById('seg-member').classList.toggle('selected', type === '会員');
-  document.getElementById('seg-visitor').classList.toggle('selected', type === '外部');
-  if (type) hideError('err-member');
-}
+  // ---- ② 自動アップデート検知：GitHubに新しいHTMLを上げたら、モニター側が自動で読み直す ----
+  //     10分ごとに自分自身を再取得して内容が変わっていたらリロード
+  //     （通信エラーや途中切れファイルで誤反応しないよう、2回連続で差分があった時だけ実行）
+  function hashText(t) { let h = 5381; for (let i = 0; i < t.length; i++) h = ((h << 5) + h + t.charCodeAt(i)) | 0; return h; }
+  let baselineHash = null, diffStrikes = 0;
+  async function fetchSelf() {
+    const url = new URL(location.href);
+    url.searchParams.set('_chk', Date.now().toString());
+    const res = await fetch(url.toString(), { cache: 'no-store' });
+    if (!res.ok) throw new Error('status ' + res.status);
+    const text = await res.text();
+    // 正常なモニターHTMLであること（途中切れ・エラーページを除外）
+    if (!text.includes('id="pcScreen"') || !text.trim().endsWith('</html>')) throw new Error('incomplete html');
+    return hashText(text);
+  }
+  async function checkUpdate() {
+    if (!isMonitor()) return;
+    try {
+      const h = await fetchSelf();
+      if (baselineHash === null) { baselineHash = h; return; }
+      if (h !== baselineHash) {
+        diffStrikes += 1;
+        if (diffStrikes >= 2) window.guildHardReload('update detected');
+      } else {
+        diffStrikes = 0;
+      }
+    } catch (e) { /* 一時的な通信エラーは無視して次回に */ }
+  }
+  setTimeout(checkUpdate, 20 * 1000);           // 起動20秒後に基準値を取得
+  setInterval(checkUpdate, 10 * 60 * 1000);     // 以降10分ごと
 
-// エラー表示ヘルパー
-function showError(id, inputId) {
-  document.getElementById(id).classList.add('show');
-  if (inputId) document.getElementById(inputId).classList.add('invalid');
-}
-function hideError(id, inputId) {
-  document.getElementById(id).classList.remove('show');
-  if (inputId) document.getElementById(inputId).classList.remove('invalid');
-}
-function clearErrors() {
-  document.querySelectorAll('.form-error').forEach(e => e.classList.remove('show'));
-  document.querySelectorAll('.form-input').forEach(e => e.classList.remove('invalid'));
-}
-
-// =====================================================================
-// 予約送信
-// =====================================================================
-async function submitBooking() {
-  clearErrors();
-  const name  = document.getElementById('form-name').value.trim();
-  const phone = document.getElementById('form-phone').value.trim();
-  const email = document.getElementById('form-email').value.trim();
-  const note  = document.getElementById('form-note').value.trim();
-
-  let hasError = false;
-  if (!name)  { showError('err-name', 'form-name'); hasError = true; }
-  if (!phone) { showError('err-phone', 'form-phone'); hasError = true; }
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('err-email', 'form-email'); hasError = true; }
-  if (!memberType) { showError('err-member'); hasError = true; }
-  if (hasError) return;
-
-  const submitBtn = document.getElementById('submit-btn');
-  submitBtn.disabled = true;
-  submitBtn.textContent = '送信中...';
-
-  try {
-    const res = await fetch(BOOKING_API_URL, {
-      method: 'POST',
-      body: JSON.stringify({
-        date: bookingState.date,
-        time: bookingState.time,
-        instructorId: bookingState.instructorId,
-        name, phone, email,
-        memberType: memberType,
-        note,
-      }),
+  // ---- ③ DOM掃除：演出の残骸（万一消し忘れた要素）を定期的に除去 ----
+  const TRANSIENT_CLASSES = ['hw-flash', 'hw-boo', 'hw-drop', 'hw-swarm', 'hw-energy-burst'];
+  setInterval(() => {
+    TRANSIENT_CLASSES.forEach(cls => {
+      document.querySelectorAll('.' + cls).forEach(el => el.remove());
     });
-    const data = await res.json();
-
-    if (data.success) {
-      // 手元の空き状況にも反映しておく（戻った時に正しく予約済み表示される）
-      apiData.bookings.push({ date: bookingState.date, time: bookingState.time, instructor: bookingState.instructorId });
-      showConfirmScreen();
-    } else if (data.already) {
-      alert('大変申し訳ございません、その時間帯はちょうど予約が入ってしまいました。お手数ですが別の時間帯をお選びください。');
-      await fetchApiData();
-      renderSlots();
-      document.getElementById('next-btn').disabled = true;
-      bookingState.time = null;
-      goTo('screen-slots');
-    } else {
-      alert('予約の送信に失敗しました。時間をおいて再度お試しください。');
-    }
-  } catch (err) {
-    alert('通信エラーが発生しました。電波の良い場所で再度お試しください。');
-  } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'この内容で予約する';
-  }
-}
-
-function showConfirmScreen() {
-  const inst = INSTRUCTORS[bookingState.instructorId];
-  document.getElementById('done-instructor').textContent = inst.name;
-  document.getElementById('done-datetime').textContent = bookingState.date + ' ' + bookingState.time;
-  document.getElementById('done-price').textContent = inst.price.toLocaleString() + '円（当日払い）';
-  document.getElementById('calendar-link').href = buildCalendarUrl(inst.name);
-  goTo('screen-confirm');
-}
-
-// Googleカレンダー追加用リンクを生成する
-function buildCalendarUrl(instructorName) {
-  const d = parseTabLabelToDate(bookingState.date);
-  const m = bookingState.time.match(/^(\d{1,2}):(\d{2})/);
-  if (!d || !m) return '#';
-  const pad = n => String(n).padStart(2, '0');
-  // ★分も含めて開始時刻を反映し、終了時刻はDate演算で60分後を正しく求める
-  //  （以前は分を無視していたため、10:30開始が10:00と表示されるバグがあった）
-  const start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), parseInt(m[1],10), parseInt(m[2],10));
-  const end   = new Date(start.getTime() + 60 * 60 * 1000);
-  const fmt = dt => `${dt.getFullYear()}${pad(dt.getMonth()+1)}${pad(dt.getDate())}T${pad(dt.getHours())}${pad(dt.getMinutes())}00`;
-  const dates = `${fmt(start)}/${fmt(end)}`;
-  const params = new URLSearchParams({
-    action: 'TEMPLATE',
-    text: `柔術ギルド プライベートクラス（${instructorName}）`,
-    dates: dates,
-    ctz: 'Asia/Tokyo',
-    details: '柔術ギルドのプライベートクラス（60分）。動きやすい服装でお越しください。',
-    location: '柔術ギルド（愛知県豊橋市）',
-  });
-  return 'https://calendar.google.com/calendar/render?' + params.toString();
-}
-
-// =====================================================================
-// キャンセルフロー（確認メールのリンク ?cancel=XXXX から）
-// =====================================================================
-async function initCancelFlow(token) {
-  cancelTokenFromUrl = token;
-  goTo('screen-cancel');
-  document.getElementById('cancel-loading').style.display = 'block';
-  document.getElementById('cancel-body').style.display = 'none';
-  document.getElementById('cancel-notfound').style.display = 'none';
-
-  try {
-    const res = await fetch(`${BOOKING_API_URL}?token=${encodeURIComponent(token)}&t=${Date.now()}`);
-    const data = await res.json();
-    document.getElementById('cancel-loading').style.display = 'none';
-
-    if (data.booking && data.booking.status !== 'cancelled') {
-      document.getElementById('cancel-name').textContent = data.booking.name + ' 様';
-      document.getElementById('cancel-instructor').textContent = data.booking.instructorName;
-      document.getElementById('cancel-datetime').textContent = data.booking.date + ' ' + data.booking.time;
-      document.getElementById('cancel-body').style.display = 'block';
-    } else if (data.booking && data.booking.status === 'cancelled') {
-      // すでにキャンセル済みの場合
-      document.getElementById('cancel-done-sub').innerHTML = 'このご予約は、すでにキャンセル済みです。<br>お手続きは不要です。';
-      goTo('screen-cancel-done');
-    } else {
-      document.getElementById('cancel-notfound').style.display = 'block';
-    }
-  } catch (err) {
-    document.getElementById('cancel-loading').style.display = 'none';
-    document.getElementById('cancel-notfound').style.display = 'block';
-  }
-}
-
-async function executeCancel() {
-  const btn = document.getElementById('cancel-exec-btn');
-  btn.disabled = true;
-  btn.textContent = 'キャンセル処理中...';
-
-  try {
-    const res = await fetch(BOOKING_API_URL, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'cancel', token: cancelTokenFromUrl }),
-    });
-    const data = await res.json();
-
-    if (data.success) {
-      goTo('screen-cancel-done');
-    } else if (data.alreadyCancelled) {
-      document.getElementById('cancel-done-sub').innerHTML = 'このご予約は、すでにキャンセル済みです。<br>お手続きは不要です。';
-      goTo('screen-cancel-done');
-    } else {
-      alert('キャンセル処理に失敗しました。お手数ですが、時間をおいて再度お試しいただくか、ギルドまでご連絡ください。');
-    }
-  } catch (err) {
-    alert('通信エラーが発生しました。電波の良い場所で再度お試しください。');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'この予約をキャンセルする';
-  }
-}
-
-// =====================================================================
-// 起動時：URLに ?cancel=XXXX があればキャンセル画面を開く
-// =====================================================================
-(function init() {
-  const params = new URLSearchParams(location.search);
-  const token = params.get('cancel');
-  if (token) initCancelFlow(token);
+  }, 3 * 60 * 1000);
 })();
 </script>
+
+<!-- 🎃 HALLOWEEN THEME（期間限定装飾）— 手動で戻す場合は、このコメントより下のスクリプトブロックごと削除してください -->
+<script>
+(function () {
+  const bats = ['🦇', '🦇', '🦇'];
+  const configs = [
+    { top: '12%',  duration: 22, delay: 0,  size: 26 },
+    { top: '52%',  duration: 28, delay: 6,  size: 20 },
+    { top: '78%',  duration: 18, delay: 12, size: 32 },
+  ];
+  configs.forEach((cfg, i) => {
+    const bat = document.createElement('div');
+    bat.className = 'hw-bat';
+    bat.textContent = bats[i];
+    bat.style.top = cfg.top;
+    bat.style.fontSize = cfg.size + 'px';
+    bat.style.animationDuration = cfg.duration + 's';
+    bat.style.animationDelay = cfg.delay + 's';
+    document.body.appendChild(bat);
+  });
+})();
+
+// 幽霊
+(function () {
+  const configs = [
+    { top: '25%', duration: 26, delay: 3,  size: 30 },
+    { top: '65%', duration: 32, delay: 15, size: 24 },
+  ];
+  configs.forEach((cfg) => {
+    const ghost = document.createElement('div');
+    ghost.className = 'hw-ghost';
+    ghost.textContent = '👻';
+    ghost.style.top = cfg.top;
+    ghost.style.fontSize = cfg.size + 'px';
+    ghost.style.animationDuration = cfg.duration + 's';
+    ghost.style.animationDelay = cfg.delay + 's';
+    document.body.appendChild(ghost);
+  });
+})();
+
+// 天井からぶら下がって揺れるクモ（複数箇所）
+(function () {
+  const positions = ['8%', '35%', '68%', '90%'];
+  positions.forEach((left, i) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'hw-spider-wrap';
+    wrap.style.left = left;
+    wrap.style.animationDuration = (5 + i) + 's';
+    wrap.style.animationDelay = (i * 1.3) + 's';
+
+    const thread = document.createElement('div');
+    thread.className = 'hw-spider-thread';
+    thread.style.height = (60 + i * 20) + 'px';
+
+    const icon = document.createElement('div');
+    icon.className = 'hw-spider-icon';
+    icon.style.fontSize = '22px';
+    icon.textContent = '🕷️';
+
+    wrap.appendChild(thread);
+    wrap.appendChild(icon);
+    document.body.appendChild(wrap);
+  });
+})();
+
+// たまに画面下部を横切るバンパイア
+(function () {
+  const vampire = document.createElement('div');
+  vampire.className = 'hw-vampire';
+  vampire.textContent = '🧛';
+  vampire.style.bottom = '6%';
+  vampire.style.fontSize = '34px';
+  vampire.style.animationDuration = '40s';
+  vampire.style.animationDelay = '5s';
+  document.body.appendChild(vampire);
+})();
+
+// ===== 常時演出：満月・流れる雲・足元の霧 =====
+(function () {
+  const moon = document.createElement('div');
+  moon.className = 'hw-moon';
+  document.body.appendChild(moon);
+
+  [ { top: '70px',  duration: 60, delay: 0  },
+    { top: '130px', duration: 85, delay: 25 } ].forEach(cfg => {
+    const cloud = document.createElement('div');
+    cloud.className = 'hw-cloud';
+    cloud.style.top = cfg.top;
+    cloud.style.animationDuration = cfg.duration + 's';
+    cloud.style.animationDelay = '-' + cfg.delay + 's';
+    document.body.appendChild(cloud);
+  });
+
+  const fog1 = document.createElement('div'); fog1.className = 'hw-fog';
+  const fog2 = document.createElement('div'); fog2.className = 'hw-fog f2';
+  document.body.appendChild(fog1);
+  document.body.appendChild(fog2);
+})();
+
+// ===== サプライズ演出：数分に1回、ランダムで派手なイベントが発生 =====
+(function () {
+  // ※揺れは .pc-screen ではなく body にかける
+  //   （.pc-screen には画面フィット用の scale() が入っているため、
+  //     transform を上書きすると一瞬スケールが外れてカクつくのを防ぐ）
+  const shakeTarget = document.body;
+
+  // ①雷：画面が光って揺れる
+  function lightning() {
+    const flash = document.createElement('div');
+    flash.className = 'hw-flash';
+    document.body.appendChild(flash);
+    shakeTarget.classList.add('hw-shake');
+    setTimeout(() => shakeTarget.classList.remove('hw-shake'), 700);
+    setTimeout(() => flash.remove(), 1800);
+  }
+
+  // ②巨大な幽霊が「BOO!」と叫びながら横切る
+  function boo() {
+    const ghost = document.createElement('div');
+    ghost.className = 'hw-boo';
+    ghost.textContent = '👻';
+    const text = document.createElement('div');
+    text.className = 'hw-boo-text';
+    text.textContent = 'BOO!';
+    ghost.appendChild(text);
+    document.body.appendChild(ghost);
+    setTimeout(() => ghost.remove(), 4800);
+  }
+
+  // ③カボチャの雨（お菓子も混ぜて賑やかに）
+  function pumpkinRain() {
+    const items = ['🎃', '🎃', '🎃', '🍬', '🍭', '🍫', '🎃'];
+    const count = 28;
+    for (let i = 0; i < count; i++) {
+      const d = document.createElement('div');
+      d.className = 'hw-drop';
+      d.textContent = items[Math.floor(Math.random() * items.length)];
+      d.style.left = (Math.random() * 100) + '%';
+      d.style.fontSize = (22 + Math.random() * 26) + 'px';
+      const dur = 3.5 + Math.random() * 2.5;
+      d.style.animationDuration = dur + 's';
+      d.style.animationDelay = (Math.random() * 1.8) + 's';
+      document.body.appendChild(d);
+      setTimeout(() => d.remove(), (dur + 2.2) * 1000);
+    }
+  }
+
+  // ④コウモリの大群
+  function batSwarm() {
+    const count = 18;
+    for (let i = 0; i < count; i++) {
+      const b = document.createElement('div');
+      b.className = 'hw-swarm';
+      b.textContent = '🦇';
+      b.style.top = (5 + Math.random() * 85) + '%';
+      b.style.fontSize = (18 + Math.random() * 22) + 'px';
+      const dur = 2.5 + Math.random() * 2;
+      b.style.animationDuration = dur + 's';
+      b.style.animationDelay = (Math.random() * 1.5) + 's';
+      document.body.appendChild(b);
+      setTimeout(() => b.remove(), (dur + 1.8) * 1000);
+    }
+  }
+
+  const events = [lightning, boo, pumpkinRain, batSwarm];
+  let lastIndex = -1;
+
+  function scheduleNext() {
+    // 70〜130秒のランダム間隔で発生（同じ演出が連続しないようにする）
+    const wait = (70 + Math.random() * 60) * 1000;
+    setTimeout(() => {
+      let idx;
+      do { idx = Math.floor(Math.random() * events.length); } while (idx === lastIndex && events.length > 1);
+      lastIndex = idx;
+      try { events[idx](); } catch (e) { /* 演出の失敗でモニター本体を止めない */ }
+      scheduleNext();
+    }, wait);
+  }
+
+  // 起動から20秒後に最初のイベント（雷）で「おおっ」を作り、その後ランダム
+  setTimeout(() => { lightning(); scheduleNext(); }, 20000);
+})();
+
+// ハロウィン限定BGM（ループ再生）
+// ソース：GitHubリポジトリ内の halloween-bgm.mp3（このHTMLファイルと同じ場所に配置してください）
+(function () {
+  const bgm = document.createElement('audio');
+  bgm.id = 'hwBgm';
+  bgm.src = 'halloween-bgm.mp3';
+  bgm.loop = true;
+  bgm.volume = 0.35; // 常時流しっぱなしのBGMなので控えめな音量に
+  bgm.preload = 'auto';
+  document.body.appendChild(bgm);
+
+  function tryPlay() {
+    const p = bgm.play();
+    if (p && p.catch) p.catch(() => { /* ブラウザの自動再生制限。下のクリック待ちで再試行 */ });
+  }
+  tryPlay();
+
+  // 自動再生がブロックされた場合、画面に一度触れた時点で再生を開始する
+  // （その後はブラウザがこのページでの音声再生を許可し続ける）
+  const resumeOnInteract = () => {
+    tryPlay();
+    document.removeEventListener('click', resumeOnInteract);
+    document.removeEventListener('touchstart', resumeOnInteract);
+  };
+  document.addEventListener('click', resumeOnInteract);
+  document.addEventListener('touchstart', resumeOnInteract);
+})();
+</script>
+<!-- 🎃 HALLOWEEN THEME ここまで -->
 </body>
 </html>
