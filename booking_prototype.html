@@ -588,7 +588,7 @@ const SLOT_TIMES = [
 ];
 
 let bookingState = { instructorId: null, date: null, time: null };
-let apiData = { bookings: [], scheduleOverrides: { closed: [], open: [] } };
+let apiData = { bookings: [], scheduleOverrides: { global: { closed: [], open: [] }, byInstructor: {} } };
 let cancelTokenFromUrl = null;
 
 // =====================================================================
@@ -658,13 +658,25 @@ async function fetchApiData() {
     const res = await fetch(`${BOOKING_API_URL}?t=${Date.now()}`);
     const data = await res.json();
     apiData.bookings = Array.isArray(data.bookings) ? data.bookings : [];
-    apiData.scheduleOverrides = data.scheduleOverrides || { closed: [], open: [] };
+    apiData.scheduleOverrides = data.scheduleOverrides || { global: { closed: [], open: [] }, byInstructor: {} };
   } catch (err) {
     // 取得に失敗しても、通常の土曜日スケジュールで動作を継続する
     // （空き状況は表示されないが、重複予約はサーバー側で防がれる）
     console.error('予約状況の取得に失敗しました。', err);
-    apiData = { bookings: [], scheduleOverrides: { closed: [], open: [] } };
+    apiData = { bookings: [], scheduleOverrides: { global: { closed: [], open: [] }, byInstructor: {} } };
   }
+}
+
+// 現在選択中の講師について、有効な休止日・特別開催日を返す
+// （「全講師共通」の設定 ＋ その講師だけの個別設定をあわせたもの）
+function getEffectiveOverrides() {
+  const so = apiData.scheduleOverrides || { global: { closed: [], open: [] }, byInstructor: {} };
+  const global = so.global || { closed: [], open: [] };
+  const mine   = (so.byInstructor && so.byInstructor[bookingState.instructorId]) || { closed: [], open: [] };
+  return {
+    closed: [...global.closed, ...mine.closed],
+    open:   [...global.open,   ...mine.open],
+  };
 }
 
 // =====================================================================
@@ -680,16 +692,18 @@ function generateUpcomingSaturdays(count = 4) {
   const firstSaturday = new Date(today);
   firstSaturday.setDate(today.getDate() + daysUntilSaturday);
 
-  const candidateCount = count + apiData.scheduleOverrides.closed.length + 2;
+  const overrides = getEffectiveOverrides();
+
+  const candidateCount = count + overrides.closed.length + 2;
   for (let i = 0; i < candidateCount; i++) {
     const d = new Date(firstSaturday);
     d.setDate(firstSaturday.getDate() + i * 7);
     dates.push(d);
   }
 
-  let filtered = dates.filter(d => !apiData.scheduleOverrides.closed.includes(formatDateTab(d)));
+  let filtered = dates.filter(d => !overrides.closed.includes(formatDateTab(d)));
 
-  apiData.scheduleOverrides.open.forEach(label => {
+  overrides.open.forEach(label => {
     const d = parseTabLabelToDate(label);
     if (d && d >= today && !filtered.some(fd => formatDateTab(fd) === label)) {
       filtered.push(d);
