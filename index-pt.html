@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jiujitsu Guild｜Academia de Jiu-Jitsu Brasileiro em Toyohashi, Aichi</title>
-<meta name="description" content="Academia especializada em Jiu-Jitsu Brasileiro em Toyohashi, Aichi — Jiujitsu Guild. Bem-vindos iniciantes e sem experiência. Turmas por faixa etária, dos 6 anos até adultos. Visitas e aulas experimentais disponíveis.">
+<title>Jiujitsu Guild｜Academia de Jiu-Jitsu em Toyohashi, Aichi</title>
+<meta name="description" content="Academia especializada em Jiu-Jitsu em Toyohashi, Aichi — Jiujitsu Guild. Bem-vindos iniciantes e sem experiência. Turmas por faixa etária, dos 6 anos até adultos. Visitas e aulas experimentais disponíveis.">
 
 <!-- OGP（LINE・SNSでのリンクプレビュー用） -->
 <meta property="og:type" content="website">
-<meta property="og:title" content="Jiujitsu Guild｜Academia de Jiu-Jitsu Brasileiro em Toyohashi, Aichi">
+<meta property="og:title" content="Jiujitsu Guild｜Academia de Jiu-Jitsu em Toyohashi, Aichi">
 <meta property="og:description" content="A maior área de tatame de Toyohashi, com 100㎡. Iniciantes bem-vindos, dos 6 anos até adultos. Visitas e aulas experimentais disponíveis.">
 <meta property="og:url" content="https://jiujitsuguild.github.io/">
 <meta property="og:image" content="https://jiujitsuguild.github.io/images/gi_back.jpg">
@@ -296,6 +296,30 @@ body::before {
 }
 
 /* =====================================================================
+   MORNING CLASS NOTICE
+   ===================================================================== */
+.morning-notice {
+  background: linear-gradient(135deg, rgba(196,30,30,0.12), rgba(196,30,30,0.03));
+  border: 1px solid var(--red-dim); border-left: 3px solid var(--red);
+  border-radius: 4px; padding: 36px 40px;
+}
+.morning-eyebrow { font-family: var(--font-en); font-size: 14px; letter-spacing: 4px; color: var(--red); margin-bottom: 10px; }
+.morning-title { font-size: 26px; font-weight: 900; color: var(--white); line-height: 1.4; margin-bottom: 10px; }
+.morning-notice p { font-size: 14px; color: var(--muted); line-height: 1.9; margin-bottom: 12px; }
+.morning-notice p.morning-lead { color: var(--white); font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+.morning-footer { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: 18px; }
+.morning-badge {
+  background: var(--red); color: var(--white); padding: 7px 18px; border-radius: 2px;
+  font-family: var(--font-en); font-size: 13px; letter-spacing: 2px; white-space: nowrap;
+}
+.morning-note { font-size: 13px; color: var(--muted); }
+.morning-notice .nb { display: inline-block; }
+@media (max-width: 600px) {
+  .morning-notice { padding: 26px 22px; }
+  .morning-title { font-size: 21px; }
+}
+
+/* =====================================================================
    About / Concept
    ===================================================================== */
 .about-grid {
@@ -382,6 +406,7 @@ body::before {
 .class-card.kids-c::before { background: linear-gradient(90deg, #c48a1e, #8b5e10); }
 .class-card.open::before   { background: linear-gradient(90deg, #8b1ec4, #5e0d8b); }
 .class-card.private::before { background: linear-gradient(90deg, var(--muted), #555); }
+.class-card.judo::before   { background: linear-gradient(90deg, #1ec4a8, #0d8b74); }
 
 .class-card:hover {
   border-color: rgba(196,30,30,0.3);
@@ -400,6 +425,7 @@ body::before {
 .class-card.kids-c .class-tag { background: rgba(196,138,30,0.15); color: #e0b040; border: 1px solid rgba(196,138,30,0.3); }
 .class-card.open   .class-tag { background: rgba(139,30,196,0.15); color: #b060e0; border: 1px solid rgba(139,30,196,0.3); }
 .class-card.private .class-tag { background: rgba(100,100,100,0.15); color: #aaa; border: 1px solid rgba(100,100,100,0.3); }
+.class-card.judo   .class-tag { background: rgba(30,196,168,0.15); color: #40d8c0; border: 1px solid rgba(30,196,168,0.3); }
 
 .class-name { font-family: var(--font-en); font-size: 22px; letter-spacing: 1px; color: var(--white); margin-bottom: 6px; }
 .class-age  { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
@@ -440,6 +466,7 @@ body::before {
 .st-kids-c  { background: rgba(196,138,30,0.15);  color: #e0b040; }
 .st-open    { background: rgba(139,30,196,0.15);  color: #b060e0; }
 .st-private { background: rgba(100,100,100,0.15); color: #aaa; }
+.st-judo    { background: rgba(30,196,168,0.15);  color: #40d8c0; }
 
 @media (max-width: 600px) {
   .schedule-table { font-size: 12px; }
@@ -655,6 +682,12 @@ body::before {
 @media (max-width: 768px) {
   .lang-switch-mobile { display: inline-flex; align-items: center; }
 }
+/* タブレット横向き・小さめのノートPC：ナビ項目が1行に収まらないのでハンバーガーに切り替え */
+@media (max-width: 1200px) {
+  .nav-links { display: none; }
+  .nav-hamburger { display: flex; }
+  .lang-switch-mobile { display: inline-flex; align-items: center; }
+}
 
 /* =====================================================================
    Animations
@@ -728,8 +761,8 @@ body::before {
         <span class="hero-title-red">GUILD</span>
       </h1>
       <p class="hero-sub">
-        Onde quem tem técnica se reúne, e a técnica fala mais alto.<br>
-        Uma academia especializada em Jiu-Jitsu Brasileiro em Toyohashi.<br>
+        Onde quem tem técnica se conecta, e a técnica fala mais alto.<br>
+        Uma academia especializada em Jiu-Jitsu em Toyohashi.<br>
         Do iniciante ao competidor, dos 6 anos até adultos.
       </p>
       <div class="hero-btns">
@@ -741,8 +774,27 @@ body::before {
   </div>
 </section>
 
+<!-- Morning Class Announcement（2027年〜 朝クラス開始の告知） -->
+<div class="container" style="margin: 8px auto 0; position:relative; z-index:1;">
+  <div class="morning-notice fade-in">
+    <div class="morning-eyebrow">NOVIDADE — AULAS DE MANHÃ</div>
+    <h2 class="morning-title"><span class="nb">A partir de 2027,</span> <span class="nb">teremos aulas de manhã.</span></h2>
+    <p class="morning-lead"><span class="nb">Mais horários pra treinar</span> <span class="nb">Jiu-Jitsu em Toyohashi.</span></p>
+    <p>
+      Muita gente trabalha em turno, faz hora extra ou simplesmente não consegue treinar à noite. Pensando em quem sai do turno da noite, em quem prefere começar o dia treinando ou em quem só tem a manhã livre, o Jiujitsu Guild vai abrir o tatame também de manhã.
+    </p>
+    <p>
+      Onde quem tem técnica se conecta — agora também de manhã. Iniciante ou de outra equipe, todo mundo continua sendo bem-vindo.
+    </p>
+    <div class="morning-footer">
+      <span class="morning-badge">COMING 2027</span>
+      <span class="morning-note">Os horários serão divulgados em breve.</span>
+    </div>
+  </div>
+</div>
+
 <!-- Pair Enrollment Banner（トップ付近・目立たせる） -->
-<div class="container" style="margin: 24px 0 56px; position:relative; z-index:1;">
+<div class="container" style="margin: 24px auto 56px; position:relative; z-index:1;">
   <div class="campaign-box fade-in" style="margin-top:0;">
     <div style="position:absolute; right:-20px; top:50%; transform:translateY(-50%) rotate(90deg); font-family:var(--font-en); font-size:60px; color:rgba(196,30,30,0.06); line-height:1; pointer-events:none;">PAIR</div>
     <div class="campaign-title">⚔ Venha com um amigo ou irmão</div>
@@ -797,7 +849,7 @@ body::before {
         <div class="about-quote-box">
           <div class="about-quote">"A porta de entrada para o iniciante. O palco técnico para quem já treina."</div>
           <div class="about-quote-sub">
-            Como uma academia especializada exclusivamente em Jiu-Jitsu Brasileiro,
+            Como uma academia especializada exclusivamente em Jiu-Jitsu,
             oferecemos ao mesmo tempo um ambiente acolhedor para quem está começando
             e um espaço técnico para quem já compete.
             Ensino em japonês, com raízes de jiu-jitsu plantadas em Toyohashi.
@@ -932,6 +984,20 @@ body::before {
         </div>
       </div>
 
+      <!-- 柔道クラス（マンスリー） -->
+      <div class="class-card judo fade-in">
+        <span class="class-tag">Mensal</span>
+        <div class="class-name">Aula de Judô</div>
+        <div class="class-age">Sem restrição de faixa ou idade ／ Sem restrição de academia</div>
+        <div class="class-desc">Uma vez por mês, com o tema "judô pra vencer no jiu-jitsu". Você aprende técnicas de judô que fazem diferença de verdade na luta — defesa de queda, arremessos e mais. Um dos treinos favoritos da galera.</div>
+        <div class="class-schedule">
+          <strong>1x por mês</strong> data divulgada nas redes e no LINE
+        </div>
+        <div class="class-price">
+          <span class="class-price-num" style="font-size:16px;">Grátis p/ membros ／ ¥2.000 visitantes</span>
+        </div>
+      </div>
+
       <!-- プライベート -->
       <div class="class-card private fade-in">
         <span class="class-tag">Particular</span>
@@ -1030,6 +1096,13 @@ body::before {
           <div style="font-size:13px; color:var(--muted);">10:00-19:00</div>
           <div style="font-size:12px; color:var(--muted); margin-top:4px;">Somente com reserva・Sem restrição</div>
           <div style="margin-top:8px;"><span class="sched-tag st-private">Private</span></div>
+        </div>
+        <div style="background:var(--gray); border:1px solid var(--border); border-left:4px solid #1ec4a8; border-radius:4px; padding:16px 18px;">
+          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:#40d8c0; margin-bottom:8px;">1x por mês</div>
+          <div style="font-size:15px; font-weight:700; color:var(--white); margin-bottom:4px;">Aula de Judô</div>
+          <div style="font-size:13px; color:var(--muted);">Data divulgada nas redes e no LINE</div>
+          <div style="font-size:12px; color:var(--muted); margin-top:4px;">Judô pra vencer no jiu-jitsu・Grátis membros / ¥2.000 visitantes</div>
+          <div style="margin-top:8px;"><span class="sched-tag st-judo">Judô</span></div>
         </div>
       </div>
     </div>
