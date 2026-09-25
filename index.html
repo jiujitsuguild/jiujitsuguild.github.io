@@ -296,6 +296,33 @@ body::before {
 }
 
 /* =====================================================================
+   MORNING CLASS NOTICE
+   ===================================================================== */
+.morning-notice {
+  background: linear-gradient(135deg, rgba(196,30,30,0.12), rgba(196,30,30,0.03));
+  border: 1px solid var(--red-dim); border-left: 3px solid var(--red);
+  border-radius: 4px; padding: 36px 40px;
+}
+.morning-eyebrow {
+  font-family: var(--font-en); font-size: 14px; letter-spacing: 4px; color: var(--red); margin-bottom: 10px;
+}
+.morning-title { font-size: 26px; font-weight: 900; color: var(--white); line-height: 1.4; margin-bottom: 10px; }
+.morning-lead { font-size: 16px; font-weight: 700; color: var(--white); margin-bottom: 16px; }
+.morning-notice p { font-size: 14px; color: var(--muted); line-height: 1.9; margin-bottom: 12px; }
+.morning-notice p.morning-lead { color: var(--white); font-size: 16px; }
+.morning-footer { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: 18px; }
+.morning-badge {
+  background: var(--red); color: var(--white); padding: 7px 18px; border-radius: 2px;
+  font-family: var(--font-en); font-size: 13px; letter-spacing: 2px; white-space: nowrap;
+}
+.morning-note { font-size: 13px; color: var(--muted); }
+.morning-notice .nb { display: inline-block; }
+@media (max-width: 600px) {
+  .morning-notice { padding: 26px 22px; }
+  .morning-title { font-size: 21px; }
+}
+
+/* =====================================================================
    About / Concept
    ===================================================================== */
 .about-grid {
@@ -360,6 +387,66 @@ body::before {
 .achievement-item::before { content: '▸'; color: var(--red); flex-shrink: 0; }
 
 /* =====================================================================
+   Athletes（試合の記録・アルバム形式）
+   ===================================================================== */
+.album-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px; margin-top: 40px;
+}
+.album-item {
+  position: relative; border-radius: 4px; overflow: hidden;
+  aspect-ratio: 4/5; border: 1px solid var(--border);
+  cursor: pointer; background: var(--gray-2);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.album-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(196,30,30,0.22);
+  border-color: var(--red-dim);
+}
+.album-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.album-photo-fallback {
+  width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-en); font-size: 13px; color: var(--muted); text-align: center; padding: 12px;
+  background: linear-gradient(135deg, var(--gray-2), var(--black));
+}
+.album-caption {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(180deg, transparent, rgba(0,0,0,0.92));
+  padding: 24px 12px 10px; font-size: 11.5px; color: var(--white); line-height: 1.5;
+  opacity: 0; transition: opacity 0.2s ease;
+}
+.album-item:hover .album-caption { opacity: 1; }
+
+/* ライトボックス */
+.lightbox-overlay {
+  display: none; position: fixed; inset: 0; z-index: 500;
+  background: rgba(5,5,5,0.96); align-items: center; justify-content: center;
+  flex-direction: column; padding: 24px;
+}
+.lightbox-overlay.show { display: flex; }
+.lightbox-img { max-width: min(90vw, 760px); max-height: 68vh; object-fit: contain; border-radius: 4px; }
+.lightbox-caption { color: var(--white); font-size: 14px; margin-top: 18px; text-align: center; max-width: 600px; line-height: 1.7; }
+.lightbox-close {
+  position: absolute; top: 24px; right: 28px; font-size: 30px; color: var(--white);
+  background: none; border: none; cursor: pointer; line-height: 1; opacity: 0.7;
+}
+.lightbox-close:hover { opacity: 1; }
+.lightbox-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  background: rgba(255,255,255,0.06); border: 1px solid var(--border); color: var(--white);
+  font-size: 22px; width: 46px; height: 46px; border-radius: 50%; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.lightbox-nav:hover { border-color: var(--red-dim); background: rgba(196,30,30,0.15); }
+.lightbox-prev { left: 16px; }
+.lightbox-next { right: 16px; }
+@media (max-width: 640px) {
+  .lightbox-nav { width: 40px; height: 40px; font-size: 18px; }
+  .lightbox-prev { left: 6px; } .lightbox-next { right: 6px; }
+}
+
+/* =====================================================================
    Classes
    ===================================================================== */
 .classes-grid {
@@ -382,6 +469,7 @@ body::before {
 .class-card.kids-c::before { background: linear-gradient(90deg, #c48a1e, #8b5e10); }
 .class-card.open::before   { background: linear-gradient(90deg, #8b1ec4, #5e0d8b); }
 .class-card.private::before { background: linear-gradient(90deg, var(--muted), #555); }
+.class-card.judo::before   { background: linear-gradient(90deg, #1ec4a8, #0d8b74); }
 
 .class-card:hover {
   border-color: rgba(196,30,30,0.3);
@@ -400,6 +488,7 @@ body::before {
 .class-card.kids-c .class-tag { background: rgba(196,138,30,0.15); color: #e0b040; border: 1px solid rgba(196,138,30,0.3); }
 .class-card.open   .class-tag { background: rgba(139,30,196,0.15); color: #b060e0; border: 1px solid rgba(139,30,196,0.3); }
 .class-card.private .class-tag { background: rgba(100,100,100,0.15); color: #aaa; border: 1px solid rgba(100,100,100,0.3); }
+.class-card.judo   .class-tag { background: rgba(30,196,168,0.15); color: #40d8c0; border: 1px solid rgba(30,196,168,0.3); }
 
 .class-name { font-family: var(--font-en); font-size: 22px; letter-spacing: 1px; color: var(--white); margin-bottom: 6px; }
 .class-age  { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
@@ -440,6 +529,7 @@ body::before {
 .st-kids-c  { background: rgba(196,138,30,0.15);  color: #e0b040; }
 .st-open    { background: rgba(139,30,196,0.15);  color: #b060e0; }
 .st-private { background: rgba(100,100,100,0.15); color: #aaa; }
+.st-judo    { background: rgba(30,196,168,0.15);  color: #40d8c0; }
 
 @media (max-width: 600px) {
   .schedule-table { font-size: 12px; }
@@ -687,6 +777,12 @@ body::before {
 @media (max-width: 768px) {
   .lang-switch-mobile { display: inline-flex; align-items: center; }
 }
+/* タブレット横向き・小さめのノートPC：ナビ項目が1行に収まらないのでハンバーガーに切り替え */
+@media (max-width: 1200px) {
+  .nav-links { display: none; }
+  .nav-hamburger { display: flex; }
+  .lang-switch-mobile { display: inline-flex; align-items: center; }
+}
 
 /* =====================================================================
    Animations
@@ -721,6 +817,7 @@ body::before {
     <a href="#classes">クラス</a>
     <a href="#pricing">料金</a>
     <a href="instructors.html">インストラクター</a>
+    <a href="facility.html">施設</a>
     <a href="#qa">Q&A</a>
     <a href="#access">アクセス</a>
     <a href="booking_prototype.html">プライベート予約</a>
@@ -741,6 +838,7 @@ body::before {
   <a href="#classes" onclick="toggleMenu()">クラス</a>
   <a href="#pricing" onclick="toggleMenu()">料金</a>
   <a href="instructors.html" onclick="toggleMenu()">インストラクター</a>
+  <a href="facility.html" onclick="toggleMenu()">施設</a>
   <a href="#qa"      onclick="toggleMenu()">Q&A</a>
   <a href="#access"  onclick="toggleMenu()">アクセス</a>
   <a href="booking_prototype.html" onclick="toggleMenu()">プライベート予約</a>
@@ -761,7 +859,7 @@ body::before {
       </h1>
       <p class="hero-sub">
         技術を持つ者が集まり、技術で語り合う場所。<br>
-        ブラジリアン柔術専門道場が、豊橋に誕生します。<br>
+        ブラジリアン柔術専門道場が、豊橋に誕生しました。<br>
         初心者から競技者まで、6歳から大人まで。
       </p>
       <div class="hero-btns">
@@ -777,9 +875,30 @@ body::before {
 </section>
 
 <!-- =====================================================================
+     Morning Class Announcement（2027年〜 朝クラス開始の告知）
+     ===================================================================== -->
+<div class="container" style="margin: 8px auto 0; position:relative; z-index:1;">
+  <div class="morning-notice fade-in">
+    <div class="morning-eyebrow">NEWS — MORNING CLASS</div>
+    <h2 class="morning-title"><span class="nb">2027年より、</span><span class="nb">朝クラスを開始します。</span></h2>
+    <p class="morning-lead"><span class="nb">豊橋で一番、</span><span class="nb">ブラジリアン柔術ができる場所へ。</span></p>
+    <p>
+      仕事や家庭の都合で夜の時間が取れない方、夜勤明けや一日のはじまりに体を動かしたい方にも、ブラジリアン柔術を届けたい。その思いから、柔術ギルドは朝の時間帯にもマットを開きます。
+    </p>
+    <p>
+      技術を持つ者が集まり、技術で語り合う場所。その輪を、朝にも広げていきます。初めての方も、他ジム所属の方も、これまで通り歓迎です。
+    </p>
+    <div class="morning-footer">
+      <span class="morning-badge">COMING 2027</span>
+      <span class="morning-note">スケジュールは後日公開します。</span>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================================
      Pair Enrollment Banner（トップ付近・目立たせる）
      ===================================================================== -->
-<div class="container" style="margin: 24px 0 56px; position:relative; z-index:1;">
+<div class="container" style="margin: 24px auto 56px; position:relative; z-index:1;">
   <div class="campaign-box fade-in" style="margin-top:0;">
     <div style="position:absolute; right:-20px; top:50%; transform:translateY(-50%) rotate(90deg); font-family:var(--font-en); font-size:60px; color:rgba(196,30,30,0.06); line-height:1; pointer-events:none;">PAIR</div>
     <div class="campaign-title">⚔ お友達・ごきょうだいと一緒なら</div>
@@ -882,6 +1001,89 @@ body::before {
 </section>
 
 <!-- =====================================================================
+     Athletes（試合の記録・アルバム）
+     ===================================================================== -->
+<section class="section" id="gallery">
+  <div class="container">
+    <span class="section-label">Gallery</span>
+    <h2 class="section-title">練習風景</h2>
+    <div class="divider"><div class="divider-line"></div><div class="divider-dot"></div></div>
+    <p class="section-sub">
+      柔術ギルドの日常と、練習の様子をお届けします。
+      <a href="facility.html" style="color:var(--red); text-decoration:none; white-space:nowrap;">施設の写真はこちら →</a>
+    </p>
+
+    <div class="album-grid" id="albumGrid"></div>
+  </div>
+</section>
+
+<!-- ライトボックス（拡大表示） -->
+<div class="lightbox-overlay" id="lightboxOverlay" onclick="if(event.target===this) closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">×</button>
+  <button class="lightbox-nav lightbox-prev" onclick="navLightbox(-1)">‹</button>
+  <img class="lightbox-img" id="lightboxImg" src="" alt="">
+  <button class="lightbox-nav lightbox-next" onclick="navLightbox(1)">›</button>
+  <div class="lightbox-caption" id="lightboxCaption"></div>
+</div>
+
+<script>
+// ===== アルバム =====
+// 新しい写真を追加する時は、この配列に1行足すだけでOK（サイズもレイアウトも自動）
+// src: 画像ファイルのパス（images/album/ 以下に写真を置いてください）
+// caption: 省略可。一言添えたい時だけ書けばOK（大会名や結果と紐付ける必要はありません）
+const matchPhotos = [
+  // 写真準備中。追加する時の例：
+  // { src: 'images/album/photo-01.jpg' },
+];
+
+const albumGrid = document.getElementById('albumGrid');
+
+if (matchPhotos.length === 0) {
+  albumGrid.innerHTML = '<div style="grid-column:1/-1; border:1px dashed var(--border); border-radius:4px; padding:48px 24px; text-align:center; color:var(--muted); font-size:14px;"><div style="font-family:var(--font-en); letter-spacing:3px; color:var(--red); margin-bottom:8px;">COMING SOON</div>練習風景の写真は、現在準備中です。</div>';
+} else {
+  matchPhotos.forEach((photo, i) => {
+    const item = document.createElement('div');
+    item.className = 'album-item';
+    item.onclick = () => openLightbox(i);
+    const caption = photo.caption || '';
+    item.innerHTML = `
+      <img src="${photo.src}" alt="柔術ギルド" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <div class="album-photo-fallback" style="display:none;">JIUJITSU GUILD</div>
+      ${caption ? `<div class="album-caption">${caption}</div>` : ''}
+    `;
+    albumGrid.appendChild(item);
+  });
+}
+
+let lightboxIndex = 0;
+function openLightbox(i) {
+  lightboxIndex = i;
+  renderLightbox();
+  document.getElementById('lightboxOverlay').classList.add('show');
+}
+function closeLightbox() {
+  document.getElementById('lightboxOverlay').classList.remove('show');
+}
+function navLightbox(dir) {
+  lightboxIndex = (lightboxIndex + dir + matchPhotos.length) % matchPhotos.length;
+  renderLightbox();
+}
+function renderLightbox() {
+  const photo = matchPhotos[lightboxIndex];
+  document.getElementById('lightboxImg').src = photo.src;
+  document.getElementById('lightboxImg').alt = 'JIUJITSU GUILD';
+  document.getElementById('lightboxCaption').textContent = photo.caption || '';
+}
+document.addEventListener('keydown', (e) => {
+  const overlay = document.getElementById('lightboxOverlay');
+  if (!overlay.classList.contains('show')) return;
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowLeft') navLightbox(-1);
+  if (e.key === 'ArrowRight') navLightbox(1);
+});
+</script>
+
+<!-- =====================================================================
      Classes
      ===================================================================== -->
 <section class="section" id="classes" style="background: var(--gray);">
@@ -962,6 +1164,20 @@ body::before {
         <div class="class-desc">柔術専用ではありません。インストラクター主導ではなく自由練習で、柔道・MMAなど他競技の方も歓迎。所属の壁を超えて技術で集まる、コミュニティ型道場の核となる場所です。</div>
         <div class="class-schedule">
           <strong>日曜</strong> 14:30〜17:30
+        </div>
+        <div class="class-price">
+          <span class="class-price-num" style="font-size:16px;">会員無料 ／ 外部2,000円</span>
+        </div>
+      </div>
+
+      <!-- 柔道クラス（マンスリー） -->
+      <div class="class-card judo fade-in">
+        <span class="class-tag">マンスリー</span>
+        <div class="class-name">柔道クラス</div>
+        <div class="class-age">帯・年齢不問 ／ 所属不問</div>
+        <div class="class-desc">「柔術で勝つための柔道」をテーマに、月1回開催。テイクダウンへの対応や投げ技など、柔術の試合で直接活きる柔道技術を学べます。会員から大好評のクラスです。</div>
+        <div class="class-schedule">
+          <strong>月1回開催</strong> 日程はSNS・LINEで告知
         </div>
         <div class="class-price">
           <span class="class-price-num" style="font-size:16px;">会員無料 ／ 外部2,000円</span>
@@ -1066,6 +1282,13 @@ body::before {
           <div style="font-size:13px; color:var(--muted);">10:00〜19:00</div>
           <div style="font-size:12px; color:var(--muted); margin-top:4px;">完全予約制・所属不問</div>
           <div style="margin-top:8px;"><span class="sched-tag st-private">Private</span></div>
+        </div>
+        <div style="background:var(--gray); border:1px solid var(--border); border-left:4px solid #1ec4a8; border-radius:4px; padding:16px 18px;">
+          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:#40d8c0; margin-bottom:8px;">月1回開催</div>
+          <div style="font-size:15px; font-weight:700; color:var(--white); margin-bottom:4px;">柔道クラス</div>
+          <div style="font-size:13px; color:var(--muted);">日程はSNS・LINEで告知</div>
+          <div style="font-size:12px; color:var(--muted); margin-top:4px;">柔術で勝つための柔道・会員無料／外部2,000円</div>
+          <div style="margin-top:8px;"><span class="sched-tag st-judo">Judo</span></div>
         </div>
       </div>
     </div>
