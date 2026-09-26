@@ -50,7 +50,7 @@ body { background: var(--black); color: var(--white); font-family: var(--font-jp
   transition: border-color 0.2s ease;
 }
 .tour-photo:hover { border-color: var(--red-dim); }
-.tour-photo img { display: block; width: 100%; height: auto; }
+.tour-photo img { display: block; width: 100%; height: auto; max-height: 560px; object-fit: contain; }
 .tour-caption { display: flex; gap: 20px; align-items: flex-start; margin-top: 20px; }
 .tour-num {
   font-family: var(--font-en); font-size: 34px; line-height: 1; color: var(--red);
@@ -179,7 +179,7 @@ const facilityPhotos = [
   {
     src: 'images/facility/mat-02.jpg',
     title: 'マットエリア（入口側）',
-    desc: 'エアコンやシーリングファン、季節を問わず快適に練習できる環境を整えています。',
+    desc: 'エアコンとシーリングファンを備え、季節を問わず快適に練習できる環境を整えています。',
   },
   {
     src: 'images/facility/entrance.jpg',
@@ -187,10 +187,25 @@ const facilityPhotos = [
     desc: 'グリーンに囲まれた、落ち着いた雰囲気のエントランス。靴箱やベンチもあり、練習前後にひと息つけます。',
   },
   {
+    src: 'images/facility/reception.jpg',
+    title: '受付エリア',
+    desc: 'ギルドランキングモニターとチェックイン端末を設置した受付エリア。練習前に、ここでチェックインします。',
+  },
+  {
     src: 'images/facility/monitor-demo.png',
     title: 'ギルドランキングモニター',
     desc: 'ギルドカードでチェックインするだけで、月間・累計の練習回数を自動で集計。日々の積み重ねが、そのままランキングに表示されます。',
     note: '※写真はデモ画面です。実際の会員名は表示していません。',
+  },
+  {
+    src: 'images/facility/changing-room.jpg',
+    title: '更衣室',
+    desc: '更衣室は男女別です（写真左：女性更衣室、右：男性更衣室）。女性更衣室には女性専用トイレを併設しているので、女性の方も安心して通えます。手洗い場もあります。',
+  },
+  {
+    src: 'images/facility/toilet.jpg',
+    title: 'トイレ（マットエリア）',
+    desc: 'マットエリアにあるトイレは、男女共用です。練習の合間にもすぐに利用できます。',
   },
 ];
 
