@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>施設紹介 | JIUJITSU GUILD 豊橋のブラジリアン柔術専門道場</title>
-<meta name="description" content="愛知県豊橋市吉川町のブラジリアン柔術専門道場「柔術ギルド」の施設紹介。">
+<meta name="description" content="愛知県豊橋市吉川町のブラジリアン柔術専門道場「柔術ギルド」の施設紹介。マットエリア、エントランス、ギルドランキングモニターをご紹介します。">
 <link rel="icon" type="image/jpeg" href="images/favicon.jpg">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -34,55 +34,39 @@ body { background: var(--black); color: var(--white); font-family: var(--font-jp
 .back-link { font-size: 13px; color: var(--muted); text-decoration: none; }
 .back-link:hover { color: var(--white); }
 
-.wrap { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
 
-.hero { padding: 72px 0 40px; text-align: center; }
+.hero { padding: 72px 0 48px; text-align: center; }
 .eyebrow { font-family: var(--font-en); font-size: 14px; letter-spacing: 5px; color: var(--red); margin-bottom: 14px; }
 .hero h1 { font-size: 30px; font-weight: 900; letter-spacing: 1px; }
 .hero .sub { margin-top: 14px; color: var(--muted); font-size: 14px; }
 
-/* 写真グリッド */
-.photo-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 14px; margin: 16px 0 12px;
+/* ===== 施設ツアー（写真を切り抜かず、1枚ずつ大きく見せる） ===== */
+.tour { display: flex; flex-direction: column; gap: 64px; }
+.tour-item { margin: 0; }
+.tour-photo {
+  display: block; width: 100%; padding: 0; border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden; background: var(--gray); cursor: zoom-in;
+  transition: border-color 0.2s ease;
 }
-.photo-item {
-  position: relative; aspect-ratio: 4/3; border-radius: 4px; overflow: hidden;
-  border: 1px solid var(--border); background: var(--gray-2); cursor: pointer;
-  transition: transform 0.25s ease, border-color 0.25s ease;
+.tour-photo:hover { border-color: var(--red-dim); }
+.tour-photo img { display: block; width: 100%; height: auto; }
+.tour-caption { display: flex; gap: 20px; align-items: flex-start; margin-top: 20px; }
+.tour-num {
+  font-family: var(--font-en); font-size: 34px; line-height: 1; color: var(--red);
+  letter-spacing: 1px; flex-shrink: 0; min-width: 44px;
 }
-.photo-item:hover { transform: translateY(-3px); border-color: var(--red-dim); }
-.photo-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.photo-label {
-  position: absolute; left: 0; right: 0; bottom: 0; padding: 22px 12px 10px;
-  background: linear-gradient(180deg, transparent, rgba(0,0,0,0.9));
-  font-size: 12px; color: var(--white);
+.tour-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+.tour-desc { font-size: 14px; color: #bbb; line-height: 1.9; }
+.tour-note { font-size: 12px; color: var(--muted); margin-top: 6px; }
+.tour-empty {
+  border: 1px dashed var(--border); border-radius: 6px; padding: 56px 24px;
+  text-align: center; color: var(--muted); font-size: 14px;
 }
-.photo-item.placeholder {
-  min-height: 120px; /* aspect-ratio 非対応ブラウザ向けの保険 */
-  cursor: default; border-style: dashed; display: flex; align-items: center; justify-content: center;
-  background: linear-gradient(135deg, var(--gray), var(--black));
-}
-.photo-item.placeholder:hover { transform: none; border-color: var(--border); }
-.placeholder-text { font-family: var(--font-en); font-size: 15px; letter-spacing: 3px; color: #444; text-align: center; }
-.coming-note { text-align: center; color: var(--muted); font-size: 14px; margin: 18px 0 8px; }
-
-/* 施設の特徴 */
-.features {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 16px; margin: 48px 0 0;
-}
-.feature-card {
-  border: 1px solid var(--border); border-left: 3px solid var(--red);
-  border-radius: 6px; background: var(--gray); padding: 24px 26px;
-}
-.feature-icon { color: var(--red); font-size: 20px; margin-bottom: 10px; }
-.feature-title { font-size: 16px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
-.feature-desc { font-size: 13px; color: var(--muted); line-height: 1.8; }
 
 /* 施設情報 */
 .info {
-  margin: 56px 0 24px; border: 1px solid var(--border); border-radius: 6px;
+  margin: 80px 0 24px; border: 1px solid var(--border); border-radius: 6px;
   background: var(--gray); padding: 28px 28px 20px;
 }
 .info-title { font-family: var(--font-en); font-size: 18px; letter-spacing: 3px; color: var(--red); margin-bottom: 14px; }
@@ -107,16 +91,16 @@ body { background: var(--black); color: var(--white); font-family: var(--font-jp
 .footer a { color: var(--muted); text-decoration: none; margin: 0 10px; }
 .footer a:hover { color: var(--white); }
 
-/* ライトボックス */
+/* ライトボックス（写真を画面いっぱいに拡大） */
 .lightbox {
   display: none; position: fixed; inset: 0; z-index: 100; background: rgba(5,5,5,0.96);
   align-items: center; justify-content: center; flex-direction: column; padding: 24px;
 }
 .lightbox.show { display: flex; }
-.lightbox img { max-width: min(92vw, 900px); max-height: 72vh; object-fit: contain; border-radius: 4px; }
+.lightbox img { max-width: 96vw; max-height: 80vh; object-fit: contain; border-radius: 4px; }
 .lightbox-caption { margin-top: 16px; font-size: 14px; color: var(--white); text-align: center; }
 .lb-btn {
-  position: absolute; background: rgba(255,255,255,0.06); border: 1px solid var(--border); color: var(--white);
+  position: absolute; background: rgba(255,255,255,0.08); border: 1px solid var(--border); color: var(--white);
   width: 46px; height: 46px; border-radius: 50%; font-size: 22px; cursor: pointer;
 }
 .lb-close { top: 20px; right: 20px; }
@@ -124,12 +108,17 @@ body { background: var(--black); color: var(--white); font-family: var(--font-jp
 .lb-next { right: 12px; top: 50%; transform: translateY(-50%); }
 
 @media (max-width: 700px) {
-  .hero { padding: 48px 0 28px; }
+  .hero { padding: 48px 0 32px; }
   .hero h1 { font-size: 24px; }
-  .photo-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .placeholder-text { font-size: 12px; letter-spacing: 2px; white-space: nowrap; }
+  .wrap { padding: 0 16px; }
+  .tour { gap: 44px; }
+  .tour-caption { gap: 14px; margin-top: 14px; }
+  .tour-num { font-size: 26px; min-width: 34px; }
+  .tour-title { font-size: 16px; }
+  .tour-desc { font-size: 13px; }
   .info { padding: 22px 18px 14px; }
   .info-row { flex-direction: column; gap: 2px; }
+  .lightbox { padding: 12px; }
 }
 </style>
 </head>
@@ -147,32 +136,8 @@ body { background: var(--black); color: var(--white); font-family: var(--font-jp
     <div class="sub">豊橋市吉川町のブラジリアン柔術専門道場</div>
   </div>
 
-  <!-- 写真が無い間は「準備中」のタイルを表示。写真を追加すると自動で置き換わります -->
-  <div class="photo-grid" id="photoGrid">
-    <div class="photo-item placeholder"><span class="placeholder-text">COMING SOON</span></div>
-    <div class="photo-item placeholder"><span class="placeholder-text">COMING SOON</span></div>
-    <div class="photo-item placeholder"><span class="placeholder-text">COMING SOON</span></div>
-    <div class="photo-item placeholder"><span class="placeholder-text">COMING SOON</span></div>
-    <div class="photo-item placeholder"><span class="placeholder-text">COMING SOON</span></div>
-    <div class="photo-item placeholder"><span class="placeholder-text">COMING SOON</span></div>
-  </div>
-  <p class="coming-note" id="comingNote">施設の写真は、現在準備中です。</p>
-
-  <div class="features">
-    <div class="feature-card">
-      <div class="feature-icon">⚔</div>
-      <div class="feature-title">マット</div>
-      <div class="feature-desc">柔術・柔道・オープンマット、複数の練習に対応する専用マットスペース。清潔な環境を保っています。</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">✦</div>
-      <div class="feature-title">ギルドランキングモニター</div>
-      <div class="feature-desc">
-        NFCカードでチェックインするだけで、月間・累計のスパー回数を自動集計。頑張りがそのまま可視化されます。
-        <span style="display:block; margin-top:8px; font-size:11px; color:var(--muted);">※上の写真はデモ画面です。実際の会員名は表示していません。</span>
-      </div>
-    </div>
-  </div>
+  <!-- 写真はJS（下の facilityPhotos）から自動で並びます -->
+  <div class="tour" id="tour"></div>
 
   <div class="info">
     <div class="info-title">INFORMATION</div>
@@ -187,10 +152,10 @@ body { background: var(--black); color: var(--white); font-family: var(--font-jp
 </div>
 
 <div class="lightbox" id="lightbox" onclick="if(event.target===this) closeLb()">
-  <button class="lb-btn lb-close" onclick="closeLb()">×</button>
-  <button class="lb-btn lb-prev" onclick="navLb(-1)">‹</button>
-  <img id="lbImg" src="" alt="柔術ギルド 施設">
-  <button class="lb-btn lb-next" onclick="navLb(1)">›</button>
+  <button class="lb-btn lb-close" onclick="closeLb()" aria-label="閉じる">×</button>
+  <button class="lb-btn lb-prev" onclick="navLb(-1)" aria-label="前の写真">‹</button>
+  <img id="lbImg" src="" alt="">
+  <button class="lb-btn lb-next" onclick="navLb(1)" aria-label="次の写真">›</button>
   <div class="lightbox-caption" id="lbCaption"></div>
 </div>
 
@@ -203,24 +168,54 @@ body { background: var(--black); color: var(--white); font-family: var(--font-jp
 
 <script>
 // ===== 施設写真 =====
-// 写真を追加する時は、この配列に1行ずつ足すだけでOK（images/facility/ に写真を置く）
-// label は省略可（例：'マット'、'受付' など、写真の場所を一言）
+// 写真を追加する時は、この配列に1ブロック足すだけでOK（images/facility/ に写真を置く）
+// title：写真の見出し ／ desc：説明文 ／ note：補足（省略可）
 const facilityPhotos = [
-  { src: 'images/facility/monitor-demo.png', label: 'ギルドランキングモニター' },
-  // { src: 'images/facility/photo-02.jpg', label: 'マット' },
+  {
+    src: 'images/facility/mat-01.jpg',
+    title: 'マットエリア',
+    desc: '白で統一した、広く明るいマットスペース。柔術・柔道・オープンマットまで、すべての練習をこのマットで行います。',
+  },
+  {
+    src: 'images/facility/mat-02.jpg',
+    title: 'マットエリア（入口側）',
+    desc: 'エアコンやシーリングファン、換気扇を備え、季節を問わず快適に練習できる環境を整えています。',
+  },
+  {
+    src: 'images/facility/entrance.jpg',
+    title: 'エントランス',
+    desc: 'グリーンに囲まれた、落ち着いた雰囲気のエントランス。靴箱やベンチもあり、練習前後にひと息つけます。',
+  },
+  {
+    src: 'images/facility/monitor-demo.png',
+    title: 'ギルドランキングモニター',
+    desc: 'NFCカードでチェックインするだけで、月間・累計の練習回数を自動で集計。日々の積み重ねが、そのままランキングに表示されます。',
+    note: '※写真はデモ画面です。実際の会員名は表示していません。',
+  },
 ];
 
-const grid = document.getElementById('photoGrid');
-if (facilityPhotos.length > 0) {
-  grid.innerHTML = '';
-  document.getElementById('comingNote').style.display = 'none';
+const tour = document.getElementById('tour');
+if (facilityPhotos.length === 0) {
+  tour.innerHTML = '<div class="tour-empty">施設の写真は、現在準備中です。</div>';
+} else {
   facilityPhotos.forEach((p, i) => {
-    const item = document.createElement('div');
-    item.className = 'photo-item';
-    item.onclick = () => openLb(i);
-    item.innerHTML = `<img src="${p.src}" alt="柔術ギルド 施設${p.label ? '・' + p.label : ''}" loading="lazy">`
-                   + (p.label ? `<div class="photo-label">${p.label}</div>` : '');
-    grid.appendChild(item);
+    const fig = document.createElement('figure');
+    fig.className = 'tour-item';
+    const num = String(i + 1).padStart(2, '0');
+    fig.innerHTML = `
+      <button class="tour-photo" type="button" aria-label="${p.title}を拡大">
+        <img src="${p.src}" alt="柔術ギルド ${p.title}" ${i === 0 ? '' : 'loading="lazy"'}>
+      </button>
+      <figcaption class="tour-caption">
+        <div class="tour-num">${num}</div>
+        <div>
+          <div class="tour-title">${p.title}</div>
+          <div class="tour-desc">${p.desc || ''}</div>
+          ${p.note ? `<div class="tour-note">${p.note}</div>` : ''}
+        </div>
+      </figcaption>`;
+    fig.querySelector('.tour-photo').onclick = () => openLb(i);
+    tour.appendChild(fig);
   });
 }
 
@@ -230,8 +225,9 @@ function closeLb() { document.getElementById('lightbox').classList.remove('show'
 function navLb(d) { lbIndex = (lbIndex + d + facilityPhotos.length) % facilityPhotos.length; renderLb(); }
 function renderLb() {
   const p = facilityPhotos[lbIndex];
-  document.getElementById('lbImg').src = p.src;
-  document.getElementById('lbCaption').textContent = p.label || '';
+  const img = document.getElementById('lbImg');
+  img.src = p.src; img.alt = '柔術ギルド ' + p.title;
+  document.getElementById('lbCaption').textContent = p.title;
 }
 document.addEventListener('keydown', (e) => {
   if (!document.getElementById('lightbox').classList.contains('show')) return;
