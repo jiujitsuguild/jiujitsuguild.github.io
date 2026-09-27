@@ -135,6 +135,18 @@ body::before {
 }
 .nav-cta:hover { background: transparent; color: var(--red); box-shadow: none; }
 
+/* セクション内の「見る→」系リンク用（モバイルでナビのCTAを消す規則に巻き込まれないよう独立） */
+.teaser-cta {
+  background: linear-gradient(135deg, #e02020, #C41E1E); color: var(--white);
+  padding: 8px 20px; border-radius: 4px;
+  font-size: 12px; letter-spacing: 2px;
+  text-decoration: none; font-family: var(--font-en);
+  transition: all 0.2s; border: 1px solid var(--red);
+  box-shadow: 0 4px 16px rgba(196,30,30,0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+  display: inline-block;
+}
+.teaser-cta:hover { background: transparent; color: var(--red); box-shadow: none; }
+
 /* ハンバーガー（モバイル） */
 .nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
 .nav-hamburger span { display: block; width: 24px; height: 2px; background: var(--white); transition: all 0.3s; }
@@ -382,6 +394,66 @@ body::before {
 .profile-achievements { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
 .achievement-item { font-size: 12px; color: var(--muted); padding: 3px 0; display: flex; align-items: center; gap: 8px; }
 .achievement-item::before { content: '▸'; color: var(--red); flex-shrink: 0; }
+
+/* =====================================================================
+   Athletes（試合の記録・アルバム形式）
+   ===================================================================== */
+.album-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px; margin-top: 40px;
+}
+.album-item {
+  position: relative; border-radius: 4px; overflow: hidden;
+  aspect-ratio: 4/5; border: 1px solid var(--border);
+  cursor: pointer; background: var(--gray-2);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.album-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(196,30,30,0.22);
+  border-color: var(--red-dim);
+}
+.album-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.album-photo-fallback {
+  width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-en); font-size: 13px; color: var(--muted); text-align: center; padding: 12px;
+  background: linear-gradient(135deg, var(--gray-2), var(--black));
+}
+.album-caption {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(180deg, transparent, rgba(0,0,0,0.92));
+  padding: 24px 12px 10px; font-size: 11.5px; color: var(--white); line-height: 1.5;
+  opacity: 0; transition: opacity 0.2s ease;
+}
+.album-item:hover .album-caption { opacity: 1; }
+
+/* ライトボックス */
+.lightbox-overlay {
+  display: none; position: fixed; inset: 0; z-index: 500;
+  background: rgba(5,5,5,0.96); align-items: center; justify-content: center;
+  flex-direction: column; padding: 24px;
+}
+.lightbox-overlay.show { display: flex; }
+.lightbox-img { max-width: min(90vw, 760px); max-height: 68vh; object-fit: contain; border-radius: 4px; }
+.lightbox-caption { color: var(--white); font-size: 14px; margin-top: 18px; text-align: center; max-width: 600px; line-height: 1.7; }
+.lightbox-close {
+  position: absolute; top: 24px; right: 28px; font-size: 30px; color: var(--white);
+  background: none; border: none; cursor: pointer; line-height: 1; opacity: 0.7;
+}
+.lightbox-close:hover { opacity: 1; }
+.lightbox-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  background: rgba(255,255,255,0.06); border: 1px solid var(--border); color: var(--white);
+  font-size: 22px; width: 46px; height: 46px; border-radius: 50%; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.lightbox-nav:hover { border-color: var(--red-dim); background: rgba(196,30,30,0.15); }
+.lightbox-prev { left: 16px; }
+.lightbox-next { right: 16px; }
+@media (max-width: 640px) {
+  .lightbox-nav { width: 40px; height: 40px; font-size: 18px; }
+  .lightbox-prev { left: 6px; } .lightbox-next { right: 6px; }
+}
 
 /* =====================================================================
    Classes
@@ -682,8 +754,8 @@ body::before {
 @media (max-width: 768px) {
   .lang-switch-mobile { display: inline-flex; align-items: center; }
 }
-/* タブレット横向き・小さめのノートPC：ナビ項目が1行に収まらないのでハンバーガーに切り替え */
-@media (max-width: 1200px) {
+/* タブレット横向き・小さめのノートPC：ポルトガル語はナビの単語が長く、1200pxでは収まらないため閾値を広げる */
+@media (max-width: 1650px) {
   .nav-links { display: none; }
   .nav-hamburger { display: flex; }
   .lang-switch-mobile { display: inline-flex; align-items: center; }
@@ -703,7 +775,7 @@ body::before {
    ===================================================================== */
 @media (max-width: 768px) {
   .section { padding: 64px 0; }
-  .hero { padding: 100px 0 64px; }
+  .hero { padding: 100px 0 64px; min-height: auto; }
   .hero-bg-text { display: none; }
   .hero-stats { gap: 24px; }
   .campaign-box { padding: 24px; }
@@ -722,6 +794,7 @@ body::before {
     <a href="#classes">Turmas</a>
     <a href="#pricing">Valores</a>
     <a href="instructors.html">Instrutores</a>
+    <a href="facility.html">Instalações</a>
     <a href="#qa">Dúvidas</a>
     <a href="#access">Acesso</a>
     <a href="booking_prototype.html">Reservar Aula Particular</a>
@@ -742,6 +815,7 @@ body::before {
   <a href="#classes" onclick="toggleMenu()">Turmas</a>
   <a href="#pricing" onclick="toggleMenu()">Valores</a>
   <a href="instructors.html" onclick="toggleMenu()">Instrutores</a>
+  <a href="facility.html" onclick="toggleMenu()">Instalações</a>
   <a href="#qa"      onclick="toggleMenu()">Dúvidas</a>
   <a href="#access"  onclick="toggleMenu()">Acesso</a>
   <a href="booking_prototype.html" onclick="toggleMenu()">Reservar Aula Particular</a>
@@ -790,23 +864,6 @@ body::before {
       <span class="morning-badge">COMING 2027</span>
       <span class="morning-note">Os horários serão divulgados em breve.</span>
     </div>
-  </div>
-</div>
-
-<!-- Pair Enrollment Banner（トップ付近・目立たせる） -->
-<div class="container" style="margin: 24px auto 56px; position:relative; z-index:1;">
-  <div class="campaign-box fade-in" style="margin-top:0;">
-    <div style="position:absolute; right:-20px; top:50%; transform:translateY(-50%) rotate(90deg); font-family:var(--font-en); font-size:60px; color:rgba(196,30,30,0.06); line-height:1; pointer-events:none;">PAIR</div>
-    <div class="campaign-title">⚔ Venha com um amigo ou irmão</div>
-    <div class="campaign-items">
-      <div class="campaign-item">
-        <div>
-          <strong style="color:var(--white); font-size:15px;">Matrícula com 50% de desconto para os dois</strong><br>
-          <span style="font-size:13px; color:var(--muted);">Amigos, irmãos, pais e filhos — não importa quem. Ao se matricularem juntos, 2 pessoas ou mais, cada um paga metade da taxa de matrícula (¥5.000).</span>
-        </div>
-      </div>
-    </div>
-    <div style="font-size:12px; color:var(--muted); margin-top:16px;">※Válido para matrículas feitas ao mesmo tempo, 2 pessoas ou mais. Entre em contato para mais detalhes.</div>
   </div>
 </div>
 
@@ -869,13 +926,13 @@ body::before {
             <div class="achievement-item">Vasta experiência ensinando do iniciante ao atleta competidor</div>
             <div class="achievement-item">Formado pela EVOX BJJ</div>
           </div>
-        </div>
-        <div style="margin-top:20px; background:linear-gradient(135deg, rgba(196,30,30,0.15), rgba(196,30,30,0.05)); border:1px solid var(--red-dim); border-radius:6px; padding:22px 26px; box-shadow:0 0 30px rgba(196,30,30,0.12), inset 0 1px 0 rgba(255,255,255,0.05); position:relative; overflow:hidden;">
-          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:var(--red); margin-bottom:8px;">🏆 ACHIEVEMENT</div>
-          <div style="font-size:15px; color:var(--white); line-height:1.7;">
-            Nosso aluno <strong>Ryosuke Kabeya</strong> conquistou o
-            <strong style="color:#ff6b6b;">ouro duplo (categoria de peso e absoluto)</strong>
-            no IBJJF Asian Jiu-Jitsu Championship 2026.
+          <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--border);">
+            <div style="font-family:var(--font-en); font-size:10px; letter-spacing:3px; color:var(--red); margin-bottom:6px;">🏆 GUILD ACHIEVEMENT</div>
+            <div style="font-size:13px; color:var(--muted); line-height:1.7;">
+              Nosso aluno <strong style="color:var(--white);">Ryosuke Kabeya</strong> conquistou o
+              <strong style="color:#ff6b6b;">ouro duplo (categoria de peso e absoluto)</strong>
+              no IBJJF Asian Jiu-Jitsu Championship 2026.
+            </div>
           </div>
         </div>
       </div>
@@ -893,9 +950,89 @@ body::before {
       <div style="font-size:20px; font-weight:700; color:var(--white);">Ensinado por instrutores faixa preta ativos</div>
       <div style="font-size:13px; color:var(--muted); margin-top:6px;">Conheça a trajetória e a filosofia de ensino do fundador e do instrutor</div>
     </div>
-    <a href="instructors.html" class="nav-cta" style="white-space:nowrap;">Ver Instrutores →</a>
+    <a href="instructors.html" class="teaser-cta" style="white-space:nowrap;">Ver Instrutores →</a>
   </div>
 </section>
+
+<!-- =====================================================================
+     Athletes（試合の記録・アルバム。写真データはJP版と共有）
+     ===================================================================== -->
+<section class="section" id="gallery">
+  <div class="container">
+    <span class="section-label">Gallery</span>
+    <h2 class="section-title">Dia a dia no tatame</h2>
+    <div class="divider"><div class="divider-line"></div><div class="divider-dot"></div></div>
+    <p class="section-sub">
+      O dia a dia do Jiujitsu Guild, direto do tatame.
+      <a href="facility.html" style="color:var(--red); text-decoration:none; white-space:nowrap;">Veja fotos das instalações →</a>
+    </p>
+
+    <div class="album-grid" id="albumGrid"></div>
+  </div>
+</section>
+
+<!-- ライトボックス（拡大表示） -->
+<div class="lightbox-overlay" id="lightboxOverlay" onclick="if(event.target===this) closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">×</button>
+  <button class="lightbox-nav lightbox-prev" onclick="navLightbox(-1)">‹</button>
+  <img class="lightbox-img" id="lightboxImg" src="" alt="">
+  <button class="lightbox-nav lightbox-next" onclick="navLightbox(1)">›</button>
+  <div class="lightbox-caption" id="lightboxCaption"></div>
+</div>
+
+<script>
+// ===== アルバム（JP版と同じ写真データを共有） =====
+const matchPhotos = [
+  // 写真準備中。追加する時の例：
+  // { src: 'images/album/photo-01.jpg' },
+];
+
+const albumGrid = document.getElementById('albumGrid');
+
+if (matchPhotos.length === 0) {
+  albumGrid.innerHTML = '<div style="grid-column:1/-1; border:1px dashed var(--border); border-radius:4px; padding:48px 24px; text-align:center; color:var(--muted); font-size:14px;"><div style="font-family:var(--font-en); letter-spacing:3px; color:var(--red); margin-bottom:8px;">COMING SOON</div>Fotos em breve.</div>';
+} else {
+  matchPhotos.forEach((photo, i) => {
+    const item = document.createElement('div');
+    item.className = 'album-item';
+    item.onclick = () => openLightbox(i);
+    const caption = photo.caption || '';
+    item.innerHTML = `
+      <img src="${photo.src}" alt="Jiujitsu Guild" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <div class="album-photo-fallback" style="display:none;">JIUJITSU GUILD</div>
+      ${caption ? `<div class="album-caption">${caption}</div>` : ''}
+    `;
+    albumGrid.appendChild(item);
+  });
+}
+
+let lightboxIndex = 0;
+function openLightbox(i) {
+  lightboxIndex = i;
+  renderLightbox();
+  document.getElementById('lightboxOverlay').classList.add('show');
+}
+function closeLightbox() {
+  document.getElementById('lightboxOverlay').classList.remove('show');
+}
+function navLightbox(dir) {
+  lightboxIndex = (lightboxIndex + dir + matchPhotos.length) % matchPhotos.length;
+  renderLightbox();
+}
+function renderLightbox() {
+  const photo = matchPhotos[lightboxIndex];
+  document.getElementById('lightboxImg').src = photo.src;
+  document.getElementById('lightboxImg').alt = photo.caption || 'Jiujitsu Guild';
+  document.getElementById('lightboxCaption').textContent = photo.caption || '';
+}
+document.addEventListener('keydown', (e) => {
+  const overlay = document.getElementById('lightboxOverlay');
+  if (!overlay.classList.contains('show')) return;
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowLeft') navLightbox(-1);
+  if (e.key === 'ArrowRight') navLightbox(1);
+});
+</script>
 
 <!-- =====================================================================
      Classes
@@ -1014,115 +1151,6 @@ body::before {
       </div>
     </div>
 
-    <!-- スケジュール表 -->
-    <h3 class="fade-in" style="font-family:var(--font-en); font-size:24px; letter-spacing:2px; margin-top:64px; margin-bottom:24px;">Horário Semanal</h3>
-
-    <!-- タブ -->
-    <div class="fade-in" style="display:flex; gap:0; border-bottom:2px solid var(--border); margin-bottom:24px; flex-wrap:wrap;">
-      <button onclick="switchSchedTab('adult')" id="stab-adult"
-        style="padding:12px 24px; background:var(--red); color:white; border:none; cursor:pointer; font-family:var(--font-en); font-size:12px; letter-spacing:3px; text-transform:uppercase; border-radius:4px 4px 0 0; margin-right:4px; transition:all 0.2s;">
-        Adult
-      </button>
-      <button onclick="switchSchedTab('kids')" id="stab-kids"
-        style="padding:12px 24px; background:var(--gray-2,#1a1a1a); color:var(--muted); border:none; cursor:pointer; font-family:var(--font-en); font-size:12px; letter-spacing:3px; text-transform:uppercase; border-radius:4px 4px 0 0; margin-right:4px; transition:all 0.2s;">
-        Kids
-      </button>
-      <button onclick="switchSchedTab('other')" id="stab-other"
-        style="padding:12px 24px; background:var(--gray-2,#1a1a1a); color:var(--muted); border:none; cursor:pointer; font-family:var(--font-en); font-size:12px; letter-spacing:3px; text-transform:uppercase; border-radius:4px 4px 0 0; transition:all 0.2s;">
-        Open / Outros
-      </button>
-    </div>
-
-    <!-- アダルト -->
-    <div id="sched-adult" class="fade-in">
-      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
-        <div style="background:var(--gray); border:1px solid var(--border); border-left:4px solid var(--red); border-radius:4px; padding:16px 18px;">
-          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:var(--red); margin-bottom:8px;">Segunda a Sexta</div>
-          <div style="font-size:15px; font-weight:700; color:var(--white); margin-bottom:4px;">Turma Adulto</div>
-          <div style="font-size:13px; color:var(--muted);">20:30-22:00</div>
-          <div style="margin-top:8px;"><span class="sched-tag st-adult">Adult</span></div>
-        </div>
-        <div style="background:var(--gray); border:1px solid var(--border); border-left:4px solid var(--red); border-radius:4px; padding:16px 18px;">
-          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:var(--red); margin-bottom:8px;">Domingo</div>
-          <div style="font-size:15px; font-weight:700; color:var(--white); margin-bottom:4px;">Turma Adulto</div>
-          <div style="font-size:13px; color:var(--muted);">18:00-20:00</div>
-          <div style="margin-top:8px;"><span class="sched-tag st-adult">Adult</span></div>
-        </div>
-      </div>
-      <p style="font-size:12px; color:var(--muted); margin-top:12px;">5 dias por semana (seg-sex) + domingo. Nos dias úteis, início às 20:30.</p>
-    </div>
-
-    <!-- キッズ -->
-    <div id="sched-kids" style="display:none;">
-      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
-        <div style="background:var(--gray); border:1px solid var(--border); border-left:4px solid #1e6fc4; border-radius:4px; padding:16px 18px;">
-          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:#5599e0; margin-bottom:8px;">Terça, Quinta e Domingo</div>
-          <div style="font-size:15px; font-weight:700; color:var(--white); margin-bottom:4px;">Turma Kids A</div>
-          <div style="font-size:13px; color:var(--muted);">Ter/Qui 19:00-20:00</div>
-          <div style="font-size:13px; color:var(--muted);">Domingo 10:30-11:30</div>
-          <div style="font-size:12px; color:var(--muted); margin-top:4px;">9 a 12 anos</div>
-          <div style="margin-top:8px;"><span class="sched-tag st-kids-a">Kids A</span></div>
-        </div>
-        <div style="background:var(--gray); border:1px solid var(--border); border-left:4px solid #1ea874; border-radius:4px; padding:16px 18px;">
-          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:#40c890; margin-bottom:8px;">Segunda, Quarta e Sexta</div>
-          <div style="font-size:15px; font-weight:700; color:var(--white); margin-bottom:4px;">Turma Kids B</div>
-          <div style="font-size:13px; color:var(--muted);">19:00-20:00</div>
-          <div style="font-size:12px; color:var(--muted); margin-top:4px;">13 a 15 anos</div>
-          <div style="margin-top:8px;"><span class="sched-tag st-kids-b">Kids B</span></div>
-        </div>
-        <div style="background:var(--gray); border:1px solid var(--border); border-left:4px solid #c48a1e; border-radius:4px; padding:16px 18px;">
-          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:#e0b040; margin-bottom:8px;">Domingo</div>
-          <div style="font-size:15px; font-weight:700; color:var(--white); margin-bottom:4px;">Turma Kids C</div>
-          <div style="font-size:13px; color:var(--muted);">13:00-14:00</div>
-          <div style="font-size:12px; color:var(--muted); margin-top:4px;">6 a 8 anos・aula avulsa</div>
-          <div style="margin-top:8px;"><span class="sched-tag st-kids-c">Kids C</span></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- オープン・その他 -->
-    <div id="sched-other" style="display:none;">
-      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
-        <div style="background:var(--gray); border:1px solid var(--border); border-left:4px solid #8b1ec4; border-radius:4px; padding:16px 18px;">
-          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:#b060e0; margin-bottom:8px;">Domingo</div>
-          <div style="font-size:15px; font-weight:700; color:var(--white); margin-bottom:4px;">Guild Open Mat</div>
-          <div style="font-size:13px; color:var(--muted);">14:30-17:30</div>
-          <div style="font-size:12px; color:var(--muted); margin-top:4px;">Sem restrição・Grátis membros / ¥2.000 visitantes</div>
-          <div style="margin-top:8px;"><span class="sched-tag st-open">Open Mat</span></div>
-        </div>
-        <div style="background:var(--gray); border:1px solid var(--border); border-left:4px solid #666; border-radius:4px; padding:16px 18px;">
-          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:#aaa; margin-bottom:8px;">Sábado</div>
-          <div style="font-size:15px; font-weight:700; color:var(--white); margin-bottom:4px;">Aula Particular</div>
-          <div style="font-size:13px; color:var(--muted);">10:00-19:00</div>
-          <div style="font-size:12px; color:var(--muted); margin-top:4px;">Somente com reserva・Sem restrição</div>
-          <div style="margin-top:8px;"><span class="sched-tag st-private">Private</span></div>
-        </div>
-        <div style="background:var(--gray); border:1px solid var(--border); border-left:4px solid #1ec4a8; border-radius:4px; padding:16px 18px;">
-          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:#40d8c0; margin-bottom:8px;">1x por mês</div>
-          <div style="font-size:15px; font-weight:700; color:var(--white); margin-bottom:4px;">Aula de Judô</div>
-          <div style="font-size:13px; color:var(--muted);">Data divulgada nas redes e no LINE</div>
-          <div style="font-size:12px; color:var(--muted); margin-top:4px;">Judô pra vencer no jiu-jitsu・Grátis membros / ¥2.000 visitantes</div>
-          <div style="margin-top:8px;"><span class="sched-tag st-judo">Judô</span></div>
-        </div>
-      </div>
-    </div>
-
-    <script>
-    function switchSchedTab(tab) {
-      ['adult','kids','other'].forEach(t => {
-        document.getElementById('sched-' + t).style.display = t === tab ? 'block' : 'none';
-        const btn = document.getElementById('stab-' + t);
-        if (t === tab) {
-          btn.style.background = 'var(--red)';
-          btn.style.color = 'white';
-        } else {
-          btn.style.background = '#1a1a1a';
-          btn.style.color = '#6a7490';
-        }
-      });
-    }
-    </script>
-
   </div>
 </section>
 
@@ -1134,6 +1162,20 @@ body::before {
     <span class="section-label fade-in">Pricing</span>
     <h2 class="section-title fade-in">Valores</h2>
     <p class="section-sub fade-in">Aceitamos pagamento online e outras formas de pagamento.</p>
+
+    <div class="campaign-box fade-in" style="margin-top:24px; margin-bottom:40px;">
+      <div style="position:absolute; right:-20px; top:50%; transform:translateY(-50%) rotate(90deg); font-family:var(--font-en); font-size:60px; color:rgba(196,30,30,0.06); line-height:1; pointer-events:none;">PAIR</div>
+      <div class="campaign-title">⚔ Venha com um amigo ou irmão</div>
+      <div class="campaign-items">
+        <div class="campaign-item">
+          <div>
+            <strong style="color:var(--white); font-size:15px;">Matrícula com 50% de desconto para os dois</strong><br>
+            <span style="font-size:13px; color:var(--muted);">Amigos, irmãos, pais e filhos — não importa quem. Ao se matricularem juntos, 2 pessoas ou mais, cada um paga metade da taxa de matrícula (¥5.000).</span>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:12px; color:var(--muted); margin-top:16px;">※Válido para matrículas feitas ao mesmo tempo, 2 pessoas ou mais. Entre em contato para mais detalhes.</div>
+    </div>
 
     <div class="pricing-grid">
       <div class="price-card fade-in">
@@ -1420,6 +1462,7 @@ body::before {
         <a href="#classes">Turmas</a>
         <a href="#pricing">Valores</a>
         <a href="instructors.html">Instrutores</a>
+        <a href="facility.html">Instalações</a>
         <a href="#qa">Dúvidas</a>
         <a href="#access">Acesso</a>
         <a href="https://www.instagram.com/jiujitsu_guild" target="_blank">Instagram</a>
