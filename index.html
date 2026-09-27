@@ -896,26 +896,6 @@ body::before {
 </div>
 
 <!-- =====================================================================
-     Pair Enrollment Banner（トップ付近・目立たせる）
-     ===================================================================== -->
-<div class="container" style="margin: 24px auto 56px; position:relative; z-index:1;">
-  <div class="campaign-box fade-in" style="margin-top:0;">
-    <div style="position:absolute; right:-20px; top:50%; transform:translateY(-50%) rotate(90deg); font-family:var(--font-en); font-size:60px; color:rgba(196,30,30,0.06); line-height:1; pointer-events:none;">PAIR</div>
-    <div class="campaign-title">⚔ お友達・ごきょうだいと一緒なら</div>
-    <div class="campaign-items">
-      <div class="campaign-item">
-        <div>
-          <strong style="color:var(--white); font-size:15px;">入会金がお二人とも半額になります</strong><br>
-          <span style="font-size:13px; color:var(--muted);">お友達・ごきょうだい・親子など、どなたとでも2名以上で同時にご入会いただく場合、お一人あたりの入会金が半額（5,000円）になります。</span>
-        </div>
-      </div>
-    </div>
-    <div style="font-size:12px; color:var(--muted); margin-top:16px;">※同時にご入会される2名様以上が対象です。詳しくはお問い合わせください。</div>
-  </div>
-</div>
-
-
-<!-- =====================================================================
      About
      ===================================================================== -->
 <section class="section" id="about">
@@ -973,12 +953,12 @@ body::before {
             <div class="achievement-item">初心者から競技選手まで幅広い指導実績</div>
             <div class="achievement-item">EVOX BJJ 出身</div>
           </div>
-        </div>
-        <div style="margin-top:20px; background:linear-gradient(135deg, rgba(196,30,30,0.15), rgba(196,30,30,0.05)); border:1px solid var(--red-dim); border-radius:6px; padding:22px 26px; box-shadow:0 0 30px rgba(196,30,30,0.12), inset 0 1px 0 rgba(255,255,255,0.05); position:relative; overflow:hidden;">
-          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:var(--red); margin-bottom:8px;">🏆 ACHIEVEMENT</div>
-          <div style="font-size:15px; color:var(--white); line-height:1.7;">
-            会員の<strong>壁谷亮佑選手</strong>が、IBJJF Asian Jiu-Jitsu Championship 2026にて
-            <strong style="color:#ff6b6b;">階級別・無差別級のダブルゴールド</strong>を獲得しました。
+          <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--border);">
+            <div style="font-family:var(--font-en); font-size:10px; letter-spacing:3px; color:var(--red); margin-bottom:6px;">🏆 GUILD ACHIEVEMENT</div>
+            <div style="font-size:13px; color:var(--muted); line-height:1.7;">
+              会員の<strong style="color:var(--white);">壁谷亮佑選手</strong>が、IBJJF Asian Jiu-Jitsu Championship 2026にて
+              <strong style="color:#ff6b6b;">階級別・無差別級のダブルゴールド</strong>を獲得しました。
+            </div>
           </div>
         </div>
       </div>
@@ -1200,115 +1180,6 @@ document.addEventListener('keydown', (e) => {
       </div>
     </div>
 
-    <!-- スケジュール表 -->
-    <h3 class="fade-in" style="font-family:var(--font-en); font-size:24px; letter-spacing:2px; margin-top:64px; margin-bottom:24px;">Weekly Schedule</h3>
-
-    <!-- タブ -->
-    <div class="fade-in" style="display:flex; gap:0; border-bottom:2px solid var(--border); margin-bottom:24px; flex-wrap:wrap;">
-      <button onclick="switchSchedTab('adult')" id="stab-adult"
-        style="padding:12px 24px; background:var(--red); color:white; border:none; cursor:pointer; font-family:var(--font-en); font-size:12px; letter-spacing:3px; text-transform:uppercase; border-radius:4px 4px 0 0; margin-right:4px; transition:all 0.2s;">
-        Adult
-      </button>
-      <button onclick="switchSchedTab('kids')" id="stab-kids"
-        style="padding:12px 24px; background:var(--gray-2,#1a1a1a); color:var(--muted); border:none; cursor:pointer; font-family:var(--font-en); font-size:12px; letter-spacing:3px; text-transform:uppercase; border-radius:4px 4px 0 0; margin-right:4px; transition:all 0.2s;">
-        Kids
-      </button>
-      <button onclick="switchSchedTab('other')" id="stab-other"
-        style="padding:12px 24px; background:var(--gray-2,#1a1a1a); color:var(--muted); border:none; cursor:pointer; font-family:var(--font-en); font-size:12px; letter-spacing:3px; text-transform:uppercase; border-radius:4px 4px 0 0; transition:all 0.2s;">
-        Open / Other
-      </button>
-    </div>
-
-    <!-- アダルト -->
-    <div id="sched-adult" class="fade-in">
-      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
-        <div style="background:var(--gray); border:1px solid var(--border); border-left:4px solid var(--red); border-radius:4px; padding:16px 18px;">
-          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:var(--red); margin-bottom:8px;">月曜日〜金曜日</div>
-          <div style="font-size:15px; font-weight:700; color:var(--white); margin-bottom:4px;">アダルトクラス</div>
-          <div style="font-size:13px; color:var(--muted);">20:30〜22:00</div>
-          <div style="margin-top:8px;"><span class="sched-tag st-adult">Adult</span></div>
-        </div>
-        <div style="background:var(--gray); border:1px solid var(--border); border-left:4px solid var(--red); border-radius:4px; padding:16px 18px;">
-          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:var(--red); margin-bottom:8px;">日曜日</div>
-          <div style="font-size:15px; font-weight:700; color:var(--white); margin-bottom:4px;">アダルトクラス</div>
-          <div style="font-size:13px; color:var(--muted);">18:00〜20:00</div>
-          <div style="margin-top:8px;"><span class="sched-tag st-adult">Adult</span></div>
-        </div>
-      </div>
-      <p style="font-size:12px; color:var(--muted); margin-top:12px;">週5日（月〜金）＋日曜開催。平日は20:30スタート。</p>
-    </div>
-
-    <!-- キッズ -->
-    <div id="sched-kids" style="display:none;">
-      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
-        <div style="background:var(--gray); border:1px solid var(--border); border-left:4px solid #1e6fc4; border-radius:4px; padding:16px 18px;">
-          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:#5599e0; margin-bottom:8px;">火曜日・木曜日・日曜日</div>
-          <div style="font-size:15px; font-weight:700; color:var(--white); margin-bottom:4px;">キッズAクラス</div>
-          <div style="font-size:13px; color:var(--muted);">火・木 19:00〜20:00</div>
-          <div style="font-size:13px; color:var(--muted);">日曜 10:30〜11:30</div>
-          <div style="font-size:12px; color:var(--muted); margin-top:4px;">9〜12歳</div>
-          <div style="margin-top:8px;"><span class="sched-tag st-kids-a">Kids A</span></div>
-        </div>
-        <div style="background:var(--gray); border:1px solid var(--border); border-left:4px solid #1ea874; border-radius:4px; padding:16px 18px;">
-          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:#40c890; margin-bottom:8px;">月曜日・水曜日・金曜日</div>
-          <div style="font-size:15px; font-weight:700; color:var(--white); margin-bottom:4px;">キッズBクラス</div>
-          <div style="font-size:13px; color:var(--muted);">19:00〜20:00</div>
-          <div style="font-size:12px; color:var(--muted); margin-top:4px;">13〜15歳</div>
-          <div style="margin-top:8px;"><span class="sched-tag st-kids-b">Kids B</span></div>
-        </div>
-        <div style="background:var(--gray); border:1px solid var(--border); border-left:4px solid #c48a1e; border-radius:4px; padding:16px 18px;">
-          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:#e0b040; margin-bottom:8px;">日曜日</div>
-          <div style="font-size:15px; font-weight:700; color:var(--white); margin-bottom:4px;">キッズCクラス</div>
-          <div style="font-size:13px; color:var(--muted);">13:00〜14:00</div>
-          <div style="font-size:12px; color:var(--muted); margin-top:4px;">6〜8歳・都度参加</div>
-          <div style="margin-top:8px;"><span class="sched-tag st-kids-c">Kids C</span></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- オープン・その他 -->
-    <div id="sched-other" style="display:none;">
-      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
-        <div style="background:var(--gray); border:1px solid var(--border); border-left:4px solid #8b1ec4; border-radius:4px; padding:16px 18px;">
-          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:#b060e0; margin-bottom:8px;">日曜日</div>
-          <div style="font-size:15px; font-weight:700; color:var(--white); margin-bottom:4px;">ギルドオープンマット</div>
-          <div style="font-size:13px; color:var(--muted);">14:30〜17:30</div>
-          <div style="font-size:12px; color:var(--muted); margin-top:4px;">所属不問・会員無料 / 外部2,000円</div>
-          <div style="margin-top:8px;"><span class="sched-tag st-open">Open Mat</span></div>
-        </div>
-        <div style="background:var(--gray); border:1px solid var(--border); border-left:4px solid #666; border-radius:4px; padding:16px 18px;">
-          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:#aaa; margin-bottom:8px;">土曜日</div>
-          <div style="font-size:15px; font-weight:700; color:var(--white); margin-bottom:4px;">プライベートクラス</div>
-          <div style="font-size:13px; color:var(--muted);">10:00〜19:00</div>
-          <div style="font-size:12px; color:var(--muted); margin-top:4px;">完全予約制・所属不問</div>
-          <div style="margin-top:8px;"><span class="sched-tag st-private">Private</span></div>
-        </div>
-        <div style="background:var(--gray); border:1px solid var(--border); border-left:4px solid #1ec4a8; border-radius:4px; padding:16px 18px;">
-          <div style="font-family:var(--font-en); font-size:11px; letter-spacing:3px; color:#40d8c0; margin-bottom:8px;">月1回開催</div>
-          <div style="font-size:15px; font-weight:700; color:var(--white); margin-bottom:4px;">柔道クラス</div>
-          <div style="font-size:13px; color:var(--muted);">日程はSNS・LINEで告知</div>
-          <div style="font-size:12px; color:var(--muted); margin-top:4px;">柔術で勝つための柔道・会員無料／外部2,000円</div>
-          <div style="margin-top:8px;"><span class="sched-tag st-judo">Judo</span></div>
-        </div>
-      </div>
-    </div>
-
-    <script>
-    function switchSchedTab(tab) {
-      ['adult','kids','other'].forEach(t => {
-        document.getElementById('sched-' + t).style.display = t === tab ? 'block' : 'none';
-        const btn = document.getElementById('stab-' + t);
-        if (t === tab) {
-          btn.style.background = 'var(--red)';
-          btn.style.color = 'white';
-        } else {
-          btn.style.background = '#1a1a1a';
-          btn.style.color = '#6a7490';
-        }
-      });
-    }
-    </script>
-
   </div>
 </section>
 
@@ -1320,6 +1191,20 @@ document.addEventListener('keydown', (e) => {
     <span class="section-label fade-in">Pricing</span>
     <h2 class="section-title fade-in">料金案内</h2>
     <p class="section-sub fade-in">支払いはオンライン決済または各種お支払い方法に対応しています。</p>
+
+    <div class="campaign-box fade-in" style="margin-top:24px; margin-bottom:40px;">
+      <div style="position:absolute; right:-20px; top:50%; transform:translateY(-50%) rotate(90deg); font-family:var(--font-en); font-size:60px; color:rgba(196,30,30,0.06); line-height:1; pointer-events:none;">PAIR</div>
+      <div class="campaign-title">⚔ お友達・ごきょうだいと一緒なら</div>
+      <div class="campaign-items">
+        <div class="campaign-item">
+          <div>
+            <strong style="color:var(--white); font-size:15px;">入会金がお二人とも半額になります</strong><br>
+            <span style="font-size:13px; color:var(--muted);">お友達・ごきょうだい・親子など、どなたとでも2名以上で同時にご入会いただく場合、お一人あたりの入会金が半額（5,000円）になります。</span>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:12px; color:var(--muted); margin-top:16px;">※同時にご入会される2名様以上が対象です。詳しくはお問い合わせください。</div>
+    </div>
 
     <div class="pricing-grid">
       <div class="price-card fade-in">
