@@ -135,6 +135,19 @@ body::before {
 }
 .nav-cta:hover { background: transparent; color: var(--red); box-shadow: none; }
 
+/* セクション内の「見る→」系リンク用（nav-ctaと見た目は同じだが、
+   モバイルでナビのCTAを消す規則に巻き込まれないよう独立させる） */
+.teaser-cta {
+  background: linear-gradient(135deg, #e02020, #C41E1E); color: var(--white);
+  padding: 8px 20px; border-radius: 4px;
+  font-size: 12px; letter-spacing: 2px;
+  text-decoration: none; font-family: var(--font-en);
+  transition: all 0.2s; border: 1px solid var(--red);
+  box-shadow: 0 4px 16px rgba(196,30,30,0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+  display: inline-block;
+}
+.teaser-cta:hover { background: transparent; color: var(--red); box-shadow: none; }
+
 /* ハンバーガー（モバイル） */
 .nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
 .nav-hamburger span { display: block; width: 24px; height: 2px; background: var(--white); transition: all 0.3s; }
@@ -976,7 +989,7 @@ body::before {
       <div style="font-size:20px; font-weight:700; color:var(--white);">指導するのは、現役の黒帯インストラクター</div>
       <div style="font-size:13px; color:var(--muted); margin-top:6px;">代表・コーチの経歴と指導方針をご紹介します</div>
     </div>
-    <a href="instructors.html" class="nav-cta" style="white-space:nowrap;">インストラクターを見る →</a>
+    <a href="instructors.html" class="teaser-cta" style="white-space:nowrap;">インストラクターを見る →</a>
   </div>
 </section>
 
