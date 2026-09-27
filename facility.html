@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" id="htmlRoot">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>施設紹介 | JIUJITSU GUILD 豊橋のブラジリアン柔術専門道場</title>
-<meta name="description" content="愛知県豊橋市吉川町のブラジリアン柔術専門道場「柔術ギルド」の施設紹介。マットエリア、エントランス、ギルドランキングモニターをご紹介します。">
+<title id="pageTitle">施設紹介 | JIUJITSU GUILD 豊橋のブラジリアン柔術専門道場</title>
+<meta name="description" id="pageDesc" content="愛知県豊橋市吉川町のブラジリアン柔術専門道場「柔術ギルド」の施設紹介。マットエリア、エントランス、ギルドランキングモニターをご紹介します。">
 <link rel="icon" type="image/jpeg" href="images/favicon.jpg">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -27,12 +27,22 @@ body { background: var(--black); color: var(--white); font-family: var(--font-jp
   display: flex; align-items: center; justify-content: space-between;
   padding: 20px 24px; border-bottom: 1px solid var(--border);
   position: sticky; top: 0; background: rgba(10,10,10,0.92);
-  backdrop-filter: blur(8px); z-index: 10;
+  backdrop-filter: blur(8px); z-index: 10; gap: 16px;
 }
-.logo { font-family: var(--font-en); font-size: 19px; letter-spacing: 2px; text-decoration: none; color: var(--white); }
+.logo { font-family: var(--font-en); font-size: 19px; letter-spacing: 2px; text-decoration: none; color: var(--white); flex-shrink: 0; }
 .logo span { color: var(--red); }
-.back-link { font-size: 13px; color: var(--muted); text-decoration: none; }
+.header-right { display: flex; align-items: center; gap: 16px; }
+.back-link { font-size: 13px; color: var(--muted); text-decoration: none; white-space: nowrap; }
 .back-link:hover { color: var(--white); }
+.lang-switch {
+  display: flex; border: 1px solid var(--border); border-radius: 20px; overflow: hidden;
+  flex-shrink: 0;
+}
+.lang-btn {
+  background: none; border: none; color: var(--muted); font-size: 12px; font-family: var(--font-en);
+  letter-spacing: 1px; padding: 6px 14px; cursor: pointer; transition: all 0.15s;
+}
+.lang-btn.active { background: var(--red); color: var(--white); }
 
 .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
 
@@ -72,7 +82,7 @@ body { background: var(--black); color: var(--white); font-family: var(--font-jp
 .info-title { font-family: var(--font-en); font-size: 18px; letter-spacing: 3px; color: var(--red); margin-bottom: 14px; }
 .info-row { display: flex; gap: 18px; padding: 12px 0; border-top: 1px solid var(--border); font-size: 14px; }
 .info-row:first-of-type { border-top: none; }
-.info-label { width: 90px; flex-shrink: 0; color: var(--muted); }
+.info-label { width: 100px; flex-shrink: 0; color: var(--muted); }
 .info-link { display: inline-block; margin-top: 10px; font-size: 13px; color: var(--red); text-decoration: none; }
 
 /* CTA */
@@ -126,14 +136,20 @@ body { background: var(--black); color: var(--white); font-family: var(--font-jp
 
 <header class="header">
   <a href="index.html" class="logo">JIUJITSU <span>GUILD</span></a>
-  <a href="index.html" class="back-link">← ホームに戻る</a>
+  <div class="header-right">
+    <div class="lang-switch">
+      <button class="lang-btn" id="langBtnJa" onclick="setLang('ja')">JP</button>
+      <button class="lang-btn" id="langBtnPt" onclick="setLang('pt')">PT</button>
+    </div>
+    <a href="index.html" class="back-link" id="backLink">← ホームに戻る</a>
+  </div>
 </header>
 
 <div class="wrap">
   <div class="hero">
     <div class="eyebrow">FACILITY</div>
-    <h1>施設紹介</h1>
-    <div class="sub">豊橋市吉川町のブラジリアン柔術専門道場</div>
+    <h1 id="heroTitle">施設紹介</h1>
+    <div class="sub" id="heroSub">豊橋市吉川町のブラジリアン柔術専門道場</div>
   </div>
 
   <!-- 写真はJS（下の facilityPhotos）から自動で並びます -->
@@ -141,97 +157,221 @@ body { background: var(--black); color: var(--white); font-family: var(--font-jp
 
   <div class="info">
     <div class="info-title">INFORMATION</div>
-    <div class="info-row"><span class="info-label">所在地</span><span>愛知県豊橋市吉川町13番2</span></div>
-    <div class="info-row"><span class="info-label">駐車場</span><span>敷地内 8台／徒歩1分以内に第二駐車場あり</span></div>
-    <a href="index.html#access" class="info-link">開館時間・アクセスの詳細はこちら →</a>
+    <div class="info-row"><span class="info-label" id="infoLabelAddr">所在地</span><span>愛知県豊橋市吉川町13番2</span></div>
+    <div class="info-row"><span class="info-label" id="infoLabelParking">駐車場</span><span id="infoParkingText">敷地内 8台／徒歩1分以内に第二駐車場あり</span></div>
+    <a href="index.html#access" class="info-link" id="infoLink">開館時間・アクセスの詳細はこちら →</a>
   </div>
 
   <div class="cta-box">
-    <a href="index.html#contact" class="btn-primary">⚔ 体験を予約する</a>
+    <a href="index.html#contact" class="btn-primary" id="ctaBtn">⚔ 体験を予約する</a>
   </div>
 </div>
 
 <div class="lightbox" id="lightbox" onclick="if(event.target===this) closeLb()">
-  <button class="lb-btn lb-close" onclick="closeLb()" aria-label="閉じる">×</button>
-  <button class="lb-btn lb-prev" onclick="navLb(-1)" aria-label="前の写真">‹</button>
+  <button class="lb-btn lb-close" onclick="closeLb()" id="lbCloseBtn" aria-label="閉じる">×</button>
+  <button class="lb-btn lb-prev" onclick="navLb(-1)" id="lbPrevBtn" aria-label="前の写真">‹</button>
   <img id="lbImg" src="" alt="">
-  <button class="lb-btn lb-next" onclick="navLb(1)" aria-label="次の写真">›</button>
+  <button class="lb-btn lb-next" onclick="navLb(1)" id="lbNextBtn" aria-label="次の写真">›</button>
   <div class="lightbox-caption" id="lbCaption"></div>
 </div>
 
 <footer class="footer">
-  <a href="index.html">ホーム</a>
-  <a href="instructors.html">インストラクター</a>
-  <a href="index.html#access">アクセス</a>
+  <a href="index.html" id="footHome">ホーム</a>
+  <a href="instructors.html" id="footInstructors">インストラクター</a>
+  <a href="index.html#access" id="footAccess">アクセス</a>
   <a href="https://www.instagram.com/jiujitsu_guild" target="_blank" rel="noopener">Instagram</a>
 </footer>
 
 <script>
-// ===== 施設写真 =====
+// =====================================================================
+// 施設写真（JP・PT共通データ）
 // 写真を追加する時は、この配列に1ブロック足すだけでOK（images/facility/ に写真を置く）
-// title：写真の見出し ／ desc：説明文 ／ note：補足（省略可）
+// title/desc は { ja, pt } で両言語を書く（片方が未記入でももう片方は表示されます）
+// note：補足（省略可、同じく { ja, pt }）
+// =====================================================================
 const facilityPhotos = [
   {
     src: 'images/facility/mat-01.jpg',
-    title: 'マットエリア',
-    desc: '白で統一した、広く明るいマットスペース。柔術・柔道・オープンマットまで、すべての練習をこのマットで行います。',
+    title: { ja: 'マットエリア', pt: 'Área do tatame' },
+    desc: {
+      ja: '白で統一した、広く明るいマットスペース。柔術・柔道・オープンマットまで、すべての練習をこのマットで行います。',
+      pt: 'Um tatame amplo e claro, todo em branco. Jiu-jitsu, judô e open mat — todo o treino acontece aqui.',
+    },
   },
   {
     src: 'images/facility/mat-02.jpg',
-    title: 'マットエリア（入口側）',
-    desc: 'エアコンとシーリングファンを備え、季節を問わず快適に練習できる環境を整えています。',
+    title: { ja: 'マットエリア（入口側）', pt: 'Área do tatame (lado da entrada)' },
+    desc: {
+      ja: 'エアコンとシーリングファンを備え、季節を問わず快適に練習できる環境を整えています。',
+      pt: 'Com ar-condicionado e ventilador de teto, pra treinar bem em qualquer época do ano.',
+    },
   },
   {
     src: 'images/facility/entrance.jpg',
-    title: 'エントランス',
-    desc: 'グリーンに囲まれた、落ち着いた雰囲気のエントランス。靴箱やベンチもあり、練習前後にひと息つけます。',
+    title: { ja: 'エントランス', pt: 'Entrada' },
+    desc: {
+      ja: 'グリーンに囲まれた、落ち着いた雰囲気のエントランス。靴箱やベンチもあり、練習前後にひと息つけます。',
+      pt: 'Uma entrada tranquila, cercada de verde. Tem sapateira e banco pra você relaxar antes ou depois do treino.',
+    },
   },
   {
     src: 'images/facility/reception.jpg',
-    title: '受付エリア',
-    desc: 'ギルドランキングモニターとチェックイン端末を設置した受付エリア。練習前に、ここでチェックインします。',
+    title: { ja: '受付エリア', pt: 'Recepção' },
+    desc: {
+      ja: 'ギルドランキングモニターとチェックイン端末を設置した受付エリア。練習前に、ここでチェックインします。',
+      pt: 'Aqui ficam o monitor de ranking do Guild e o totem de check-in. É por onde você passa antes de treinar.',
+    },
   },
   {
     src: 'images/facility/monitor-demo.png',
-    title: 'ギルドランキングモニター',
-    desc: 'ギルドカードでチェックインするだけで、月間・累計の練習回数を自動で集計。日々の積み重ねが、そのままランキングに表示されます。',
-    note: '※写真はデモ画面です。実際の会員名は表示していません。',
+    title: { ja: 'ギルドランキングモニター', pt: 'Monitor de ranking do Guild' },
+    desc: {
+      ja: 'NFCカードでチェックインするだけで、月間・累計の練習回数を自動で集計。日々の積み重ねが、そのままランキングに表示されます。',
+      pt: 'Basta fazer check-in com o cartão NFC: o sistema conta sozinho quantas vezes você treinou no mês e no total. Sua constância aparece direto no ranking.',
+    },
+    note: {
+      ja: '※写真はデモ画面です。実際の会員名は表示していません。',
+      pt: '※ Esta imagem é uma tela de demonstração. Nenhum nome real de aluno é exibido aqui.',
+    },
   },
   {
     src: 'images/facility/changing-room.jpg',
-    title: '更衣室',
-    desc: '更衣室は男女別です（写真左：女性更衣室、右：男性更衣室）。女性更衣室には女性専用トイレを併設しているので、女性の方も安心して通えます。手洗い場もあります。',
+    title: { ja: '更衣室', pt: 'Vestiário' },
+    desc: {
+      ja: '更衣室は男女別です（写真左：女性更衣室、右：男性更衣室）。女性更衣室には女性専用トイレを併設しているので、女性の方も安心して通えます。手洗い場もあります。',
+      pt: 'Vestiários separados por gênero (na foto: à esquerda o feminino, à direita o masculino). O vestiário feminino tem banheiro exclusivo, pra mais tranquilidade. Também tem pia pra lavar as mãos.',
+    },
   },
   {
     src: 'images/facility/toilet.jpg',
-    title: 'トイレ（マットエリア）',
-    desc: 'マットエリアにあるトイレは、男女共用です。練習の合間にもすぐに利用できます。',
+    title: { ja: 'トイレ（マットエリア）', pt: 'Banheiro (área do tatame)' },
+    desc: {
+      ja: 'マットエリアにあるトイレは、男女共用です。練習の合間にもすぐに利用できます。',
+      pt: 'O banheiro da área do tatame é compartilhado (unissex). Fica bem à mão durante o treino.',
+    },
   },
 ];
 
-const tour = document.getElementById('tour');
-if (facilityPhotos.length === 0) {
-  tour.innerHTML = '<div class="tour-empty">施設の写真は、現在準備中です。</div>';
-} else {
+// =====================================================================
+// UI文言（両言語）
+// =====================================================================
+const UI = {
+  ja: {
+    htmlLang: 'ja',
+    pageTitle: '施設紹介 | JIUJITSU GUILD 豊橋のブラジリアン柔術専門道場',
+    pageDesc: '愛知県豊橋市吉川町のブラジリアン柔術専門道場「柔術ギルド」の施設紹介。マットエリア、エントランス、ギルドランキングモニターをご紹介します。',
+    backLink: '← ホームに戻る',
+    heroTitle: '施設紹介',
+    heroSub: '豊橋市吉川町のブラジリアン柔術専門道場',
+    tourEmpty: '施設の写真は、現在準備中です。',
+    infoLabelAddr: '所在地',
+    infoLabelParking: '駐車場',
+    infoParkingText: '敷地内 8台／徒歩1分以内に第二駐車場あり',
+    infoLink: '開館時間・アクセスの詳細はこちら →',
+    ctaBtn: '⚔ 体験を予約する',
+    lbClose: '閉じる', lbPrev: '前の写真', lbNext: '次の写真',
+    footHome: 'ホーム', footInstructors: 'インストラクター', footAccess: 'アクセス',
+    zoomAria: (t) => `${t}を拡大`,
+    altPrefix: '柔術ギルド ',
+  },
+  pt: {
+    htmlLang: 'pt',
+    pageTitle: 'Instalações | JIUJITSU GUILD Academia de Jiu-Jitsu Brasileiro em Toyohashi',
+    pageDesc: 'Conheça as instalações do Jiujitsu Guild, academia de Jiu-Jitsu Brasileiro em Toyohashi, Aichi. Área do tatame, entrada e monitor de ranking do Guild.',
+    backLink: '← Voltar ao início',
+    heroTitle: 'Instalações',
+    heroSub: 'Academia de Jiu-Jitsu em Toyohashi-shi, Yoshikawa-cho',
+    tourEmpty: 'Fotos em breve.',
+    infoLabelAddr: 'Endereço',
+    infoLabelParking: 'Estacionamento',
+    infoParkingText: '8 vagas no local／2º estacionamento a 1 min a pé',
+    infoLink: 'Horários e detalhes de acesso →',
+    ctaBtn: '⚔ Agendar aula experimental',
+    lbClose: 'Fechar', lbPrev: 'Foto anterior', lbNext: 'Próxima foto',
+    footHome: 'Início', footInstructors: 'Instrutores', footAccess: 'Acesso',
+    zoomAria: (t) => `Ampliar: ${t}`,
+    altPrefix: 'Jiujitsu Guild ',
+  },
+};
+
+let currentLang = 'ja';
+
+function getInitialLang() {
+  const params = new URLSearchParams(location.search);
+  const q = params.get('lang');
+  if (q === 'pt' || q === 'ja') return q;
+  return 'ja';
+}
+
+function pick(field) {
+  // { ja, pt } オブジェクトから現在の言語を取り出す（片方が空でももう片方を表示）
+  if (!field) return '';
+  return field[currentLang] || field.ja || field.pt || '';
+}
+
+function renderTour() {
+  const tour = document.getElementById('tour');
+  const t = UI[currentLang];
+  if (facilityPhotos.length === 0) {
+    tour.innerHTML = `<div class="tour-empty">${t.tourEmpty}</div>`;
+    return;
+  }
+  tour.innerHTML = '';
   facilityPhotos.forEach((p, i) => {
+    const title = pick(p.title);
+    const desc = pick(p.desc);
+    const note = pick(p.note);
     const fig = document.createElement('figure');
     fig.className = 'tour-item';
     const num = String(i + 1).padStart(2, '0');
     fig.innerHTML = `
-      <button class="tour-photo" type="button" aria-label="${p.title}を拡大">
-        <img src="${p.src}" alt="柔術ギルド ${p.title}" ${i === 0 ? '' : 'loading="lazy"'}>
+      <button class="tour-photo" type="button" aria-label="${t.zoomAria(title)}">
+        <img src="${p.src}" alt="${t.altPrefix}${title}" ${i === 0 ? '' : 'loading="lazy"'}>
       </button>
       <figcaption class="tour-caption">
         <div class="tour-num">${num}</div>
         <div>
-          <div class="tour-title">${p.title}</div>
-          <div class="tour-desc">${p.desc || ''}</div>
-          ${p.note ? `<div class="tour-note">${p.note}</div>` : ''}
+          <div class="tour-title">${title}</div>
+          <div class="tour-desc">${desc}</div>
+          ${note ? `<div class="tour-note">${note}</div>` : ''}
         </div>
       </figcaption>`;
     fig.querySelector('.tour-photo').onclick = () => openLb(i);
     tour.appendChild(fig);
   });
+}
+
+function applyUI() {
+  const t = UI[currentLang];
+  document.getElementById('htmlRoot').lang = t.htmlLang;
+  document.getElementById('pageTitle').textContent = t.pageTitle;
+  document.getElementById('pageDesc').setAttribute('content', t.pageDesc);
+  document.getElementById('backLink').textContent = t.backLink;
+  document.getElementById('heroTitle').textContent = t.heroTitle;
+  document.getElementById('heroSub').textContent = t.heroSub;
+  document.getElementById('infoLabelAddr').textContent = t.infoLabelAddr;
+  document.getElementById('infoLabelParking').textContent = t.infoLabelParking;
+  document.getElementById('infoParkingText').textContent = t.infoParkingText;
+  document.getElementById('infoLink').textContent = t.infoLink;
+  document.getElementById('ctaBtn').textContent = t.ctaBtn;
+  document.getElementById('lbCloseBtn').setAttribute('aria-label', t.lbClose);
+  document.getElementById('lbPrevBtn').setAttribute('aria-label', t.lbPrev);
+  document.getElementById('lbNextBtn').setAttribute('aria-label', t.lbNext);
+  document.getElementById('footHome').textContent = t.footHome;
+  document.getElementById('footInstructors').textContent = t.footInstructors;
+  document.getElementById('footAccess').textContent = t.footAccess;
+  document.getElementById('langBtnJa').classList.toggle('active', currentLang === 'ja');
+  document.getElementById('langBtnPt').classList.toggle('active', currentLang === 'pt');
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  const url = new URL(location.href);
+  url.searchParams.set('lang', lang);
+  history.replaceState(null, '', url);
+  applyUI();
+  renderTour();
+  if (document.getElementById('lightbox').classList.contains('show')) renderLb();
 }
 
 let lbIndex = 0;
@@ -240,9 +380,10 @@ function closeLb() { document.getElementById('lightbox').classList.remove('show'
 function navLb(d) { lbIndex = (lbIndex + d + facilityPhotos.length) % facilityPhotos.length; renderLb(); }
 function renderLb() {
   const p = facilityPhotos[lbIndex];
+  const title = pick(p.title);
   const img = document.getElementById('lbImg');
-  img.src = p.src; img.alt = '柔術ギルド ' + p.title;
-  document.getElementById('lbCaption').textContent = p.title;
+  img.src = p.src; img.alt = UI[currentLang].altPrefix + title;
+  document.getElementById('lbCaption').textContent = title;
 }
 document.addEventListener('keydown', (e) => {
   if (!document.getElementById('lightbox').classList.contains('show')) return;
@@ -250,6 +391,11 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowLeft') navLb(-1);
   if (e.key === 'ArrowRight') navLb(1);
 });
+
+// 初期化
+currentLang = getInitialLang();
+applyUI();
+renderTour();
 </script>
 </body>
 </html>
