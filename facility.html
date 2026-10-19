@@ -159,6 +159,7 @@ body { background: var(--black); color: var(--white); font-family: var(--font-jp
     <div class="info-title">INFORMATION</div>
     <div class="info-row"><span class="info-label" id="infoLabelAddr">所在地</span><span>愛知県豊橋市吉川町13番2</span></div>
     <div class="info-row"><span class="info-label" id="infoLabelParking">駐車場</span><span id="infoParkingText">敷地内 約12台／第2駐車場 5台（G〜K区画・徒歩約3分）</span></div>
+    <div class="info-row"><span class="info-label" id="infoLabelParking2Map">第2駐車場</span><a href="https://goo.gl/maps/LxKpPKxV98rPjAKF6" target="_blank" rel="noopener" id="infoParking2Map">Googleマップで場所を見る →</a></div>
     <a href="index.html#access" class="info-link" id="infoLink">開館時間・アクセスの詳細はこちら →</a>
   </div>
 
@@ -266,6 +267,8 @@ const UI = {
     tourEmpty: '施設の写真は、現在準備中です。',
     infoLabelAddr: '所在地',
     infoLabelParking: '駐車場',
+    infoLabelParking2Map: '第2駐車場',
+    infoParking2Map: 'Googleマップで場所を見る →',
     infoParkingText: '敷地内 約12台／第2駐車場 5台（G〜K区画・徒歩約3分）',
     infoLink: '開館時間・アクセスの詳細はこちら →',
     ctaBtn: '⚔ 体験を予約する',
@@ -284,6 +287,8 @@ const UI = {
     tourEmpty: 'Fotos em breve.',
     infoLabelAddr: 'Endereço',
     infoLabelParking: 'Estacionamento',
+    infoLabelParking2Map: '2º estacionamento',
+    infoParking2Map: 'Ver no Google Maps →',
     infoParkingText: 'Cerca de 12 vagas no local／2º estacionamento com 5 vagas (G–K, a cerca de 3 min a pé)',
     infoLink: 'Horários e detalhes de acesso →',
     ctaBtn: '⚔ Agendar aula experimental',
@@ -352,6 +357,8 @@ function applyUI() {
   document.getElementById('infoLabelAddr').textContent = t.infoLabelAddr;
   document.getElementById('infoLabelParking').textContent = t.infoLabelParking;
   document.getElementById('infoParkingText').textContent = t.infoParkingText;
+  document.getElementById('infoLabelParking2Map').textContent = t.infoLabelParking2Map;
+  document.getElementById('infoParking2Map').textContent = t.infoParking2Map;
   document.getElementById('infoLink').textContent = t.infoLink;
   document.getElementById('ctaBtn').textContent = t.ctaBtn;
   document.getElementById('lbCloseBtn').setAttribute('aria-label', t.lbClose);
