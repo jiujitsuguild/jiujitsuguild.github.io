@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja" id="htmlRoot">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大会結果 | JIUJITSU GUILD 豊橋のブラジリアン柔術専門道場</title>
+<meta name="description" id="pageDesc" content="愛知県豊橋市のブラジリアン柔術専門道場「柔術ギルド」所属選手の大会結果。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://jiujitsuguild.github.io/results.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="大会結果 | 柔術ギルド JIUJITSU GUILD">
+<meta property="og:description" content="柔術ギルド所属選手の大会結果。ASJJF世界選手権、IBJJFアジア選手権、プロ柔術ART.8。愛知県豊橋市のブラジリアン柔術専門道場。">
+<meta property="og:url" content="https://jiujitsuguild.github.io/results.html">
+<meta property="og:image" content="https://jiujitsuguild.github.io/images/gi_back.jpg">
+<meta property="og:site_name" content="柔術ギルド JIUJITSU GUILD">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/jpeg" href="images/favicon.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root { --black:#0A0A0A; --white:#FFFFFF; --red:#C41E1E; --red-dim:#8B1515; --muted:#999; --border:#2a2a2a; --gray:#141414; --gray-2:#1c1c1c; --font-en:'Bebas Neue',sans-serif; --font-jp:'Noto Sans JP',sans-serif; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--black); color:var(--white); font-family:var(--font-jp); line-height:1.8; }
+.header { display:flex; align-items:center; justify-content:space-between; padding:20px 24px; border-bottom:1px solid var(--border); position:sticky; top:0; background:rgba(10,10,10,.92); backdrop-filter:blur(8px); z-index:10; gap:16px; }
+.logo { font-family:var(--font-en); font-size:19px; letter-spacing:2px; text-decoration:none; color:var(--white); flex-shrink:0; }
+.logo span { color:var(--red); }
+.header-right { display:flex; align-items:center; gap:16px; }
+.back-link { font-size:13px; color:var(--muted); text-decoration:none; white-space:nowrap; }
+.back-link:hover { color:var(--white); }
+.lang-switch { display:flex; border:1px solid var(--border); border-radius:20px; overflow:hidden; flex-shrink:0; }
+.lang-btn { background:none; border:none; color:var(--muted); font-size:12px; font-family:var(--font-en); letter-spacing:1px; padding:6px 14px; cursor:pointer; }
+.lang-btn.active { background:var(--red); color:var(--white); }
+.wrap { max-width:880px; margin:0 auto; padding:0 24px; }
+
+.hero { padding:72px 0 36px; text-align:center; }
+.eyebrow { font-family:var(--font-en); font-size:14px; letter-spacing:5px; color:var(--red); margin-bottom:14px; }
+.hero h1 { font-size:32px; font-weight:900; letter-spacing:1px; }
+.hero .sub { margin-top:14px; color:var(--muted); font-size:14px; }
+
+/* 集計 */
+.stats { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:8px 0 40px; }
+.stat { background:var(--gray); border:1px solid var(--border); padding:20px 12px; text-align:center; }
+.stat-num { font-family:var(--font-en); font-size:48px; line-height:1; color:var(--red); letter-spacing:1px; }
+.stat-label { margin-top:8px; font-size:12px; color:var(--muted); line-height:1.5; }
+
+/* 切り替え */
+.tabs { display:flex; justify-content:center; gap:8px; margin-bottom:28px; }
+.tab { background:none; border:1px solid var(--border); color:var(--muted); font-family:var(--font-jp); font-size:13px; padding:8px 22px; border-radius:20px; cursor:pointer; }
+.tab.active { background:var(--white); color:var(--black); border-color:var(--white); font-weight:700; }
+
+/* 大会カード */
+.list { display:flex; flex-direction:column; gap:20px; }
+.ev { background:var(--gray); border:1px solid var(--border); border-left:3px solid var(--red); padding:26px 28px 14px; }
+.ev-head { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; }
+.ev-name { font-size:20px; font-weight:900; line-height:1.4; }
+.ev-meta { font-size:12px; color:var(--muted); margin-top:2px; }
+.ev-badge { font-family:var(--font-en); font-size:15px; letter-spacing:2px; color:var(--red); border:1px solid var(--red-dim); padding:2px 12px; white-space:nowrap; }
+.ev-desc { font-size:13px; color:#bbb; margin:12px 0 10px; }
+.row { display:flex; justify-content:space-between; align-items:center; gap:14px; padding:14px 0; border-top:1px solid var(--border); flex-wrap:wrap; }
+.row:first-of-type { margin-top:8px; }
+.who { font-size:16px; font-weight:700; }
+.chips { display:flex; gap:6px; flex-wrap:wrap; }
+.chip { font-size:12px; font-weight:700; padding:3px 12px; border-radius:2px; border:1px solid var(--red); color:var(--white); background:var(--red); white-space:nowrap; }
+.chip.win { background:none; border-color:#555; color:#ddd; }
+
+/* 選手カード */
+.ath { background:var(--gray); border:1px solid var(--border); padding:24px 28px 12px; }
+.ath-name { font-size:20px; font-weight:900; }
+.ath-role { font-size:12px; color:var(--muted); margin-bottom:8px; }
+
+.note { margin-top:28px; font-size:12px; color:var(--muted); text-align:center; }
+.cta-box { margin:48px 0 80px; padding:44px 24px; text-align:center; border:1px solid var(--border); border-radius:8px; background:radial-gradient(ellipse at center, rgba(196,30,30,.08), transparent 70%); }
+.cta-lead { font-size:14px; color:#bbb; margin-bottom:20px; }
+.btn-primary { display:inline-block; font-weight:700; font-size:16px; letter-spacing:1px; background:var(--red); color:var(--white); padding:18px 44px; border-radius:4px; text-decoration:none; }
+.btn-primary:hover { background:#e02020; }
+.footer { text-align:center; padding:32px 24px; border-top:1px solid var(--border); font-size:12px; }
+.footer a { color:var(--muted); text-decoration:none; margin:0 10px; }
+.footer a:hover { color:var(--white); }
+@media (max-width:600px){
+  .back-link { display:none; } .header { padding:16px; }
+  .wrap { padding:0 16px; } .hero { padding:48px 0 24px; } .hero h1 { font-size:26px; }
+  .stat-num { font-size:38px; } .stat { padding:16px 6px; } .stat-label { font-size:11px; }
+  .ev, .ath { padding:20px 18px 8px; } .ev-name, .ath-name { font-size:18px; }
+  .row { flex-direction:column; align-items:flex-start; gap:8px; }
+}
+</style>
+</head>
+<body>
+<header class="header">
+  <a href="index.html" class="logo" id="logoLink">JIUJITSU <span>GUILD</span></a>
+  <div class="header-right">
+    <div class="lang-switch">
+      <button class="lang-btn" id="langBtnJa" onclick="setLang('ja')">JP</button>
+      <button class="lang-btn" id="langBtnPt" onclick="setLang('pt')">PT</button>
+    </div>
+    <a href="index.html" class="back-link" id="backLink">← ホームに戻る</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">RESULTS 2026</div>
+    <h1 id="heroTitle"></h1>
+    <div class="sub" id="heroSub"></div>
+  </div>
+  <div class="stats" id="stats"></div>
+  <div class="tabs">
+    <button class="tab active" id="tabEv" onclick="setView('ev')"></button>
+    <button class="tab" id="tabAth" onclick="setView('ath')"></button>
+  </div>
+  <div class="list" id="list"></div>
+  <p class="note" id="note"></p>
+  <div class="cta-box"><p class="cta-lead" id="ctaLead"></p><a href="index.html#contact" class="btn-primary" id="ctaBtn"></a></div>
+</div>
+<footer class="footer">
+  <a href="index.html" id="footHome"></a>
+  <a href="instructors.html" id="footIns"></a>
+  <a href="https://www.instagram.com/jiujitsu_guild" target="_blank" rel="noopener">Instagram</a>
+</footer>
+
+<script>
+/* ============================================================
+   大会結果データ（JP・PT共通）。結果が増えたら EVENTS に足すだけ。
+   kind: 'gold'=優勝（赤）／'win'=勝利（枠のみ）
+   ============================================================ */
+const EVENTS = [
+  { name:{ja:'ASJJF 世界選手権', pt:'Campeonato Mundial ASJJF'},
+    meta:{ja:'ASJJF主催', pt:'Organização ASJJF'},
+    badge:{ja:'優勝', pt:'CAMPEÕES'},
+    desc:{ja:'今年で日本開催がラストとなった世界選手権。出場したメンバーは全員が社会人で、仕事と両立しながらの優勝です。',
+          pt:'O último Mundial realizado no Japão. Todos os atletas do Guild que competiram trabalham em tempo integral, e conquistaram o título conciliando treino e trabalho.'},
+    results:[
+      {a:'matsuno', res:[{k:'gold',t:{ja:'階級別 優勝',pt:'Categoria · Campeã'}},{k:'gold',t:{ja:'無差別 優勝',pt:'Absoluto · Campeã'}}]},
+      {a:'kuroya',  res:[{k:'gold',t:{ja:'階級別 優勝',pt:'Categoria · Campeão'}}]},
+      {a:'kabeya',  res:[{k:'gold',t:{ja:'階級別 優勝',pt:'Categoria · Campeão'}}]} ]},
+  { name:{ja:'IBJJF アジア選手権 2026', pt:'IBJJF Asian Championship 2026'},
+    meta:{ja:'IBJJF主催', pt:'Organização IBJJF'},
+    badge:{ja:'ダブルゴールド', pt:'OURO DUPLO'},
+    desc:{ja:'アジア各国の選手が集まる大会で、階級別と無差別の両方を制しました。',
+          pt:'Em um campeonato que reúne atletas de toda a Ásia, venceu tanto a sua categoria quanto o absoluto.'},
+    results:[
+      {a:'kabeya', res:[{k:'gold',t:{ja:'階級別 優勝',pt:'Categoria · Campeão'}},{k:'gold',t:{ja:'無差別 優勝',pt:'Absoluto · Campeão'}}]} ]},
+  { name:{ja:'プロ柔術 ART.8', pt:'Pro Jiu-Jitsu ART.8'},
+    meta:{ja:'2026年11月1日｜碧南市芸術文化ホール｜ASJJF', pt:'1º de novembro de 2026 · Hekinan, Aichi · ASJJF'},
+    badge:{ja:'2名とも勝利', pt:'2 VITÓRIAS'},
+    desc:{ja:'トーナメントではなく、1試合ごとに勝敗を競うプロ柔術のワンマッチ。ギルドから代表と所属選手の2名が出場し、2名とも勝利しました。',
+          pt:'Um evento profissional de lutas únicas (sem chave de torneio). O Guild levou dois atletas, o representante e um aluno, e os dois venceram.'},
+    results:[
+      {a:'kabeya', res:[{k:'win',t:{ja:'勝利（ワンマッチ）',pt:'Vitória (luta única)'}}]},
+      {a:'lucas',  res:[{k:'win',t:{ja:'勝利（ワンマッチ）',pt:'Vitória (luta única)'}}]} ]},
+];
+const ATHLETES = {
+  kabeya:{ name:{ja:'壁谷亮佑',pt:'Kabeya'},       role:{ja:'柔術ギルド所属',pt:'Atleta do Guild'} },
+  matsuno:{name:{ja:'松野保奈朱',pt:'Matsuno'},     role:{ja:'柔術ギルド所属',pt:'Atleta do Guild'} },
+  kuroya:{ name:{ja:'黒谷善行',pt:'Kuroya'},       role:{ja:'インストラクター',pt:'Instrutor'} },
+  lucas:{  name:{ja:'ルーカス・タヒラ',pt:'Lucas Tahira'}, role:{ja:'代表・黒帯インストラクター',pt:'Fundador e instrutor faixa-preta'} },
+};
+const UI = {
+  ja:{ lang:'ja', title:'大会結果 | JIUJITSU GUILD 豊橋のブラジリアン柔術専門道場', desc:'愛知県豊橋市のブラジリアン柔術専門道場「柔術ギルド」所属選手の大会結果。',
+       back:'← ホームに戻る', home:'index.html', hero:'大会結果', sub:'柔術ギルド所属選手の、2026年の大会結果です。',
+       tabEv:'大会別', tabAth:'選手別',
+       stats:[['4','世界選手権\n優勝タイトル'],['2','アジア選手権\n金メダル'],['2','ART.8\n勝利']],
+       note:'結果は随時更新します。', ctaLead:'このメンバーと一緒に練習してみませんか？', cta:'⚔ 体験を予約する', footHome:'ホーム', footIns:'インストラクター' },
+  pt:{ lang:'pt-BR', title:'Resultados | JIUJITSU GUILD', desc:'Resultados dos atletas do Jiujitsu Guild, academia de jiu-jitsu brasileiro em Toyohashi, Aichi.',
+       back:'← Voltar ao início', home:'index-pt.html', hero:'Resultados', sub:'Resultados dos atletas do Jiujitsu Guild em 2026.',
+       tabEv:'Por campeonato', tabAth:'Por atleta',
+       stats:[['4','títulos no\nMundial'],['2','medalhas de ouro\nno Asiático'],['2','vitórias\nno ART.8']],
+       note:'Atualizamos os resultados com frequência.', ctaLead:'Quer treinar com esse time?', cta:'⚔ Agendar aula experimental', footHome:'Início', footIns:'Instrutores' },
+};
+let lang='ja', view='ev';
+const q=new URLSearchParams(location.search).get('lang'); if(q==='pt'||q==='ja') lang=q;
+const $=id=>document.getElementById(id);
+const chips=r=>`<div class="chips">${r.map(x=>`<span class="chip ${x.k==='win'?'win':''}">${x.t[lang]}</span>`).join('')}</div>`;
+
+function render(){
+  const t=UI[lang];
+  document.documentElement.lang=t.lang; document.title=t.title; $('pageDesc').setAttribute('content',t.desc);
+  $('heroTitle').textContent=t.hero; $('heroSub').textContent=t.sub;
+  $('backLink').textContent=t.back; $('backLink').href=t.home; $('logoLink').href=t.home;
+  $('tabEv').textContent=t.tabEv; $('tabAth').textContent=t.tabAth;
+  $('tabEv').classList.toggle('active',view==='ev'); $('tabAth').classList.toggle('active',view==='ath');
+  $('note').textContent=t.note; $('ctaLead').textContent=t.ctaLead; $('ctaBtn').textContent=t.cta; $('ctaBtn').href=t.home+'#contact';
+  $('footHome').textContent=t.footHome; $('footHome').href=t.home; $('footIns').textContent=t.footIns;
+  $('langBtnJa').classList.toggle('active',lang==='ja'); $('langBtnPt').classList.toggle('active',lang==='pt');
+  $('stats').innerHTML=t.stats.map(([n,l])=>`<div class="stat"><div class="stat-num">${n}</div><div class="stat-label">${l.replace('\n','<br>')}</div></div>`).join('');
+  if(view==='ev'){
+    $('list').innerHTML=EVENTS.map(e=>`<div class="ev"><div class="ev-head"><div><div class="ev-name">${e.name[lang]}</div><div class="ev-meta">${e.meta[lang]}</div></div><div class="ev-badge">${e.badge[lang]}</div></div><p class="ev-desc">${e.desc[lang]}</p>${e.results.map(r=>`<div class="row"><div class="who">${ATHLETES[r.a].name[lang]}</div>${chips(r.res)}</div>`).join('')}</div>`).join('');
+  } else {
+    const by={}; EVENTS.forEach(e=>e.results.forEach(r=>{(by[r.a]=by[r.a]||[]).push({ev:e.name[lang],res:r.res});}));
+    const order=['kabeya','matsuno','kuroya','lucas'];
+    $('list').innerHTML=order.filter(a=>by[a]).map(a=>`<div class="ath"><div class="ath-name">${ATHLETES[a].name[lang]}</div><div class="ath-role">${ATHLETES[a].role[lang]}</div>${by[a].map(x=>`<div class="row"><div class="who" style="font-size:14px;font-weight:500">${x.ev}</div>${chips(x.res)}</div>`).join('')}</div>`).join('');
+  }
+}
+function setLang(l){ lang=l; const u=new URL(location.href); u.searchParams.set('lang',l); history.replaceState(null,'',u); render(); }
+function setView(v){ view=v; render(); }
+render();
+</script>
+</body>
+</html>
