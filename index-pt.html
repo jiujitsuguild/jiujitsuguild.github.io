@@ -484,6 +484,8 @@ body::before {
 .class-card.kids-c::before { background: linear-gradient(90deg, #c48a1e, #8b5e10); }
 .class-card.open::before   { background: linear-gradient(90deg, #8b1ec4, #5e0d8b); }
 .class-card.private::before { background: linear-gradient(90deg, var(--muted), #555); }
+.class-card.morning::before { background: linear-gradient(90deg, #e0a030, #a86f10); }
+.class-card.morning .class-tag { background: rgba(224,160,48,0.15); color: #e8b44f; border: 1px solid rgba(224,160,48,0.3); }
 .class-card.judo::before   { background: linear-gradient(90deg, #1ec4a8, #0d8b74); }
 
 .class-card:hover {
@@ -867,8 +869,8 @@ body::before {
       Onde quem tem técnica se conecta — agora também de manhã. Iniciante ou de outra equipe, todo mundo continua sendo bem-vindo.
     </p>
     <div class="morning-footer">
-      <span class="morning-badge">COMING 2027</span>
-      <span class="morning-note">Os horários serão divulgados em breve.</span>
+      <span class="morning-badge">A PARTIR DE 4/1/2027</span>
+      <span class="morning-note">Seg a sex, 10:45-12:15</span>
     </div>
   </div>
 </div>
@@ -1043,6 +1045,20 @@ document.addEventListener('keydown', (e) => {
     <p class="section-sub fade-in" style="margin-top:8px; color:var(--red);">Para as turmas infantis, uma visita para conhecer já é bem-vinda. Venha ver o clima do tatame de perto.</p>
 
     <div class="classes-grid">
+      <!-- Aula da manhã (a partir de 4/1/2027) -->
+      <div class="class-card morning fade-in">
+        <span class="class-tag">Manhã</span>
+        <div class="class-name">Aula da Manhã</div>
+        <div class="class-age">A partir de 16 anos ／ Iniciante ao competidor ／ Começa em 4 de janeiro de 2027</div>
+        <div class="class-desc">Pra quem não consegue treinar à noite, sai do turno da noite ou quer começar o dia no tatame. Quem é aluno treina sem pagar nada a mais, e visitantes também são bem-vindos.</div>
+        <div class="class-schedule">
+          <strong>Dias úteis (seg-sex)</strong> 10:45-12:15
+        </div>
+        <div class="class-price">
+          <span class="class-price-num" style="font-size:16px;">Já incluída na mensalidade</span>
+        </div>
+      </div>
+
       <!-- アダルト -->
       <div class="class-card adult fade-in">
         <span class="class-tag">Adulto</span>
@@ -1361,7 +1377,8 @@ document.addEventListener('keydown', (e) => {
           <div>
             <div class="access-label">Horário de Funcionamento</div>
             <div class="access-value">
-              Dias úteis (seg-sex) 18:30-22:30<br>
+              Dias úteis (seg-sex) 10:15-12:45 ／ 18:30-23:00<br>
+              Seg, qua e sex 22:00-22:40 Free Sparring<br>
               Domingo 10:00-20:30<br>
               Sábado apenas Aula Particular (com reserva)
             </div>

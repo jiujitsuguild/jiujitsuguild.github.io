@@ -488,6 +488,8 @@ body::before {
 .class-card.kids-c::before { background: linear-gradient(90deg, #c48a1e, #8b5e10); }
 .class-card.open::before   { background: linear-gradient(90deg, #8b1ec4, #5e0d8b); }
 .class-card.private::before { background: linear-gradient(90deg, var(--muted), #555); }
+.class-card.morning::before { background: linear-gradient(90deg, #e0a030, #a86f10); }
+.class-card.morning .class-tag { background: rgba(224,160,48,0.15); color: #e8b44f; border: 1px solid rgba(224,160,48,0.3); }
 .class-card.judo::before   { background: linear-gradient(90deg, #1ec4a8, #0d8b74); }
 
 .class-card:hover {
@@ -908,8 +910,8 @@ body::before {
       技術を持つ者が集まり、技術で語り合う場所。その輪を、朝にも広げていきます。初めての方も、他ジム所属の方も、これまで通り歓迎です。
     </p>
     <div class="morning-footer">
-      <span class="morning-badge">COMING 2027</span>
-      <span class="morning-note">スケジュールは後日公開します。</span>
+      <span class="morning-badge">2027.1.4 START</span>
+      <span class="morning-note">月〜金 10:45〜12:15</span>
     </div>
   </div>
 </div>
@@ -1086,6 +1088,20 @@ document.addEventListener('keydown', (e) => {
     <p class="section-sub fade-in" style="margin-top:8px; color:var(--red);">お子様のクラスは、まず見学だけでも大歓迎です。実際のマットの雰囲気を、ぜひ一度見にきてください。</p>
 
     <div class="classes-grid">
+      <!-- 朝クラス（2027.1.4〜） -->
+      <div class="class-card morning fade-in">
+        <span class="class-tag">Morning</span>
+        <div class="class-name">朝クラス</div>
+        <div class="class-age">16歳以上 ／ 初心者〜競技者 ／ 2027年1月4日スタート</div>
+        <div class="class-desc">仕事や家庭の都合で夜に来られない方、夜勤明けや一日のはじまりに体を動かしたい方へ。会員の方は追加料金なしで参加できます。ビジターの方も参加できます。</div>
+        <div class="class-schedule">
+          <strong>平日（月〜金）</strong> 10:45〜12:15
+        </div>
+        <div class="class-price">
+          <span class="class-price-num" style="font-size:16px;">会員は月会費に含まれます</span>
+        </div>
+      </div>
+
       <!-- アダルト -->
       <div class="class-card adult fade-in">
         <span class="class-tag">アダルト</span>
@@ -1405,7 +1421,8 @@ document.addEventListener('keydown', (e) => {
           <div>
             <div class="access-label">開館時間</div>
             <div class="access-value">
-              平日（月〜金） 18:30〜22:30<br>
+              平日（月〜金） 10:15〜12:45 ／ 18:30〜23:00<br>
+              月・水・金 22:00〜22:40 フリースパー<br>
               日曜 10:00〜20:30<br>
               土曜 プライベートクラスのみ（予約制）
             </div>
