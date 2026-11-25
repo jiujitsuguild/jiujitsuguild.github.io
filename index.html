@@ -1234,7 +1234,8 @@ document.addEventListener('keydown', (e) => {
       </div>
     </div>
 
-    <div class="campaign-box fade-in" style="margin-top:24px; margin-bottom:40px;">
+    <!-- ペア入会金半額: 入会金無料キャンペーン終了後(2027-02-01)に自動再開 -->
+    <div class="campaign-box fade-in" data-resume-from="2027-02-01" style="display:none; margin-top:24px; margin-bottom:40px;">
       <div style="position:absolute; right:-20px; top:50%; transform:translateY(-50%) rotate(90deg); font-family:var(--font-en); font-size:60px; color:rgba(196,30,30,0.06); line-height:1; pointer-events:none;">PAIR</div>
       <div class="campaign-title">⚔ お友達・ごきょうだいと一緒なら</div>
       <div class="campaign-items">
@@ -1598,5 +1599,15 @@ window.addEventListener('scroll', () => {
 });
 </script>
 
+<script>
+/* 一時停止中の告知：data-resume-from の日付(日本時間0:00)になると自動で表示される */
+(function(){
+  try {
+    document.querySelectorAll('[data-resume-from]').forEach(function(el){
+      if (Date.now() >= Date.parse(el.getAttribute('data-resume-from') + 'T00:00:00+09:00')) el.style.display = '';
+    });
+  } catch(e) {}
+})();
+</script>
 </body>
 </html>
